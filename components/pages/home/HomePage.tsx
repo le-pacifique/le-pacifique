@@ -18,7 +18,7 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
   const { overview = [], showcaseProjects = [], title = '' } = data ?? {}
 
   return (
-    <div className="space-y-20 h-full w-full flex items-center justify-center">
+    <div className="h-full w-full flex items-center justify-center">
       <div className="absolute inset-0 bg-homepage-pattern bg-cover bg-center blur-sm md:blur-md"></div>
 
       {/* Header */}
