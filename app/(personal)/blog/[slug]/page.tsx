@@ -4,10 +4,10 @@ import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { toPlainText } from 'next-sanity'
 
-import { ProjectPage } from '@/components/pages/project/ProjectPage'
+import ArticlePage from '@/components/pages/article/ArticlePage'
 import { urlForOpenGraphImage } from '@/sanity/lib/utils'
 import { generateStaticSlugs } from '@/sanity/loader/generateStaticSlugs'
-import { loadProject } from '@/sanity/loader/loadQuery'
+import { loadArticle } from '@/sanity/loader/loadQuery'
 const ProjectPreview = dynamic(
   () => import('@/components/pages/project/ProjectPreview'),
 )
@@ -20,13 +20,15 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  const { data: project } = await loadProject(params.slug)
-  const ogImage = urlForOpenGraphImage(project?.coverImage)
+  const { data: article } = await loadArticle(params.slug)
+  const ogImage = article?.coverImage?.asset
+    ? urlForOpenGraphImage({ _ref: article.coverImage.asset._ref })
+    : null
 
   return {
-    title: project?.title,
-    description: project?.overview
-      ? toPlainText(project.overview)
+    title: article?.title,
+    description: article?.excerpt
+      ? toPlainText(article.excerpt)
       : (await parent).description,
     openGraph: ogImage
       ? {
@@ -37,11 +39,11 @@ export async function generateMetadata(
 }
 
 export function generateStaticParams() {
-  return generateStaticSlugs('project')
+  return generateStaticSlugs('artist')
 }
 
-export default async function ProjectSlugRoute({ params }: Props) {
-  const initial = await loadProject(params.slug)
+export default async function ArticleSlugRoute({ params }: Props) {
+  const initial = await loadArticle(params.slug)
 
   // if (draftMode().isEnabled) {
   //   return <ProjectPreview params={params} initial={initial} />
@@ -51,5 +53,5 @@ export default async function ProjectSlugRoute({ params }: Props) {
     notFound()
   }
 
-  return <ProjectPage data={initial.data} />
+  return <ArticlePage data={initial.data} />
 }

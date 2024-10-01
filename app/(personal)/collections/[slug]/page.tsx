@@ -4,10 +4,11 @@ import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { toPlainText } from 'next-sanity'
 
-import { ProjectPage } from '@/components/pages/project/ProjectPage'
+import ArtistPage from '@/components/pages/artist/ArtistPage'
 import { urlForOpenGraphImage } from '@/sanity/lib/utils'
 import { generateStaticSlugs } from '@/sanity/loader/generateStaticSlugs'
-import { loadProject } from '@/sanity/loader/loadQuery'
+import { loadCollection } from '@/sanity/loader/loadQuery'
+import CollectionPage from '@/components/pages/collection/CollectionPage'
 const ProjectPreview = dynamic(
   () => import('@/components/pages/project/ProjectPreview'),
 )
@@ -20,13 +21,13 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  const { data: project } = await loadProject(params.slug)
-  const ogImage = urlForOpenGraphImage(project?.coverImage)
+  const { data: collection } = await loadCollection(params.slug)
+  const ogImage = urlForOpenGraphImage(collection?.image)
 
   return {
-    title: project?.title,
-    description: project?.overview
-      ? toPlainText(project.overview)
+    title: collection?.title,
+    description: collection?.overview
+      ? toPlainText(collection.overview)
       : (await parent).description,
     openGraph: ogImage
       ? {
@@ -37,11 +38,12 @@ export async function generateMetadata(
 }
 
 export function generateStaticParams() {
-  return generateStaticSlugs('project')
+  return generateStaticSlugs('collection')
 }
 
-export default async function ProjectSlugRoute({ params }: Props) {
-  const initial = await loadProject(params.slug)
+export default async function CollectionSlugRoute({ params }: Props) {
+  const initial = await loadCollection(params.slug)
+  console.log(initial.data, 'initial.data')
 
   // if (draftMode().isEnabled) {
   //   return <ProjectPreview params={params} initial={initial} />
@@ -51,5 +53,5 @@ export default async function ProjectSlugRoute({ params }: Props) {
     notFound()
   }
 
-  return <ProjectPage data={initial.data} />
+  return <CollectionPage data={initial.data} />
 }

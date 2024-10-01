@@ -4,10 +4,10 @@ import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { toPlainText } from 'next-sanity'
 
-import { ProjectPage } from '@/components/pages/project/ProjectPage'
+import ArtistPage from '@/components/pages/artist/ArtistPage'
 import { urlForOpenGraphImage } from '@/sanity/lib/utils'
 import { generateStaticSlugs } from '@/sanity/loader/generateStaticSlugs'
-import { loadProject } from '@/sanity/loader/loadQuery'
+import { loadArtist } from '@/sanity/loader/loadQuery'
 const ProjectPreview = dynamic(
   () => import('@/components/pages/project/ProjectPreview'),
 )
@@ -20,13 +20,13 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  const { data: project } = await loadProject(params.slug)
-  const ogImage = urlForOpenGraphImage(project?.coverImage)
+  const { data: artist } = await loadArtist(params.slug)
+  const ogImage = urlForOpenGraphImage(artist?.image)
 
   return {
-    title: project?.title,
-    description: project?.overview
-      ? toPlainText(project.overview)
+    title: artist?.name,
+    description: artist?.overview
+      ? toPlainText(artist.overview)
       : (await parent).description,
     openGraph: ogImage
       ? {
@@ -37,11 +37,11 @@ export async function generateMetadata(
 }
 
 export function generateStaticParams() {
-  return generateStaticSlugs('project')
+  return generateStaticSlugs('artist')
 }
 
-export default async function ProjectSlugRoute({ params }: Props) {
-  const initial = await loadProject(params.slug)
+export default async function ArtistSlugRoute({ params }: Props) {
+  const initial = await loadArtist(params.slug)
 
   // if (draftMode().isEnabled) {
   //   return <ProjectPreview params={params} initial={initial} />
@@ -51,5 +51,5 @@ export default async function ProjectSlugRoute({ params }: Props) {
     notFound()
   }
 
-  return <ProjectPage data={initial.data} />
+  return <ArtistPage data={initial.data} />
 }

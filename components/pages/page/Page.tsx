@@ -7,12 +7,13 @@ export interface PageProps {
 }
 
 export function Page({ data }: PageProps) {
+  console.log(data)
   // Default to an empty object to allow previews on non-existent documents
   const { body, overview, title } = data ?? {}
 
   return (
     <div>
-      <div className="mb-14">
+      <div className="mb-14 h-36 flex justify-center items-center">
         {/* Header */}
         <Header title={title} description={overview} />
 
@@ -24,7 +25,7 @@ export function Page({ data }: PageProps) {
           />
         )}
       </div>
-      <div className="absolute left-0 w-screen border-t" />
+      {/* <div className="absolute left-0 w-screen border-t" /> */}
     </div>
   )
 }

@@ -60,6 +60,66 @@ export const pageStructure = (
 
     return S.list()
       .title('Content')
-      .items([...singletonItems, S.divider(), ...defaultListItems])
+      .items([
+        ...singletonItems,
+        S.divider(),
+        S.listItem()
+          .title('Articles')
+          .schemaType('article')
+          .child(S.documentTypeList('article').title('Articles')),
+        S.listItem()
+          .title('Artists')
+          .schemaType('artist')
+          .child(S.documentTypeList('artist').title('Artists')),
+        S.listItem()
+          .title('Collections')
+          .schemaType('collection')
+          .child(S.documentTypeList('collection').title('Collections')),
+        S.listItem()
+          .title('Releases')
+          .schemaType('release')
+          .child(S.documentTypeList('release').title('Releases')),
+        S.listItem()
+          .title('Merch')
+          .child(
+            S.list()
+              .title('Merch Types')
+              .items([
+                S.listItem()
+                  .title('Vinyl')
+                  .child(
+                    S.documentTypeList('merch')
+                      .title('Vinyl')
+                      .filter('_type == "merch" && type == "vinyl"'),
+                  ),
+                S.listItem()
+                  .title('Tapes')
+                  .child(
+                    S.documentTypeList('merch')
+                      .title('Tapes')
+                      .filter('_type == "merch" && type == "tapes"'),
+                  ),
+                S.listItem()
+                  .title('Clothes')
+                  .child(
+                    S.documentTypeList('merch')
+                      .title('Clothes')
+                      .filter('_type == "merch" && type == "clothes"'),
+                  ),
+                S.listItem()
+                  .title('Bibelots')
+                  .child(
+                    S.documentTypeList('merch')
+                      .title('Bibelots')
+                      .filter('_type == "merch" && type == "bibelots"'),
+                  ),
+              ]),
+          ),
+        S.divider(),
+        S.listItem()
+          .title('Pages')
+          .schemaType('page')
+          .child(S.documentTypeList('page').title('Pages')),
+      ])
   }
 }

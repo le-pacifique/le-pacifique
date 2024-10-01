@@ -5,17 +5,28 @@ import { draftMode } from 'next/headers'
 
 import { client } from '@/sanity/lib/client'
 import {
+  artistBySlugQuery,
+  collectionBySlugQuery,
   homePageQuery,
   pagesBySlugQuery,
   projectBySlugQuery,
+  releaseBySlugQuery,
+  merchBySlugQuery,
+  articleBySlugQuery,
   settingsQuery,
+  simplifiedPagesBySlugQuery,
 } from '@/sanity/lib/queries'
 import { token } from '@/sanity/lib/token'
 import {
+  ArtistPayload,
+  ArticlePayload,
+  ReleasePayload,
+  CollectionPayload,
   HomePagePayload,
   PagePayload,
   ProjectPayload,
   SettingsPayload,
+  MerchPayload,
 } from '@/types'
 
 const serverClient = client.withConfig({
@@ -86,10 +97,50 @@ export function loadProject(slug: string) {
   )
 }
 
+export function loadArtist(slug: string) {
+  return loadQuery<ArtistPayload | null>(
+    artistBySlugQuery,
+    { slug },
+    { next: { tags: [`artist:${slug}`] } },
+  )
+}
+
+export function loadCollection(slug: string) {
+  return loadQuery<CollectionPayload | null>(
+    collectionBySlugQuery,
+    { slug },
+    { next: { tags: [`collection:${slug}`] } },
+  )
+}
+
 export function loadPage(slug: string) {
   return loadQuery<PagePayload | null>(
     pagesBySlugQuery,
     { slug },
     { next: { tags: [`page:${slug}`] } },
+  )
+}
+
+export function loadRelease(slug: string) {
+  return loadQuery<ReleasePayload | null>(
+    releaseBySlugQuery,
+    { slug },
+    { next: { tags: [`release:${slug}`] } },
+  )
+}
+
+export function loadArticle(slug: string) {
+  return loadQuery<ArticlePayload | null>(
+    articleBySlugQuery,
+    { slug },
+    { next: { tags: [`article:${slug}`] } },
+  )
+}
+
+export function loadMerch(slug: string) {
+  return loadQuery<MerchPayload | null>(
+    merchBySlugQuery,
+    { slug },
+    { next: { tags: [`merch:${slug}`] } },
   )
 }

@@ -42,6 +42,109 @@ export interface PagePayload {
   overview?: PortableTextBlock[]
   title?: string
   slug?: string
+  artists?: ArtistPayload[]
+  collections?: CollectionPayload[]
+  articles?: ArticlePayload[]
+  releases?: ReleasePayload[]
+  merch?: MerchPayload[]
+}
+
+export interface ArtistPayload {
+  _id: string
+  name: string
+  image: any
+  biography: string
+  links: string[]
+  slug?: {
+    current: string
+  }
+  _type?: string
+  overview?: PortableTextBlock[]
+}
+
+export interface ReleasePayload {
+  _id: string
+  image: any
+  title: string
+  catalogNumber: string
+  releaseDate: string
+  genres: string[]
+  description: PortableTextBlock[]
+  tracklist: Track[]
+  credits: Credits
+  slug: {
+    current: string
+  }
+  _type: string
+  bandcampPlayer: string
+}
+
+export type ArticlePayload = {
+  _id: string
+  title: string
+  slug?: {
+    current: string
+  }
+  _type?: string
+  backgroundColor?: string
+  excerpt?: PortableTextBlock[]
+  coverImage?: {
+    asset: {
+      _ref: string
+    }
+    alt?: string
+    caption?: string
+  }
+  date: string
+  content: Array<
+    | {
+        _type: 'block'
+        children: Array<{ text: string }>
+      }
+    | {
+        _type: 'image'
+        asset: {
+          _ref: string
+        }
+        alt?: string
+        caption?: string
+      }
+    | {
+        _type: 'embed'
+        url: string
+      }
+  >
+}
+
+export interface CollectionPayload {
+  _id: string
+  image: any
+  title: string
+  artists: string[]
+  releaseDate: string
+  genres: string[]
+  description: PortableTextBlock[]
+  tracklist: Track[]
+  credits: Credits
+  slug?: {
+    current: string
+  }
+  _type?: string
+  overview?: PortableTextBlock[]
+  releases: ReleasePayload[]
+}
+
+export interface Track {
+  title: string
+  duration: string
+}
+
+export interface Credits {
+  writtenBy: string[]
+  masteringBy: string
+  photoAndDrawingBy: string[]
+  graphicDesign: string
+  text: string
 }
 
 export interface ProjectPayload {
@@ -63,4 +166,20 @@ export interface SettingsPayload {
   footer?: PortableTextBlock[]
   menuItems?: MenuItem[]
   ogImage?: Image
+}
+
+export type MerchPayload = {
+  _id: string
+  name: string
+  price: number
+  stock: number
+  type: 'vinyl' | 'tapes' | 'clothes' | 'bibelots'
+  photo: {
+    asset: {
+      _ref: string
+    }
+    alt?: string
+  }
+  artist?: string // For VINYL and TAPES
+  design?: string // For CLOTHES and BIBELOTS
 }

@@ -1,5 +1,6 @@
 import { HomeIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
+import { ColorInput } from '@sanity/color-input'
 
 export default defineType({
   name: 'home',
@@ -42,45 +43,31 @@ export default defineType({
               },
             ],
             decorators: [
-              {
-                title: 'Italic',
-                value: 'em',
-              },
-              {
-                title: 'Strong',
-                value: 'strong',
-              },
+              { title: 'Strong', value: 'strong' },
+              { title: 'Emphasis', value: 'em' },
             ],
           },
-          styles: [],
           type: 'block',
         }),
       ],
-      validation: (rule) => rule.max(155).required(),
     }),
     defineField({
-      name: 'showcaseProjects',
-      title: 'Showcase projects',
-      description:
-        'These are the projects that will appear first on your landing page.',
-      type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'reference',
-          to: [{ type: 'project' }],
-        }),
-      ],
+      name: 'backgroundColor',
+      title: 'Background Color',
+      type: 'color',
+      description: 'The background color of the homepage.',
+      options: {
+        disableAlpha: true, // Disable alpha channel if not needed
+      },
+    }),
+    defineField({
+      name: 'backgroundImage',
+      title: 'Background Image',
+      type: 'image',
+      description: 'The background image of the homepage.',
+      options: {
+        hotspot: true,
+      },
     }),
   ],
-  preview: {
-    select: {
-      title: 'title',
-    },
-    prepare({ title }) {
-      return {
-        subtitle: 'Home',
-        title,
-      }
-    },
-  },
 })

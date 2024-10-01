@@ -115,6 +115,54 @@ export default defineType({
         }),
       ],
     }),
+    defineField({
+      name: 'artists',
+      title: 'Artists',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{ type: 'artist' }],
+        }),
+      ],
+      hidden: ({ parent }) => parent?.slug?.current !== 'artists',
+    }),
+    defineField({
+      name: 'collections',
+      title: 'Collections',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{ type: 'collection' }],
+        }),
+      ],
+      hidden: ({ parent }) => parent?.slug?.current !== 'collections',
+    }),
+    defineField({
+      name: 'articles',
+      title: 'Articles',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{ type: 'article' }],
+        }),
+      ],
+      hidden: ({ parent }) => parent?.slug?.current !== 'blog',
+    }),
+    defineField({
+      name: 'merch',
+      title: 'Merch',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{ type: 'merch' }],
+        }),
+      ],
+      hidden: ({ parent }) => parent?.slug?.current !== 'merch',
+    }),
   ],
   preview: {
     select: {

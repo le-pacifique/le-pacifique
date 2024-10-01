@@ -51,9 +51,9 @@ export default async function IndexRoute({
   return (
     <>
       <div className="flex h-svh flex-col bg-primary text-black">
-        {/* <Suspense>
+        <Suspense>
           <Navbar />
-        </Suspense> */}
+        </Suspense>
         <div className="flex-grow">
           <Suspense>{children}</Suspense>
         </div>
@@ -61,7 +61,7 @@ export default async function IndexRoute({
           <Footer />
         </Suspense> */}
       </div>
-      {draftMode().isEnabled && <LiveVisualEditing />}
+      {/* {draftMode().isEnabled && <LiveVisualEditing />} */}
     </>
   )
 }

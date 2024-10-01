@@ -4,6 +4,7 @@
  */
 
 import { visionTool } from '@sanity/vision'
+import { colorInput } from '@sanity/color-input'
 import { defineConfig } from 'sanity'
 import { presentationTool } from 'sanity/presentation'
 import { structureTool } from 'sanity/structure'
@@ -12,6 +13,8 @@ import { unsplashImageAsset } from 'sanity-plugin-asset-source-unsplash'
 import { apiVersion, dataset, projectId, studioUrl } from '@/sanity/lib/api'
 import * as resolve from '@/sanity/plugins/resolve'
 import { pageStructure, singletonPlugin } from '@/sanity/plugins/settings'
+import artist from '@/sanity/schemas/documents/artist'
+import collection from '@/sanity/schemas/documents/collection'
 import page from '@/sanity/schemas/documents/page'
 import project from '@/sanity/schemas/documents/project'
 import duration from '@/sanity/schemas/objects/duration'
@@ -19,10 +22,12 @@ import milestone from '@/sanity/schemas/objects/milestone'
 import timeline from '@/sanity/schemas/objects/timeline'
 import home from '@/sanity/schemas/singletons/home'
 import settings from '@/sanity/schemas/singletons/settings'
+import release from '@/sanity/schemas/documents/release'
+import article from './sanity/schemas/documents/article'
+import merch from './sanity/schemas/documents/merch'
 
 const title =
-  process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE ||
-  'Next.js Personal Website with Sanity.io'
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE || 'Le Pacifique Records'
 
 export default defineConfig({
   basePath: studioUrl,
@@ -39,6 +44,11 @@ export default defineConfig({
       duration,
       page,
       project,
+      artist,
+      collection,
+      release,
+      article,
+      merch,
       // Objects
       milestone,
       timeline,
@@ -63,5 +73,6 @@ export default defineConfig({
     // Vision lets you query your content with GROQ in the studio
     // https://www.sanity.io/docs/the-vision-plugin
     visionTool({ defaultApiVersion: apiVersion }),
+    colorInput(),
   ],
 })
