@@ -11,6 +11,15 @@ export default defineType({
   // liveEdit: true,
   fields: [
     defineField({
+      name: 'backgroundColor',
+      title: 'Background Color',
+      type: 'color',
+      description: 'The background color of the homepage.',
+      options: {
+        disableAlpha: true, // Disable alpha channel if not needed
+      },
+    }),
+    defineField({
       name: 'title',
       description: 'This field is the title of your personal website.',
       title: 'Title',
@@ -52,21 +61,20 @@ export default defineType({
       ],
     }),
     defineField({
-      name: 'backgroundColor',
-      title: 'Background Color',
-      type: 'color',
-      description: 'The background color of the homepage.',
-      options: {
-        disableAlpha: true, // Disable alpha channel if not needed
-      },
+      name: 'popupText',
+      title: 'Popup Text',
+      type: 'text',
+      description: 'The text that will be displayed in the popup.',
     }),
     defineField({
-      name: 'backgroundImage',
-      title: 'Background Image',
-      type: 'image',
-      description: 'The background image of the homepage.',
+      name: 'logo',
+      title: 'Logo',
+      type: 'reference',
+      to: [{ type: 'drawingsBank' }],
+      description: 'Select a logo from the Drawings Bank.',
       options: {
-        hotspot: true,
+        filter: 'category == $category',
+        filterParams: { category: 'logos' },
       },
     }),
   ],

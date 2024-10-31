@@ -7,6 +7,25 @@ export default defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'backgroundColor',
+      title: 'Background Color',
+      type: 'color',
+      options: {
+        disableAlpha: true, // Disable alpha channel if not needed
+      },
+    }),
+    defineField({
+      name: 'noteDrawing',
+      title: 'Notes Drawing',
+      type: 'reference',
+      to: [{ type: 'drawingsBank' }],
+      description: 'Select a note drawing from the Drawings Bank.',
+      options: {
+        filter: 'category == $category',
+        filterParams: { category: 'notes' },
+      },
+    }),
+    defineField({
       name: 'name',
       title: 'Name',
       type: 'string',
@@ -23,25 +42,6 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'biography',
-      title: 'Biography',
-      type: 'text',
-    }),
-    defineField({
-      name: 'links',
-      title: 'Links',
-      type: 'array',
-      of: [{ type: 'url' }],
-    }),
-    defineField({
-      name: 'backgroundColor',
-      title: 'Background Color',
-      type: 'color',
-      options: {
-        disableAlpha: true, // Disable alpha channel if not needed
-      },
-    }),
-    defineField({
       name: 'image',
       title: 'Image',
       type: 'image',
@@ -50,9 +50,9 @@ export default defineType({
       },
     }),
     defineField({
-      name: 'drawingOrPhoto',
-      title: 'Drawing or Photo',
-      type: 'file',
+      name: 'biography',
+      title: 'Biography',
+      type: 'text',
     }),
     defineField({
       name: 'releasesCatalog',
@@ -125,6 +125,17 @@ export default defineType({
           ],
         }),
       ],
+    }),
+    defineField({
+      name: 'links',
+      title: 'Links',
+      type: 'array',
+      of: [{ type: 'url' }],
+    }),
+    defineField({
+      name: 'drawingOrPhoto',
+      title: 'Drawing or Photo',
+      type: 'file',
     }),
     defineField({
       name: 'email',

@@ -20,18 +20,18 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'name',
-      title: 'Name',
-      type: 'string',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
       name: 'photo',
       title: 'Photo',
       type: 'image',
       options: {
         hotspot: true,
       },
+    }),
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'artist',

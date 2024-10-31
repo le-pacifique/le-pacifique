@@ -61,12 +61,11 @@ export const pageStructure = (
     return S.list()
       .title('Content')
       .items([
-        ...singletonItems,
-        S.divider(),
         S.listItem()
-          .title('Articles')
-          .schemaType('article')
-          .child(S.documentTypeList('article').title('Articles')),
+          .title('Home')
+          .schemaType('home')
+          .child(S.editor().id('home').schemaType('home').documentId('home')),
+        S.divider(),
         S.listItem()
           .title('Artists')
           .schemaType('artist')
@@ -79,6 +78,10 @@ export const pageStructure = (
           .title('Releases')
           .schemaType('release')
           .child(S.documentTypeList('release').title('Releases')),
+        S.listItem()
+          .title('Articles')
+          .schemaType('article')
+          .child(S.documentTypeList('article').title('Articles')),
         S.listItem()
           .title('Merch')
           .child(
@@ -117,9 +120,34 @@ export const pageStructure = (
           ),
         S.divider(),
         S.listItem()
+          .title('Media')
+          .child(
+            S.list()
+              .title('Media Types')
+              .items([
+                S.listItem()
+                  .title('Drawings')
+                  .child(S.documentTypeList('drawingsBank').title('Drawings')),
+                S.listItem()
+                  .title('Images')
+                  .child(S.documentTypeList('imagesBank').title('Images')),
+              ]),
+          ),
+        S.divider(),
+        S.listItem()
           .title('Pages')
           .schemaType('page')
           .child(S.documentTypeList('page').title('Pages')),
+        S.divider(),
+        S.listItem()
+          .title('Settings')
+          .schemaType('settings')
+          .child(
+            S.editor()
+              .id('settings')
+              .schemaType('settings')
+              .documentId('settings'),
+          ),
       ])
   }
 }

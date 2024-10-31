@@ -25,6 +25,8 @@ import settings from '@/sanity/schemas/singletons/settings'
 import release from '@/sanity/schemas/documents/release'
 import article from './sanity/schemas/documents/article'
 import merch from './sanity/schemas/documents/merch'
+import images from './sanity/schemas/documents/images'
+import drawings from './sanity/schemas/documents/drawings'
 
 const title =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE || 'Le Pacifique Records'
@@ -49,6 +51,8 @@ export default defineConfig({
       release,
       article,
       merch,
+      images,
+      drawings,
       // Objects
       milestone,
       timeline,

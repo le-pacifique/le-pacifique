@@ -6,6 +6,12 @@ export default defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'catalogNumber',
+      title: 'Catalog Number',
+      type: 'string',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
@@ -23,7 +29,7 @@ export default defineType({
     }),
     defineField({
       name: 'artists',
-      title: 'Artists',
+      title: 'Artist(s)',
       type: 'array',
       of: [{ type: 'reference', to: { type: 'artist' } }],
       validation: (rule) => rule.required(),
@@ -47,7 +53,7 @@ export default defineType({
     }),
     defineField({
       name: 'genres',
-      title: 'Genres',
+      title: 'Genre(s)',
       type: 'array',
       of: [{ type: 'string' }],
       validation: (rule) => rule.required(),
