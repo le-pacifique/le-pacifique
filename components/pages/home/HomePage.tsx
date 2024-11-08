@@ -2,7 +2,8 @@ import type { EncodeDataAttributeCallback } from '@sanity/react-loader'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import logo from '/public/images/banners/B13.png'
+// import logo from '/public/images/banners/B13.png'
+import logo from '/public/images/banners/homepage.svg'
 import logoBis from '/public/images/banners/B13bis.png'
 import { ProjectListItem } from '@/components/pages/home/ProjectListItem'
 import { Header } from '@/components/shared/Header'
@@ -21,7 +22,7 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
 
   return (
     <div className="h-full w-full flex items-center justify-center">
-      <div className="absolute inset-0 bg-homepage-pattern bg-cover bg-center blur-sm md:blur-md"></div>
+      {/* <div className="absolute inset-0 bg-homepage-pattern bg-cover bg-center blur-sm md:blur-md"></div> */}
 
       {/* Header */}
       {/* {title && <Header centered title={title} description={overview} />} */}
