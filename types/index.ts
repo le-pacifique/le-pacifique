@@ -126,6 +126,9 @@ export interface CollectionPayload {
   description: PortableTextBlock[]
   tracklist: Track[]
   credits: Credits
+  backgroundColor: {
+    hex: string
+  }
   slug?: {
     current: string
   }
@@ -166,6 +169,8 @@ export interface SettingsPayload {
   footer?: PortableTextBlock[]
   menuItems?: MenuItem[]
   ogImage?: Image
+  artists?: ArtistPayload[]
+  collections?: CollectionPayload[]
 }
 
 export type MerchPayload = {
