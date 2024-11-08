@@ -8,7 +8,6 @@ export interface CollectionsPageProps {
 }
 
 const CollectionsPage = ({ collections }: CollectionsPageProps) => {
-  console.log(collections, 'collections')
   return (
     <div className="bg-[#9D9998] h-full w-full flex items-center justify-center">
       <h1 className="text-3xl font-bold mb-8">Collections</h1>

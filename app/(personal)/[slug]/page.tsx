@@ -46,7 +46,6 @@ export default async function PageSlugRoute({ params }: Props) {
   if (!initial.data) {
     notFound()
   }
-  console.log(initial.data, 'initial.data')
 
   // Conditionally render the ArtistsPage component if the slug is 'artists'
   if (params.slug === 'artists') {
