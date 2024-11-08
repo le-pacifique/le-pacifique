@@ -13,5 +13,11 @@ export async function Navbar() {
     return <NavbarPreview initial={initial} />
   }
 
-  return <NavbarLayout data={initial.data} />
+  return (
+    <NavbarLayout
+      data={initial.data}
+      artists={initial.data.artists}
+      collections={initial.data.collections}
+    />
+  )
 }
