@@ -119,6 +119,7 @@ export const collectionBySlugQuery = groq`
       title,
       slug,
       _type,
+      "image": image.asset->url,
       catalogNumber,
       releaseDate,
       genres,
@@ -163,6 +164,18 @@ export const settingsQuery = groq`
       title
     },
     ogImage,
+        "artists": *[_type == "artist"] | order(name asc) {
+      _id,
+      name,
+      "slug": slug.current,
+      _type
+    },
+    "collections": *[_type == "collection"] | order(title asc) {
+      _id,
+      title,
+      "slug": slug.current,
+      _type
+    }
   }
 `
 
@@ -172,6 +185,7 @@ export const releaseBySlugQuery = groq`
     title,
     slug,
     _type,
+    "image": image.asset->url,
     catalogNumber,
     releaseDate,
     genres,

@@ -43,6 +43,14 @@ export default defineType({
       },
     }),
     defineField({
+      name: 'backCover',
+      title: 'Back Cover',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+    }),
+    defineField({
       name: 'releaseDate',
       title: 'Release Date',
       type: 'date',
