@@ -5,10 +5,10 @@ import Link from 'next/link'
 // import logo from '/public/images/banners/B13.png'
 import logo from '/public/images/banners/homepage.svg'
 import logoBis from '/public/images/banners/B13bis.png'
-import { ProjectListItem } from '@/components/pages/home/ProjectListItem'
 import { Header } from '@/components/shared/Header'
 import { resolveHref } from '@/sanity/lib/utils'
 import type { HomePagePayload } from '@/types'
+import LogoTitle from './LogoTitle'
 
 export interface HomePageProps {
   data: HomePagePayload | null
@@ -25,11 +25,22 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
 
       {/* Header */}
       {/* {title && <Header centered title={title} description={overview} />} */}
-      <Image
+      {/* <Image
         className="z-50 min-w-96 max-w-[90rem] hidden md:flex"
         src={logo}
         alt="PCFQ Logo"
-      />
+      /> */}
+      <LogoTitle name="Le Pacifique" />
+
+      {logo?.image && (
+        <Image
+          className="z-[19] min-w-96 max-w-[90rem] hidden md:flex p-10"
+          src={logo.image}
+          alt={logo.title || 'PCFQ Logo'}
+          width={2500} // Adjust the width as needed
+          height={2500} // Adjust the height as needed
+        />
+      )}
       <Image
         className="z-50 max-w-60 p-4 -mt-12 md:hidden"
         src={logoBis}
