@@ -9,6 +9,9 @@ import type {
   SettingsPayload,
 } from '@/types'
 import { useState } from 'react'
+import Image from 'next/image'
+import artistsImage from '/public/images/blobs/artists.svg'
+import collectionsImage from '/public/images/blobs/collectionsBis.svg'
 
 interface NavbarLayoutProps {
   data: SettingsPayload
@@ -66,14 +69,33 @@ export default function NavbarLayout({
       <AnimatePresence>
         {hoveredItem && (
           <motion.div
-            className="absolute inset-0 z-10"
+            className="absolute inset-0 z-20 overflow-hidden"
             initial="hidden"
             animate="visible"
             exit="hidden"
             variants={backgroundVariants}
             transition={{ duration: 0.5 }}
             style={{ backgroundColor: getBackgroundColor(hoveredItem) }}
-          />
+          >
+            {hoveredItem === 'Artists' && (
+              <Image
+                className="z-50 absolute left-1/3 md:right-0 bottom-16 md:top-0 w-[100vw] md:w-[70vw]"
+                src={artistsImage}
+                alt={'Artists Image'}
+                width={2500} // Adjust the width as needed
+                height={2500} // Adjust the height as needed
+              />
+            )}
+            {hoveredItem === 'Collections' && (
+              <Image
+                className="z-50 absolute right-[13vw] md:left-32 bottom-16 md:bottom-0 w-[80vw] md:w-[55vw] -rotate-12"
+                src={collectionsImage}
+                alt={'Collections Image'}
+                width={2500} // Adjust the width as needed
+                height={2500} // Adjust the height as needed
+              />
+            )}
+          </motion.div>
         )}
       </AnimatePresence>
       <div className="fixed top-0 w-full z-50 flex flex-wrap items-center justify-between gap-x-0 px-4 md:px-16 lg:px-32 text-black tracking-tighter">
@@ -119,7 +141,7 @@ export default function NavbarLayout({
                   <AnimatePresence>
                     {menuItem.title === 'Artists' &&
                       hoveredItem === 'Artists' && (
-                        <div className="absolute left-0 ml-6 uppercase tracking-tighter text-lg font-extrabold hover:text-black md:text-2xl w-80">
+                        <div className="absolute left-0 ml-3 md:ml-6 uppercase tracking-tighter text-lg font-extrabold hover:text-black md:text-2xl min-w-max">
                           {artists.map((artist, index) => {
                             const artistHref = resolveHref(
                               artist._type,
@@ -156,7 +178,7 @@ export default function NavbarLayout({
                   <AnimatePresence>
                     {menuItem.title === 'Collections' &&
                       hoveredItem === 'Collections' && (
-                        <div className="absolute left-0 ml-6 uppercase tracking-tighter text-lg font-extrabold hover:text-black md:text-2xl w-full">
+                        <div className="absolute left-0 ml-3 md:ml-6 uppercase tracking-tighter text-lg font-extrabold hover:text-black md:text-2xl w-full">
                           {collections.map((collection, index) => {
                             const collectionHref = resolveHref(
                               collection._type,
