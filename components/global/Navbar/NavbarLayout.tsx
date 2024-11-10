@@ -139,7 +139,8 @@ export default function NavbarLayout({
                                 variants={dropdownItem}
                                 transition={{
                                   duration: 0.3,
-                                  delay: index * 0.2,
+                                  ease: [0.76, 0, 0.24, 1],
+                                  delay: index * 0.07,
                                 }}
                               >
                                 <Link
@@ -175,7 +176,9 @@ export default function NavbarLayout({
                                 variants={dropdownItem}
                                 transition={{
                                   duration: 0.3,
-                                  delay: index * 0.2,
+                                  ease: [0.76, 0, 0.24, 1],
+                                  // delay: index * 0.2,
+                                  delay: index * 0.07,
                                 }}
                               >
                                 <Link

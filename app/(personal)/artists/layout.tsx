@@ -4,7 +4,7 @@ export default function ArtistsLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="bg-[#9D9998] h-full w-full flex items-center justify-center">
+    <div className="h-full w-full flex items-center justify-center">
       {children}
     </div>
   )

@@ -13,8 +13,10 @@ const ArtistPage = ({ data }: ArtistPageProps) => {
   const artist = data
 
   return (
-    <>
-      {/* <ArtistTitle name={artist.name} /> */}
+    <div
+      className="min-h-screen w-full relative"
+      style={{ backgroundColor: backgroundColor?.hex }}
+    >
       <CollectionTitle name={artist.name} />
       {/* <div className="absolute inset-0 bg-artistpage-pattern bg-cover bg-center -z-0"></div> */}
 
