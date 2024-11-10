@@ -4,15 +4,14 @@ export const homePageQuery = groq`
   *[_type == "home"][0]{
     _id,
     overview,
-    showcaseProjects[]->{
-      _type,
-      coverImage,
-      overview,
-      "slug": slug.current,
-      tags,
-      title,
-    },
     title,
+    backgroundColor,
+    popupText,
+    "logo": logo->{
+      _id,
+      title,
+      "image": media.asset->url
+    }
   }
 `
 
@@ -105,6 +104,12 @@ export const artistBySlugQuery = groq`
     links,
     name,
     "slug": slug.current,
+    "noteDrawing": noteDrawing->{
+      _id,
+      title,
+      "image": media.asset->url
+    },
+    backgroundColor,
   }
 `
 

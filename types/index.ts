@@ -34,6 +34,11 @@ export interface HomePagePayload {
   overview?: PortableTextBlock[]
   showcaseProjects?: ShowcaseProject[]
   title?: string
+  logo?: {
+    _id: string
+    title: string
+    image: string
+  }
 }
 
 export interface PagePayload {
@@ -60,6 +65,14 @@ export interface ArtistPayload {
   }
   _type?: string
   overview?: PortableTextBlock[]
+  noteDrawing?: {
+    _id: string
+    title: string
+    image: string
+  }
+  backgroundColor?: {
+    hex: string
+  }
 }
 
 export interface ReleasePayload {
