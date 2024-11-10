@@ -1,4 +1,6 @@
+'use client'
 import { Fragment } from 'react'
+import { motion } from 'framer-motion'
 
 const LogoTitle = ({ name }) => {
   const words = name.split(' ') // Split the name into words
@@ -36,20 +38,38 @@ const LogoTitle = ({ name }) => {
     }
   }
 
+  // Function to generate random animation properties
+  const generateAnimationProps = () => {
+    const duration = Math.random() * 2 + 1 // Random duration between 1 and 3 seconds
+    const delay = Math.random() * 2 // Random delay between 0 and 2 seconds
+    return {
+      x: [0, -2, 2, -2, 2, 0],
+      y: [0, -2, 2, -2, 2, 0],
+      transition: {
+        duration,
+        ease: 'easeInOut',
+        repeat: Infinity,
+        repeatType: 'mirror',
+        delay,
+      },
+    }
+  }
+
   return (
     <div className="hidden md:block absolute top-0 left-0 w-full h-full pointer-events-none z-20">
       {words.map((word, wordIndex) => (
-        <div key={wordIndex}>
+        <Fragment key={wordIndex}>
           {word.split('').map((letter, letterIndex) => (
-            <span
+            <motion.span
               key={`${wordIndex}-${letterIndex}`}
               className="absolute font-medium text-4xl md:text-8xl text-[#E6DA01] uppercase"
               style={generateLetterStyles(wordIndex, letterIndex, word.length)}
+              animate={generateAnimationProps()}
             >
               {letter}
-            </span>
+            </motion.span>
           ))}
-        </div>
+        </Fragment>
       ))}
     </div>
   )
