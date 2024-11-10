@@ -103,7 +103,7 @@ export default function NavbarLayout({
               </Link> */}
                 <div
                   key={key}
-                  className="relative px-2 pb-2"
+                  className="relative px-0 pb-2"
                   onMouseEnter={() => handleMouseEnter(menuItem.title)}
                   onMouseLeave={handleMouseLeave}
                 >
