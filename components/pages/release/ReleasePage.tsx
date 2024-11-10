@@ -65,8 +65,8 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
             </div>
           </div>
 
-          <div className="group h-[55vh] aspect-square [perspective:1000px] order-1 lg:order-2">
-            <div className="relative h-full w-full rounded-xl shadow-xl transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+          <div className="group w-[90%] aspect-square [perspective:1000px] order-1 lg:order-2">
+            <div className="relative h-full w-full rounded-xl shadow-xl transition-all duration-500 [transform-style:preserve-3d] animate-continuousFlip">
               {/* Front Face */}
               <div className="absolute inset-0 h-full w-full rounded-xl [backface-visibility:hidden]">
                 {release?.image && (
