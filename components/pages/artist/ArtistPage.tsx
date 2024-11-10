@@ -11,6 +11,7 @@ export interface ArtistPageProps {
 
 const ArtistPage = ({ data }: ArtistPageProps) => {
   const artist = data
+  const { noteDrawing, backgroundColor } = data
 
   return (
     <div
@@ -18,9 +19,14 @@ const ArtistPage = ({ data }: ArtistPageProps) => {
       style={{ backgroundColor: backgroundColor?.hex }}
     >
       <CollectionTitle name={artist.name} />
-      {/* <div className="absolute inset-0 bg-artistpage-pattern bg-cover bg-center -z-0"></div> */}
+      {noteDrawing?.image && (
+        <div
+          className="absolute inset-0 bg-cover bg-center -z-10"
+          style={{ backgroundImage: `url(${noteDrawing.image})` }}
+        ></div>
+      )}
 
-      <div className="mx-auto max-w-7xl px-4 lg:px-8 z-10 py-16 lg:py-24 tracking-tight">
+      <div className="mx-auto max-w-7xl px-4 lg:px-8 z-10 py-12 lg:py-24 tracking-tight">
         <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-6 lg:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
           <div className="lg:pr-8 lg:pt-4 order-2 lg:order-1">
             <div className="lg:max-w-lg">
@@ -29,7 +35,7 @@ const ArtistPage = ({ data }: ArtistPageProps) => {
               </p>
             </div>
             <div className="mt-4 flex flex-col">
-              {artist.links.map((link, index) => (
+              {artist.links?.map((link, index) => (
                 <a
                   key={index}
                   href={link}
@@ -53,7 +59,7 @@ const ArtistPage = ({ data }: ArtistPageProps) => {
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
