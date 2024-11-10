@@ -13,13 +13,13 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
   return (
     <div className="">
       {/* <div className="absolute inset-0 bg-artistpage-pattern bg-cover bg-center -z-0 blur-sm"></div> */}
-      <div className="mx-auto max-w-full px-4 lg:px-8 relative z-10 py-16 lg:py-24 tracking-tight flex items-center justify-center">
+      <div className="mx-auto max-w-full px-4 lg:px-8 relative z-10 py-12 lg:py-24 tracking-tight flex items-center justify-center">
         <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 lg:gap-x-56 gap-y-6 lg:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-          <div className="lg:pr-8 lg:pt-4 order-2 lg:order-1">
+          <div className="lg:pr-8 lg:pt-4 order-2 lg:order-1 lg:px-24">
             <div className="lg:max-w-lg">
               <div className="flex flex-col space-y-0">
-                <p>
-                  <strong>PCFQ_UNREF2:</strong>
+                <p className="text-xl md:text-2xl">
+                  <strong>PCFQ_UNREF2</strong>
                 </p>
                 <p>
                   <strong>Title:</strong> {release.title}
@@ -33,7 +33,7 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
                 </p>
               </div>
 
-              <div className="mt-6 text-md leading-snug">
+              <div className="mt-6 text-sm md:text-md leading-snug">
                 {release.description?.map((block: any) => {
                   if (block._type === 'block') {
                     return (
@@ -54,10 +54,10 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
                   return null
                 })}
               </div>
-              <h2 className="text-2xl font-bold mb-2">Tracklist</h2>
+              <h2 className="text-xl md:text-2xl font-bold mb-2">Tracklist</h2>
               <ol className="list-decimal list-inside">
                 {release.tracklist?.map((track: any, index: number) => (
-                  <li key={index} className="mb-2">
+                  <li key={index} className="text-sm md:text-md">
                     {track.title} - {track.duration}
                   </li>
                 ))}
