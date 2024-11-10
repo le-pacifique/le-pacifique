@@ -43,7 +43,7 @@ const CollectionTitle = ({ name }) => {
           {word.split('').map((letter, letterIndex) => (
             <span
               key={`${wordIndex}-${letterIndex}`}
-              className="absolute text-4xl font-black md:text-9xl font-medium text-[#fff] uppercase"
+              className="absolute text-4xl font-black md:font-normal md:text-9xl text-[#fff] uppercase"
               style={generateLetterStyles(wordIndex, letterIndex, word.length)}
             >
               {letter}
