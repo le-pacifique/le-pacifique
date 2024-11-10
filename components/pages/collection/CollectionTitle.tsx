@@ -37,7 +37,7 @@ const CollectionTitle = ({ name }) => {
   }
 
   return (
-    <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-20">
+    <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-[19]">
       {words.map((word, wordIndex) => (
         <div key={wordIndex}>
           {word.split('').map((letter, letterIndex) => (
