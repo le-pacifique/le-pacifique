@@ -76,63 +76,10 @@ const CollectionPage = ({ data }: CollectionPageProps) => {
   return (
     <div
       className="h-full w-full absolute -z-0"
-      style={{ backgroundColor: collection.backgroundColor.hex }}
+      style={{ backgroundColor: collection.backgroundColor?.hex }}
     >
       <RotatingCarousel releases={fakeReleases} />
-      {/* <div className="absolute inset-0 bg-artistpage-pattern bg-cover bg-center -z-0 blur-sm"></div> */}
-
       <CollectionTitle name={collection.title} />
-
-      {/* <div className="mx-auto max-w-7xl px-4 lg:px-8 relative z-10 py-16 lg:py-24">
-        {collection.releases && collection.releases.length > 0 ? (
-          <div>
-            <div className="mt-6 text-lg leading-snug">
-              {collection.description?.map((block: any) => {
-                if (block._type === 'block') {
-                  return (
-                    <p key={block._key} className="mb-10">
-                      {block.children.map((child: any) => {
-                        if (child._type === 'span') {
-                          return (
-                            <span key={child._key} className="mb-10">
-                              {child.text}
-                            </span>
-                          )
-                        }
-                        return null
-                      })}
-                    </p>
-                  )
-                }
-                return null
-              })}
-            </div>
-            <ul>
-              {collection.releases.map((release, key) => {
-                console.log(release.slug.current, 'release.slug.current')
-
-                const href = resolveHref(release._type, release.slug.current)
-                console.log(release._type, 'release')
-                console.log(href)
-                if (!href) {
-                  return null
-                }
-                return (
-                  <li key={key}>
-                    <h3>
-                      <Link href={href}>
-                        <span>{release.title}</span>
-                      </Link>
-                    </h3>
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-        ) : (
-          <p>No releases found.</p>
-        )}
-      </div> */}
     </div>
   )
 }

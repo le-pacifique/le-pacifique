@@ -3,5 +3,5 @@ export default function CollectionsLayout({
 }: {
   children: React.ReactNode
 }) {
-  return <div className="bg-[#FF4517] h-full w-full">{children}</div>
+  return <div className="h-full w-full">{children}</div>
 }
