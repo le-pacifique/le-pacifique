@@ -86,9 +86,9 @@ const RotatingCarousel = ({ releases }: RotatingCarouselProps) => {
           </div> */}
           <div
             key={focusedRelease.title}
-            className="group h-64 w-64 md:h-96 md:w-96 [perspective:1000px]"
+            className="group w-[80vw] aspect-square md:w-96 [perspective:1000px]"
           >
-            <div className="relative h-full w-full rounded-xl shadow-xl transition-all duration-500 [transform-style:preserve-3d] animate-continuousFlip">
+            <div className="relative h-full w-full transition-all duration-500 [transform-style:preserve-3d] animate-continuousFlip">
               {/* Front Face */}
               <div className="absolute inset-0 h-full w-full rounded-xl [backface-visibility:hidden]">
                 {focusedRelease.image && (
