@@ -7,7 +7,6 @@ export interface PageProps {
 }
 
 export function Page({ data }: PageProps) {
-  console.log(data)
   // Default to an empty object to allow previews on non-existent documents
   const { body, overview, title } = data ?? {}
 

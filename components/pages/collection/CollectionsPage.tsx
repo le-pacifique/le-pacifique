@@ -18,8 +18,6 @@ const CollectionsPage = ({ collections }: CollectionsPageProps) => {
               collection?._type,
               collection?.slug?.current,
             )
-            console.log(collection._type, 'collection')
-            console.log(href)
             if (!href) {
               return null
             }

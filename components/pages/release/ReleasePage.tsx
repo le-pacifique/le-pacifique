@@ -9,8 +9,6 @@ export interface ReleasePageProps {
 
 const ReleasePage = ({ data }: ReleasePageProps) => {
   const release = data
-  console.log(release, 'release')
-  console.log(release.description[0].children, 'release description')
 
   return (
     <div className="">

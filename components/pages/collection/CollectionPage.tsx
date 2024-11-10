@@ -72,7 +72,6 @@ const fakeReleases = [
 
 const CollectionPage = ({ data }: CollectionPageProps) => {
   const collection = data
-  console.log(collection, 'collection page')
 
   return (
     <div

@@ -85,9 +85,7 @@ export default function NavbarLayout({
             }
 
             const borderColor = borderColors[key % borderColors.length]
-            console.log(borderColor)
 
-            console.log(menuItem.title, 'menuItem.title')
             return (
               <>
                 {/* <Link

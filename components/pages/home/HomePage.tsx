@@ -17,8 +17,7 @@ export interface HomePageProps {
 
 export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
   // Default to an empty object to allow previews on non-existent documents
-  const { overview = [], showcaseProjects = [], title = '' } = data ?? {}
-  console.log(data)
+  const { logo } = data ?? {}
 
   return (
     <div className="h-full w-full flex items-center justify-center">

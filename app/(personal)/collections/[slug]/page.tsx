@@ -43,8 +43,6 @@ export function generateStaticParams() {
 
 export default async function CollectionSlugRoute({ params }: Props) {
   const initial = await loadCollection(params.slug)
-  console.log(initial.data, 'initial.data')
-
   // if (draftMode().isEnabled) {
   //   return <ProjectPreview params={params} initial={initial} />
   // }
