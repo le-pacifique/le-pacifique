@@ -11,7 +11,7 @@ export interface ReleasePageProps {
 const ReleasePage = ({ data }: ReleasePageProps) => {
   const release = data
 
-  console.log(release.collection.releases, 'release data')
+  console.log(release.collection?.releases, 'release data')
   // Find the index of the current release in the collection
   const currentIndex = release.collection?.releases.findIndex(
     (r) => r._id === release._id,
@@ -58,7 +58,7 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
                   )}
                 </div> */}
                 <div className="flex -mt-3 mb-2">
-                  {release.artists.map((artist, index) => (
+                  {release.artists?.map((artist, index) => (
                     <div key={artist._id}>
                       <span>{artist.name}</span>
                       {index < release.artists.length - 1 && ', '}
@@ -67,7 +67,7 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
                 </div>
 
                 <div className="flex flex-wrap gap-2 mt-4">
-                  {release.genres.map((genre, index) => (
+                  {release.genres?.map((genre, index) => (
                     <span
                       key={index}
                       className="border border-black px-2 py-1 rounded-none text-sm hover:bg-black hover:text-white"
@@ -83,7 +83,7 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
                   if (block._type === 'block') {
                     return (
                       <p key={block._key} className="mb-4">
-                        {block.children.map((child: any) => {
+                        {block.children?.map((child: any) => {
                           if (child._type === 'span') {
                             return (
                               <span key={child._key} className="mb-10">
