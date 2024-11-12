@@ -7,11 +7,12 @@ export const homePageQuery = groq`
     title,
     backgroundColor,
     popupText,
-    "logo": logo->{
+    "logos": logos[]->{
       _id,
       title,
       "image": media.asset->url
-    }
+    },
+    popupText
   }
 `
 
@@ -110,6 +111,7 @@ export const artistBySlugQuery = groq`
       "image": media.asset->url
     },
     backgroundColor,
+    socialMedia,
   }
 `
 
@@ -206,7 +208,17 @@ export const releaseBySlugQuery = groq`
       graphicDesign,
       text
     },
-    bandcampPlayer
+    bandcampPlayer,
+    "artists": artists[]->{
+      _id,
+      name,
+      slug
+    },
+    "collection": *[_type == "collection" && references(^._id)][0] {
+      _id,
+      title,
+      releases
+    }
   }
 `
 

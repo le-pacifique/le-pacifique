@@ -39,6 +39,12 @@ export interface HomePagePayload {
     title: string
     image: string
   }
+  popupText?: string
+  logos?: {
+    _id: string
+    title: string
+    image: string
+  }[]
 }
 
 export interface PagePayload {
@@ -59,7 +65,6 @@ export interface ArtistPayload {
   name: string
   image: any
   biography: string
-  links: string[]
   slug?: {
     current: string
   }
@@ -73,6 +78,12 @@ export interface ArtistPayload {
   backgroundColor?: {
     hex: string
   }
+  socialMedia?: {
+    _key: string
+    title: string
+    _type: string
+    href: string
+  }[]
 }
 
 export interface ReleasePayload {
@@ -90,6 +101,24 @@ export interface ReleasePayload {
   }
   _type: string
   bandcampPlayer: string
+  artists: {
+    _id: string
+    name: string
+    slug: {
+      current: string
+    }
+  }[]
+  collection: {
+    _id: string
+    title: string
+    releases: {
+      _id: string
+      title: string
+      slug: {
+        current: string
+      }
+    }[]
+  }
 }
 
 export type ArticlePayload = {
