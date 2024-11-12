@@ -56,7 +56,7 @@ const LogoTitle = ({ name }) => {
   }
 
   return (
-    <div className="hidden md:block absolute top-0 left-0 w-full h-full pointer-events-none z-20">
+    <div className="hidden md:block absolute top-0 left-0 w-full h-full pointer-events-none z-10">
       {words.map((word, wordIndex) => (
         <Fragment key={wordIndex}>
           {word.split('').map((letter, letterIndex) => (
