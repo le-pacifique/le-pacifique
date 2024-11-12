@@ -21,6 +21,7 @@ module.exports = {
         orbit: 'orbit 60s infinite linear',
         'backwards-rotation': 'backwards-rotation 60s infinite linear',
         continuousFlip: 'continuousFlip 15s linear infinite',
+        wiggle: 'wiggle 0.3s infinite',
       },
       keyframes: {
         orbit: {
@@ -35,6 +36,12 @@ module.exports = {
           '0%': { transform: 'rotateY(0)' },
           '50%': { transform: 'rotateY(180deg)' },
           '100%': { transform: 'rotateY(360deg)' },
+        },
+        wiggle: {
+          '0%, 100%': {
+            transform: 'rotate(calc(var(--initial-rotate) - 3deg))',
+          },
+          '50%': { transform: 'rotate(calc(var(--initial-rotate) + 3deg))' },
         },
       },
       colors: {

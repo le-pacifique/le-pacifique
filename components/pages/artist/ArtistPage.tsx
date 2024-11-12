@@ -11,7 +11,21 @@ export interface ArtistPageProps {
 
 const ArtistPage = ({ data }: ArtistPageProps) => {
   const artist = data
-  const { noteDrawing, backgroundColor } = data
+  const { noteDrawing, backgroundColor, socialMedia } = data
+
+  // Function to generate random styles
+  const generateRandomStyles = (index: number) => {
+    const randomTop = Math.random() * 20 - 10 // Random value between -10 and 10
+    const randomLeft = Math.random() * 20 - 10 // Random value between -10 and 10
+    const randomRotate = Math.random() * 20 * (index % 2 === 0 ? 1 : -1) // Alternate rotation between positive and negative
+
+    return {
+      top: `${randomTop}px`,
+      left: `${randomLeft}px`,
+      transform: `rotate(${randomRotate}deg)`,
+      '--initial-rotate': `${randomRotate}deg`,
+    }
+  }
 
   return (
     <div
@@ -34,16 +48,17 @@ const ArtistPage = ({ data }: ArtistPageProps) => {
                 {artist.biography}
               </p>
             </div>
-            <div className="mt-4 flex flex-col">
-              {artist.links?.map((link, index) => (
+            <div className="mt-16 flex">
+              {artist.socialMedia?.map((link, index) => (
                 <a
-                  key={index}
-                  href={link}
+                  key={link._key}
+                  href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-500 hover:underline text-sm md:text-base"
+                  className="bg-white text-black text-sm md:text-xl mx-3 px-2 py-1 uppercase font-medium tracking-tight hover:animate-wiggle"
+                  style={generateRandomStyles(index)}
                 >
-                  {link}
+                  {link.title}
                 </a>
               ))}
             </div>
