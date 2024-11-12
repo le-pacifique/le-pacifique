@@ -11,7 +11,8 @@ import type {
 import { useState } from 'react'
 import Image from 'next/image'
 import artistsImage from '/public/images/blobs/artists.svg'
-import collectionsImage from '/public/images/blobs/collectionsBis.svg'
+import collectionsImage from '/public/images/blobs/collectionsTris.svg'
+import { usePathname } from 'next/navigation'
 
 interface NavbarLayoutProps {
   data: SettingsPayload
@@ -24,23 +25,23 @@ export default function NavbarLayout({
   artists,
   collections,
 }: NavbarLayoutProps) {
-  const menuItems = data?.menuItems || ([] as MenuItem[])
-  const borderColors = ['#C6F042', '#FF4517', '#B798DF', '#FE2B97', '#6596F6']
+  const pathname = usePathname()
 
+  const menuItems = data?.menuItems || ([] as MenuItem[])
+  const borderColors = ['#C6F042', '#FF4517', '#B798DF', '#FE2B97', '#000']
+  const grayColor = 'rgba(255, 255, 255, 0.25)'
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
 
   const getBackgroundColor = (menuItem) => {
     switch (menuItem) {
       case 'Artists':
-        return '#9D9998'
+        return '#C6F042'
       case 'Blog':
         return '#CC96FF'
       case 'Collections':
-        return '#9FADFD'
+        return '#FF4517'
       case 'Merch':
         return '#d28a04'
-      case 'Info':
-        return '#556bfc'
       default:
         return 'transparent'
     }
@@ -62,6 +63,27 @@ export default function NavbarLayout({
   const backgroundVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
+    exit: { opacity: 0, transition: { delay: 0.2, duration: 0.4 } },
+  }
+
+  // const backgroundVariants = {
+  //   hidden: { opacity: 0, y: '-100%' },
+  //   visible: {
+  //     opacity: 1,
+  //     y: 0,
+  //     transition: { ease: [0.76, 0, 0.24, 1] },
+  //   },
+  //   exit: {
+  //     y: '-100%',
+  //     transition: { delay: 0.1, duration: 1, ease: [0.76, 0, 0.24, 1] },
+  //   },
+  // }
+
+  const shouldColorBorder = (menuItem) => {
+    if (pathname === '/' || pathname === '/info') {
+      return true
+    }
+    return pathname.includes(menuItem.toLowerCase())
   }
 
   return (
@@ -72,9 +94,9 @@ export default function NavbarLayout({
             className="absolute inset-0 z-20 overflow-hidden"
             initial="hidden"
             animate="visible"
-            exit="hidden"
+            exit="exit"
             variants={backgroundVariants}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.1 }}
             style={{ backgroundColor: getBackgroundColor(hoveredItem) }}
           >
             {hoveredItem === 'Artists' && (
@@ -98,6 +120,7 @@ export default function NavbarLayout({
           </motion.div>
         )}
       </AnimatePresence>
+
       <div className="fixed top-0 w-full z-50 flex flex-wrap items-center justify-between gap-x-0 px-4 md:px-16 lg:px-32 text-black tracking-tighter">
         {menuItems &&
           menuItems.slice(0, 2).map((menuItem, key) => {
@@ -106,23 +129,18 @@ export default function NavbarLayout({
               return null
             }
 
-            const borderColor = borderColors[key % borderColors.length]
+            const borderColor =
+              hoveredItem === menuItem.title
+                ? 'transparent'
+                : shouldColorBorder(menuItem.title)
+                  ? borderColors[key % borderColors.length]
+                  : grayColor
+            const textColor = shouldColorBorder(menuItem.title)
+              ? 'black'
+              : grayColor
 
             return (
               <>
-                {/* <Link
-                key={key}
-                className={`uppercase tracking-tighter text-lg font-extrabold hover:text-black md:text-2xl`}
-                href={href}
-              >
-                <div
-                  className={`h-2 w-full z-20 relative`}
-                  style={{ backgroundColor: `${borderColor}` }}
-                ></div>
-                <div className="z-10" key={key}>
-                  {menuItem.title}
-                </div>
-              </Link> */}
                 <div
                   key={key}
                   className="relative px-0 pb-2"
@@ -136,7 +154,9 @@ export default function NavbarLayout({
                       className={`h-2 w-full z-20 relative uppercase tracking-tighter text-lg font-extrabold hover:text-black md:text-2xl`}
                       style={{ backgroundColor: `${borderColor}` }}
                     ></div>
-                    <div className="z-10">{menuItem.title}</div>
+                    <div className="z-10" style={{ color: textColor }}>
+                      {menuItem.title}
+                    </div>
                   </span>
                   <AnimatePresence>
                     {menuItem.title === 'Artists' &&
@@ -218,6 +238,7 @@ export default function NavbarLayout({
               </>
             )
           })}
+
         <div className="fixed bottom-0 left-0 w-full z-10 flex flex-wrap items-center justify-between gap-x-0 px-4 md:px-16 lg:px-32 text-black tracking-tighter">
           {menuItems &&
             menuItems.slice(2).map((menuItem, key) => {
@@ -226,26 +247,31 @@ export default function NavbarLayout({
                 return null
               }
 
-              const borderColor = borderColors[(key + 2) % borderColors.length]
+              const borderColor =
+                hoveredItem === menuItem.title
+                  ? 'transparent'
+                  : shouldColorBorder(menuItem.title)
+                    ? borderColors[(key + 2) % borderColors.length]
+                    : grayColor
+              const textColor = shouldColorBorder(menuItem.title)
+                ? 'black'
+                : grayColor
 
               return (
                 <Link
                   key={key + 2}
                   className={`uppercase text-lg font-extrabold tracking-tighter border-b-8 border-[${borderColor}] hover:text-black md:text-2xl`}
                   href={href}
-                  style={{ borderBottom: `8px solid ${borderColor}` }}
+                  style={{
+                    borderBottom: `8px solid ${borderColor}`,
+                    color: textColor,
+                  }}
                 >
                   <div
                     className="z-10"
                     key={key}
                     onMouseEnter={() => handleMouseEnter(menuItem.title)}
                     onMouseLeave={handleMouseLeave}
-                    // custom={key}
-                    // variants={perspective}
-                    // animate="enter"
-                    // exit="exit"
-                    // initial="initial"
-                    // whileHover={{ opacity: 1, y: 0 }}
                   >
                     {menuItem.title}
                   </div>
