@@ -9,6 +9,7 @@ import { Header } from '@/components/shared/Header'
 import { resolveHref } from '@/sanity/lib/utils'
 import type { HomePagePayload } from '@/types'
 import LogoTitle from './LogoTitle'
+import Stickies from './Stickies'
 
 export interface HomePageProps {
   data: HomePagePayload | null
@@ -17,60 +18,36 @@ export interface HomePageProps {
 
 export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
   // Default to an empty object to allow previews on non-existent documents
-  const { logo } = data ?? {}
+  const { logos, popupText } = data ?? {}
+
+  console.log(data, 'data homepage')
+
+  const randomLogo =
+    logos && logos.length > 0
+      ? logos[Math.floor(Math.random() * logos.length)]
+      : null
 
   return (
     <div className="h-full w-full flex items-center justify-center">
-      {/* <div className="absolute inset-0 bg-homepage-pattern bg-cover bg-center blur-sm md:blur-md"></div> */}
+      {/* <LogoTitle name="Le Pacifique" /> */}
 
-      {/* Header */}
-      {/* {title && <Header centered title={title} description={overview} />} */}
-      {/* <Image
-        className="z-50 min-w-96 max-w-[90rem] hidden md:flex"
-        src={logo}
-        alt="PCFQ Logo"
-      /> */}
-      <LogoTitle name="Le Pacifique" />
-
-      {logo?.image && (
+      {randomLogo?.image && (
         <Image
           className="z-[19] min-w-96 max-w-[90rem] hidden md:flex p-10"
-          src={logo.image}
-          alt={logo.title || 'PCFQ Logo'}
+          src={randomLogo.image}
+          alt={randomLogo.title || 'PCFQ Logo'}
           width={2500} // Adjust the width as needed
           height={2500} // Adjust the height as needed
         />
       )}
+
       <Image
-        className="z-50 max-w-60 p-4 -mt-12 md:hidden"
+        className="z-[19] max-w-60 p-4 -mt-12 md:hidden"
         src={logoBis}
         alt="PCFQ Logo"
       />
 
-      {/* Showcase projects */}
-      {/* {showcaseProjects && showcaseProjects.length > 0 && (
-        <div className="mx-auto max-w-[100rem] rounded-md border">
-          {showcaseProjects.map((project, key) => {
-            const href = resolveHref(project?._type, project?.slug)
-            if (!href) {
-              return null
-            }
-            return (
-              <Link
-                key={key}
-                href={href}
-                data-sanity={encodeDataAttribute?.([
-                  'showcaseProjects',
-                  key,
-                  'slug',
-                ])}
-              >
-                <ProjectListItem project={project} odd={key % 2} />
-              </Link>
-            )
-          })}
-        </div>
-      )} */}
+      <Stickies text={popupText} />
     </div>
   )
 }
