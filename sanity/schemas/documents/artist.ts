@@ -127,17 +127,6 @@ export default defineType({
       ],
     }),
     defineField({
-      name: 'links',
-      title: 'Links',
-      type: 'array',
-      of: [{ type: 'url' }],
-    }),
-    defineField({
-      name: 'drawingOrPhoto',
-      title: 'Drawing or Photo',
-      type: 'file',
-    }),
-    defineField({
       name: 'email',
       title: 'Email Address for Bookings',
       type: 'email',

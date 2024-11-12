@@ -37,14 +37,6 @@ export default defineType({
       of: [{ type: 'block' }],
     }),
     defineField({
-      name: 'cover',
-      title: 'Cover',
-      type: 'image',
-      options: {
-        hotspot: true,
-      },
-    }),
-    defineField({
       name: 'releases',
       title: 'Releases',
       type: 'array',

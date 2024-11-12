@@ -67,15 +67,20 @@ export default defineType({
       description: 'The text that will be displayed in the popup.',
     }),
     defineField({
-      name: 'logo',
-      title: 'Logo',
-      type: 'reference',
-      to: [{ type: 'drawingsBank' }],
-      description: 'Select a logo from the Drawings Bank.',
-      options: {
-        filter: 'category == $category',
-        filterParams: { category: 'logos' },
-      },
+      name: 'logos',
+      title: 'Logos',
+      type: 'array',
+      of: [
+        {
+          type: 'reference',
+          to: [{ type: 'drawingsBank' }],
+          options: {
+            filter: 'category == $category',
+            filterParams: { category: 'logos' },
+          },
+        },
+      ],
+      description: 'Select one or more logos from the Drawings Bank.',
     }),
   ],
 })

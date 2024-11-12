@@ -12,6 +12,25 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'backgroundColor',
+      title: 'Background Color',
+      type: 'color',
+      options: {
+        disableAlpha: true, // Disable alpha channel if not needed
+      },
+    }),
+    defineField({
+      name: 'noteDrawing',
+      title: 'Notes Drawing',
+      type: 'reference',
+      to: [{ type: 'drawingsBank' }],
+      description: 'Select a note drawing from the Drawings Bank.',
+      options: {
+        filter: 'category == $category',
+        filterParams: { category: 'notes' },
+      },
+    }),
+    defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
@@ -32,7 +51,7 @@ export default defineType({
       title: 'Artist(s)',
       type: 'array',
       of: [{ type: 'reference', to: { type: 'artist' } }],
-      validation: (rule) => rule.required(),
+      // validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'image',
@@ -112,6 +131,20 @@ export default defineType({
         },
         { name: 'graphicDesign', title: 'Graphic Design', type: 'string' },
         { name: 'text', title: 'Text', type: 'string' },
+        {
+          name: 'customCredits',
+          title: 'Custom Credits',
+          type: 'array',
+          of: [
+            {
+              type: 'object',
+              fields: [
+                { name: 'title', title: 'Title', type: 'string' },
+                { name: 'value', title: 'Value', type: 'string' },
+              ],
+            },
+          ],
+        },
       ],
     }),
     defineField({
