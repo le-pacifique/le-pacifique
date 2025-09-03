@@ -57,9 +57,6 @@ export default async function IndexRoute({
         <div className="flex-grow">
           <Suspense>{children}</Suspense>
         </div>
-        {/* <Suspense>
-          <Footer />
-        </Suspense> */}
       </div>
       {/* {draftMode().isEnabled && <LiveVisualEditing />} */}
     </>

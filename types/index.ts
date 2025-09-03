@@ -84,6 +84,7 @@ export interface ArtistPayload {
     _type: string
     href: string
   }[]
+  layout?: 'left' | 'right'
 }
 
 export interface ReleasePayload {
@@ -119,6 +120,7 @@ export interface ReleasePayload {
       }
     }[]
   }
+  backCover?: string
 }
 
 export type ArticlePayload = {

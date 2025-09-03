@@ -27,6 +27,7 @@ import article from './sanity/schemas/documents/article'
 import merch from './sanity/schemas/documents/merch'
 import images from './sanity/schemas/documents/images'
 import drawings from './sanity/schemas/documents/drawings'
+import StudioLogo from './components/global/StudioLogo'
 
 const title =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE || 'Le Pacifique Records'
@@ -36,6 +37,7 @@ export default defineConfig({
   projectId: projectId || '',
   dataset: dataset || '',
   title,
+  icon: StudioLogo,
   schema: {
     // If you want more content types, you can add them to this array
     types: [

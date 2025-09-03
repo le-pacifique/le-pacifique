@@ -155,5 +155,18 @@ export default defineType({
         }),
       ],
     }),
+    {
+      name: 'layout',
+      title: 'Layout',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Image Left', value: 'left' },
+          { title: 'Image Right', value: 'right' },
+        ],
+        layout: 'radio', // or dropdown
+      },
+      initialValue: 'right',
+    },
   ],
 })

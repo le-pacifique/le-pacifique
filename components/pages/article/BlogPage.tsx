@@ -35,7 +35,7 @@ const BlogPage = ({ articles }: BlogPageProps) => {
   const renderHeader = () => {
     const dateFormat = 'MMMM yyyy'
     return (
-      <div className="flex justify-between items-center mb-6 w-[40vw]">
+      <div className="flex justify-between items-center mb-6 md:md:w-[40vw]">
         <h2 className="text-5xl uppercase font-bold">
           {format(currentMonth, dateFormat)}
         </h2>
@@ -62,7 +62,7 @@ const BlogPage = ({ articles }: BlogPageProps) => {
     const dateFormat = 'EEEE'
 
     return (
-      <div className="grid grid-cols-7 gap-1 w-[40vw] bg-black text-white">
+      <div className="grid grid-cols-7 w-full md:w-[40vw] bg-black text-white">
         {Array.from({ length: 7 }).map((_, i) => (
           <div key={i} className="text-center text-base font-medium uppercase">
             {format(addDays(startDate, i), dateFormat).substring(0, 3)}
@@ -94,8 +94,8 @@ const BlogPage = ({ articles }: BlogPageProps) => {
         const cell = (
           <div
             key={day.toString()}
-            className={`p-3 border-red-600 border m-1 font-bold text-center text-4xl ${
-              isOutsideMonth ? 'text-black/10' : 'text-black'
+            className={`p-3 border-red-600 border m-1 font-bold text-center text-xl sm:text-4xl ${
+              isOutsideMonth ? 'text-red-600' : 'text-black'
             } ${article ? 'bg-white shadow-md border-none hover:bg-white/75' : ''}`}
           >
             {href ? (
@@ -113,7 +113,10 @@ const BlogPage = ({ articles }: BlogPageProps) => {
       })
 
       rows.push(
-        <div key={day.toString()} className="grid grid-cols-7 gap-1 w-[40vw]">
+        <div
+          key={day.toString()}
+          className="grid grid-cols-7 gap-0 md:gap-1 md:w-[40vw]"
+        >
           {weekDays}
         </div>,
       )

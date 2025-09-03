@@ -82,5 +82,52 @@ export default defineType({
       ],
       description: 'Select one or more logos from the Drawings Bank.',
     }),
+    defineField({
+      name: 'menuImages',
+      title: 'Menu Images',
+      type: 'object',
+      fields: [
+        {
+          name: 'artists',
+          title: 'Artists Image',
+          type: 'reference',
+          to: [{ type: 'drawingsBank' }],
+          options: {
+            filter: 'category == $category',
+            filterParams: { category: 'menuImages' },
+          },
+        },
+        {
+          name: 'collections',
+          title: 'Collections Image',
+          type: 'reference',
+          to: [{ type: 'drawingsBank' }],
+          options: {
+            filter: 'category == $category',
+            filterParams: { category: 'menuImages' },
+          },
+        },
+        {
+          name: 'blog',
+          title: 'Blog Image',
+          type: 'reference',
+          to: [{ type: 'drawingsBank' }],
+          options: {
+            filter: 'category == $category',
+            filterParams: { category: 'menuImages' },
+          },
+        },
+        {
+          name: 'merch',
+          title: 'Merch Image',
+          type: 'reference',
+          to: [{ type: 'drawingsBank' }],
+          options: {
+            filter: 'category == $category',
+            filterParams: { category: 'menuImages' },
+          },
+        },
+      ],
+    }),
   ],
 })

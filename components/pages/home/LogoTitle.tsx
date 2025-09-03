@@ -56,13 +56,13 @@ const LogoTitle = ({ name }) => {
   }
 
   return (
-    <div className="hidden md:block absolute top-0 left-0 w-full h-full pointer-events-none z-10">
+    <div className="hidden md:block absolute top-0 left-0 w-full h-full pointer-events-none z-20 mix-blend-difference">
       {words.map((word, wordIndex) => (
         <Fragment key={wordIndex}>
           {word.split('').map((letter, letterIndex) => (
             <motion.span
               key={`${wordIndex}-${letterIndex}`}
-              className="absolute font-medium text-4xl md:text-8xl text-[#E6DA01] uppercase"
+              className="absolute font-medium text-4xl md:text-[9rem] text-[#C6F042] uppercase"
               style={generateLetterStyles(wordIndex, letterIndex, word.length)}
               animate={generateAnimationProps()}
             >

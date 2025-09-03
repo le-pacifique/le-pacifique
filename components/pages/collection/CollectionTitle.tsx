@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 
-const CollectionTitle = ({ name }) => {
+const CollectionTitle = ({ name, style }) => {
   const words = name.split(' ') // Split the name into words
 
   // Function to generate style for each letter
@@ -37,13 +37,16 @@ const CollectionTitle = ({ name }) => {
   }
 
   return (
-    <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-[19]">
+    <div
+      className="absolute top-0 left-0 w-full h-full pointer-events-none z-[19]"
+      style={style}
+    >
       {words.map((word, wordIndex) => (
         <div key={wordIndex}>
           {word.split('').map((letter, letterIndex) => (
             <span
               key={`${wordIndex}-${letterIndex}`}
-              className="absolute text-4xl font-black md:font-normal md:text-9xl text-[#fff] uppercase"
+              className="absolute text-5xl font-black md:font-normal md:text-9xl text-[#fff] uppercase"
               style={generateLetterStyles(wordIndex, letterIndex, word.length)}
             >
               {letter}

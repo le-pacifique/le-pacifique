@@ -12,6 +12,28 @@ export const homePageQuery = groq`
       title,
       "image": media.asset->url
     },
+    "menuImages": {
+          "artists": menuImages.artists->{
+            _id,
+            title,
+            "image": media.asset->url
+          },
+          "collections": menuImages.collections->{
+            _id,
+            title,
+            "image": media.asset->url
+          },
+          "blog": menuImages.blog->{
+            _id,
+            title,
+            "image": media.asset->url
+          },
+          "merch": menuImages.merch->{
+            _id,
+            title,
+            "image": media.asset->url
+          }
+        },
     popupText
   }
 `
@@ -104,6 +126,7 @@ export const artistBySlugQuery = groq`
     image,
     links,
     name,
+    layout,
     "slug": slug.current,
     "noteDrawing": noteDrawing->{
       _id,
@@ -124,9 +147,10 @@ export const collectionBySlugQuery = groq`
     "releases": releases[]->{
       _id,
       title,
-      slug,
+      "slug": slug,
       _type,
       "image": image.asset->url,
+      "backCover": backCover.asset->url,
       catalogNumber,
       releaseDate,
       genres,
@@ -190,9 +214,10 @@ export const releaseBySlugQuery = groq`
   *[_type == "release" && slug.current == $slug][0] {
     _id,
     title,
-    slug,
+    "slug": slug.current,
     _type,
     "image": image.asset->url,
+    "backCover": backCover.asset->url,
     catalogNumber,
     releaseDate,
     genres,
@@ -212,12 +237,18 @@ export const releaseBySlugQuery = groq`
     "artists": artists[]->{
       _id,
       name,
-      slug
+      "slug": slug.current
     },
     "collection": *[_type == "collection" && references(^._id)][0] {
       _id,
       title,
-      releases
+      "releases": releases[]-> {
+        _id,
+        title,
+        "slug": slug.current,
+        _type,
+        "image": image.asset->url
+      }
     }
   }
 `

@@ -28,6 +28,7 @@ export default defineType({
         list: [
           { title: 'Logos', value: 'logos' },
           { title: 'Notes', value: 'notes' },
+          { title: 'Menu', value: 'menuImages' },
           { title: 'Others', value: 'others' },
         ],
       },

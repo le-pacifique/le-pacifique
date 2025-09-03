@@ -34,7 +34,7 @@ const ArtistTitle = ({ name }) => {
           {word.split('').map((letter, letterIndex) => (
             <span
               key={`${wordIndex}-${letterIndex}`}
-              className="absolute text-7xl font-medium text-[#C6F042] uppercase"
+              className="absolute text-7xl font-medium text-[#F1FB84] uppercase"
               style={generateLetterStyles(wordIndex, letterIndex)}
             >
               {letter}
