@@ -2,15 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-body::-webkit-scrollbar {
+/* Apply scrollbar styles globally */
+body,
+* {
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: #c6f042 #9d9998; /* For Firefox */
+}
+
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
   width: 0.6rem;
 }
 
-body::-webkit-scrollbar-track {
-  background-color: #9d9998; /* Make the track transparent */
-  /* box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); */
+body::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+  background-color: #9d9998; /* Track color */
 }
 
-body::-webkit-scrollbar-thumb {
-  background-color: #c6f042;
+body::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background-color: #c6f042; /* Thumb color */
 }

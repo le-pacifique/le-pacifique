@@ -4,6 +4,7 @@ import { urlForImage } from '@/sanity/lib/utils'
 import type { ReleasePayload } from '@/types'
 import CollectionTitle from '../collection/CollectionTitle'
 import AnimatedArtistTitle from '../artist/AnimatedArtistTitle'
+import frame from '/public/images/frames/player-4.png'
 
 export interface ReleasePageProps {
   data: ReleasePayload
@@ -30,7 +31,7 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
       : null
 
   return (
-    <div className="">
+    <div className="h-full w-full min-h-screen relative flex items-center justify-center">
       <svg className="hidden">
         <filter id="roughText">
           <feTurbulence
@@ -78,7 +79,7 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
           </div>
         )}
 
-        <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 lg:gap-x-8 gap-y-6 lg:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:mt-16 lg:items-center">
+        <div className="hmx-auto grid max-w-2xl grid-cols-1 gap-x-8 lg:gap-x-8 gap-y-6 lg:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:mt-16 lg:items-center">
           <div className="order-2 lg:order-1 lg:px-0">
             <div className="lg:max-w-3xl">
               <div className="flex flex-col">
@@ -87,32 +88,71 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
                 </p>
 
                 <div className="flex -mt-3 mb-2">
-                  {release.artists?.map((artist, index) => (
-                    <div key={artist._id} className="flex items-center">
-                      {artist.slug ? (
-                        // This is one of our own artists with a dedicated page
-                        <Link
-                          href={`/artists/${artist.slug}`}
-                          className="hover:text-[#C6F042] hover:underline transition-colors"
+                  {release.artists?.map((artist, index) => {
+                    if (!artist) return null
+
+                    // Internal artist reference (from Sanity)
+                    if (
+                      artist._type === 'artist' &&
+                      'slug' in artist &&
+                      artist.slug &&
+                      typeof artist.slug === 'object'
+                    ) {
+                      return (
+                        <div
+                          key={artist._id || artist.name}
+                          className="flex items-center"
                         >
-                          {artist.name}
-                        </Link>
-                      ) : (
-                        // External artist, just display name
-                        <span>{artist.name}</span>
-                      )}
-                      {index < release.artists.length - 1 && (
-                        <span className="mx-1">, </span>
-                      )}
-                    </div>
-                  ))}
+                          <Link
+                            href={`/artists/${artist.slug.current}`}
+                            className="hover:text-[#C6F042] hover:underline transition-colors"
+                          >
+                            {artist.name}
+                          </Link>
+                          {index < release.artists.length - 1 && (
+                            <span className="mx-1">, </span>
+                          )}
+                        </div>
+                      )
+                    }
+                    // External artist object
+                    if ('url' in artist && artist.url) {
+                      return (
+                        <div key={artist.name} className="flex items-center">
+                          <a
+                            href={artist.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-[#FF4517] hover:underline transition-colors"
+                          >
+                            {artist.name}
+                          </a>
+                          {index < release.artists.length - 1 && (
+                            <span className="mx-1">, </span>
+                          )}
+                        </div>
+                      )
+                    }
+                    // Fallback for external artist without URL
+                    if (artist.name) {
+                      return (
+                        <div key={artist.name} className="flex items-center">
+                          <span>{artist.name}</span>
+                          {index < release.artists.length - 1 && (
+                            <span className="mx-1">, </span>
+                          )}
+                        </div>
+                      )
+                    }
+                    return null
+                  })}
                 </div>
 
-                <div className="flex flex-wrap gap-2 mt-4">
+                <div className="flex flex-wrap gap-2 mt-0">
                   {release.genres?.map((genre, index) => (
                     <span
                       key={index}
-                      className="border border-white text-white px-2 leading-[1] pb-0.5 rounded-full text-sm hover:bg-black hover:text-white"
+                      className="text-white px-2 border rounded-full leading-[1] py-1 pt-0.5 text-sm lowercase"
                     >
                       {genre}
                     </span>
@@ -143,7 +183,19 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
               </div>
 
               {/* Tracklist dropdown */}
-              <label>
+              <div className="mt-6">
+                <h3 className="font-bold text-sm md:text-base mb-2">
+                  Tracklist
+                </h3>
+                <ol className="list-decimal list-inside mb-6">
+                  {release.tracklist?.map((track: any, index: number) => (
+                    <li key={index} className="text-sm md:text-base">
+                      {track.title} - {track.duration}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              {/* <label>
                 <input
                   className="peer/showLabel absolute scale-0"
                   type="checkbox"
@@ -160,17 +212,22 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
                     ))}
                   </ol>
                 </span>
-              </label>
+              </label> */}
 
               {/* Bandcamp Player */}
               {release.bandcampPlayer && (
-                <div className="mt-8">
-                  <h3 className="font-bold text-sm md:text-base mb-3">
+                <div className="mt-8 relative">
+                  <Image
+                    className="absolute -left-4 -top-[0.55rem] w-[26rem] h-[4rem] pointer-events-none"
+                    src={frame}
+                    alt="Player frame"
+                  />
+                  {/* <h3 className="font-bold text-sm md:text-base mb-3">
                     Listen
-                  </h3>
+                  </h3> */}
                   <div
                     className="w-full overflow-hidden rounded"
-                    style={{ maxWidth: '400px' }}
+                    style={{ maxWidth: '24rem' }}
                   >
                     <iframe
                       style={{ border: 0, width: '100%', height: '120px' }}

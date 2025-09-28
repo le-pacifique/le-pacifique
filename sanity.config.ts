@@ -3,8 +3,8 @@
  * This config is used to set up Sanity Studio that's mounted on the `app/studio/[[...index]]/page.tsx` route
  */
 
-import { visionTool } from '@sanity/vision'
 import { colorInput } from '@sanity/color-input'
+import { visionTool } from '@sanity/vision'
 import { defineConfig } from 'sanity'
 import { presentationTool } from 'sanity/presentation'
 import { structureTool } from 'sanity/structure'
@@ -17,17 +17,18 @@ import artist from '@/sanity/schemas/documents/artist'
 import collection from '@/sanity/schemas/documents/collection'
 import page from '@/sanity/schemas/documents/page'
 import project from '@/sanity/schemas/documents/project'
+import release from '@/sanity/schemas/documents/release'
 import duration from '@/sanity/schemas/objects/duration'
 import milestone from '@/sanity/schemas/objects/milestone'
 import timeline from '@/sanity/schemas/objects/timeline'
 import home from '@/sanity/schemas/singletons/home'
 import settings from '@/sanity/schemas/singletons/settings'
-import release from '@/sanity/schemas/documents/release'
-import article from './sanity/schemas/documents/article'
-import merch from './sanity/schemas/documents/merch'
-import images from './sanity/schemas/documents/images'
-import drawings from './sanity/schemas/documents/drawings'
+
 import StudioLogo from './components/global/StudioLogo'
+import article from './sanity/schemas/documents/article'
+import drawings from './sanity/schemas/documents/drawings'
+import images from './sanity/schemas/documents/images'
+import merch from './sanity/schemas/documents/merch'
 
 const title =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE || 'Le Pacifique Records'

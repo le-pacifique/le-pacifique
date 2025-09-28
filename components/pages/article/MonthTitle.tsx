@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 
-interface ArtistTitleProps {
+interface MonthTitleProps {
   name: string
   style?: React.CSSProperties
   fontSize?: string // For text size control
@@ -25,7 +25,7 @@ interface ArtistTitleProps {
   zIndex?: number // For z-index control
 }
 
-const ArtistTitle = ({
+const MonthTitle = ({
   name,
   style,
   fontSize = '7xl',
@@ -34,29 +34,30 @@ const ArtistTitle = ({
   rotation = {},
   color = '#F1FB84',
   zIndex = 20,
-}: ArtistTitleProps) => {
+}: MonthTitleProps) => {
   const words = name.split(' ') // Split the name into words
 
   // Set default values or use provided ones
   const {
-    baseTop = 10,
-    baseLeft = 60,
+    baseTop = 5,
+    baseLeft = 10,
     wordTopOffset = 15,
     wordLeftOffset = 0,
   } = position
 
   const { topIncrement = 5, leftIncrement = 3 } = spacing
 
-  const { min = -15, max = 15 } = rotation
+  // Reduce the rotation range to make letters less inclined
+  const { min = -2, max = 2 } = rotation // Adjusted to a smaller range
 
   // Function to generate style for each letter
-  const generateLetterStyles = (wordIndex, letterIndex) => {
+  const generateLetterStyles = (wordIndex: number, letterIndex: number) => {
     // Calculating diagonal positions
     const top = baseTop + wordIndex * wordTopOffset + letterIndex * topIncrement
     const left =
       baseLeft + wordIndex * wordLeftOffset + letterIndex * leftIncrement
 
-    // Random rotation between min and max
+    // Random rotation between min and max (less inclined)
     const rotate = Math.random() * (max - min) + min
 
     return {
@@ -94,4 +95,4 @@ const ArtistTitle = ({
   )
 }
 
-export default ArtistTitle
+export default MonthTitle

@@ -1,5 +1,5 @@
-import { defineField, defineType } from 'sanity'
 import { colorInput } from '@sanity/color-input'
+import { defineField, defineType } from 'sanity'
 
 export default defineType({
   name: 'article',

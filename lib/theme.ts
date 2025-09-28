@@ -12,15 +12,15 @@ export const theme = {
         // background: '#9E9E9E',
       },
       Collections: {
-        border: '#F6AB65',
-        hover: '#F6AB65',
+        border: '#c5e1a5',
+        hover: '#c5e1a5',
         // background: '#9E9E9E',
-        background: '#F6AB65',
+        background: '#c5e1a5',
       },
       Blog: {
-        border: '#CC96FF',
-        hover: '#CC96FF',
-        background: '#CC96FF',
+        border: '#C2D9C7',
+        hover: '#C2D9C7',
+        background: '#9E9E9E',
       },
       Merch: {
         border: '#EED5F4',

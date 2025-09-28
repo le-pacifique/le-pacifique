@@ -3,17 +3,17 @@
 import { motion } from 'framer-motion'
 import { theme } from '@/lib/theme'
 
-interface AnimatedArtistTitleProps {
+interface AnimatedCollectionTitleProps {
   name: string
   style?: React.CSSProperties
   color?: string // <-- Add color prop
 }
 
-const AnimatedArtistTitle = ({
+const AnimatedCollectionTitle = ({
   name,
   style,
   color,
-}: AnimatedArtistTitleProps) => {
+}: AnimatedCollectionTitleProps) => {
   const words = name.split(' ')
 
   const generateLetterStyles = (
@@ -94,4 +94,4 @@ const AnimatedArtistTitle = ({
   )
 }
 
-export default AnimatedArtistTitle
+export default AnimatedCollectionTitle

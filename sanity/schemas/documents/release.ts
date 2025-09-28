@@ -50,7 +50,28 @@ export default defineType({
       name: 'artists',
       title: 'Artist(s)',
       type: 'array',
-      of: [{ type: 'reference', to: { type: 'artist' } }],
+      of: [
+        // Internal artist reference
+        { type: 'reference', to: { type: 'artist' } },
+        // External artist object
+        {
+          type: 'object',
+          title: 'External Artist',
+          fields: [
+            {
+              name: 'name',
+              title: 'Name',
+              type: 'string',
+              validation: (rule) => rule.required(),
+            },
+            {
+              name: 'url',
+              title: 'Website or Profile URL',
+              type: 'url',
+            },
+          ],
+        },
+      ],
       // validation: (rule) => rule.required(),
     }),
     defineField({

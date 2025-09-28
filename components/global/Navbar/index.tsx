@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic'
 import { draftMode } from 'next/headers'
 
-import { loadSettings, loadHomePage } from '@/sanity/loader/loadQuery'
+import { loadHomePage, loadSettings } from '@/sanity/loader/loadQuery'
 
 import NavbarLayout from './NavbarLayout'
 const NavbarPreview = dynamic(() => import('./NavbarPreview'))
@@ -10,8 +10,6 @@ export async function Navbar() {
   const initial = await loadSettings()
   const homepage = await loadHomePage()
 
-  console.log('homepageFETCH', homepage.data.menuImages)
-
   if (draftMode().isEnabled) {
     return <NavbarPreview initial={initial} />
   }
@@ -19,9 +17,14 @@ export async function Navbar() {
   return (
     <NavbarLayout
       data={initial.data}
-      artists={initial.data.artists}
-      collections={initial.data.collections}
-      menuImages={homepage.data.menuImages}
+      artists={initial.data.artists ?? []}
+      collections={initial.data.collections ?? []}
+      menuImages={{
+        artists: homepage?.data?.menuImages?.artists ?? { image: '' },
+        collections: homepage?.data?.menuImages?.collections ?? { image: '' },
+        blog: homepage?.data?.menuImages?.blog ?? { image: '' },
+        merch: homepage?.data?.menuImages?.merch ?? { image: '' },
+      }}
     />
   )
 }

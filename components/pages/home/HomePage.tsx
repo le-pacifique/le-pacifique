@@ -1,17 +1,18 @@
 'use client'
+import LottiePlayer from '@lottiefiles/react-lottie-player'
 import type { EncodeDataAttributeCallback } from '@sanity/react-loader'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import LottiePlayer from '@lottiefiles/react-lottie-player'
-import animationData from '@/public/lottie/data.json'
-import dynamic from 'next/dynamic'
 
+import logoBis from '/public/images/banners/B13bis.png'
 // import logo from '/public/images/banners/B13.png'
 import logo from '/public/images/banners/homepage.svg'
-import logoBis from '/public/images/banners/B13bis.png'
 import { Header } from '@/components/shared/Header'
+import animationData from '@/public/lottie/data.json'
 import { resolveHref } from '@/sanity/lib/utils'
 import type { HomePagePayload } from '@/types'
+
 import LogoTitle from './LogoTitle'
 import Stickies from './Stickies'
 
@@ -36,6 +37,17 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
 
   return (
     <div className="h-full w-full flex items-center justify-center bg-[#9E9E9E]">
+      <svg className="hidden">
+        <filter id="roughText">
+          <feTurbulence
+            type="turbulence"
+            baseFrequency="0.02"
+            numOctaves="3"
+            result="noise"
+          />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1" />
+        </filter>
+      </svg>
       {randomLogo?.image && (
         <Image
           className="z-[19] min-w-96 max-w-[100rem] hidden md:flex px-10"
@@ -50,7 +62,7 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
         src={logoBis}
         alt="PCFQ Logo"
       />
-      <LogoTitle name="Le Pacifique" />
+      <LogoTitle name="Le Pacifique" style={{ filter: 'url(#roughText)' }} />
 
       {/* <Lottie animationData={animationData} loop={true} /> */}
       {/* <Stickies text={popupText} /> */}

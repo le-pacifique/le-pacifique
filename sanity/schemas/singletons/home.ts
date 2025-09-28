@@ -1,6 +1,6 @@
+import { ColorInput } from '@sanity/color-input'
 import { HomeIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
-import { ColorInput } from '@sanity/color-input'
 
 export default defineType({
   name: 'home',

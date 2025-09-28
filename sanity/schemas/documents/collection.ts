@@ -1,5 +1,5 @@
-import { defineField, defineType } from 'sanity'
 import { colorInput } from '@sanity/color-input'
+import { defineField, defineType } from 'sanity'
 
 export default defineType({
   name: 'collection',
@@ -28,6 +28,17 @@ export default defineType({
       type: 'color',
       options: {
         disableAlpha: true, // Disable alpha channel if not needed
+      },
+    }),
+    defineField({
+      name: 'noteDrawing',
+      title: 'Notes Drawing',
+      type: 'reference',
+      to: [{ type: 'drawingsBank' }],
+      description: 'Select a note drawing from the Drawings Bank.',
+      options: {
+        filter: 'category == $category',
+        filterParams: { category: 'notes' },
       },
     }),
     defineField({

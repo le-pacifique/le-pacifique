@@ -45,6 +45,12 @@ export interface HomePagePayload {
     title: string
     image: string
   }[]
+  menuImages?: {
+    artists?: { image: string; title?: string }
+    collections?: { image: string; title?: string }
+    blog?: { image: string; title?: string }
+    merch?: { image: string; title?: string }
+  }
 }
 
 export interface PagePayload {
@@ -68,7 +74,7 @@ export interface ArtistPayload {
   slug?: {
     current: string
   }
-  _type?: string
+  _type: string
   overview?: PortableTextBlock[]
   noteDrawing?: {
     _id: string
@@ -102,13 +108,19 @@ export interface ReleasePayload {
   }
   _type: string
   bandcampPlayer: string
-  artists: {
-    _id: string
-    name: string
-    slug: {
-      current: string
-    }
-  }[]
+  artists: Array<
+    | {
+        _id: string
+        name: string
+        slug?: { current: string }
+        _type?: string
+      }
+    | {
+        name: string
+        url?: string
+        _type?: string
+      }
+  >
   collection: {
     _id: string
     title: string
@@ -132,6 +144,8 @@ export type ArticlePayload = {
   _type?: string
   backgroundColor?: string
   excerpt?: PortableTextBlock[]
+  color?: string
+  previewText?: string
   coverImage?: {
     asset: {
       _ref: string
@@ -139,6 +153,7 @@ export type ArticlePayload = {
     alt?: string
     caption?: string
   }
+
   date: string
   content: Array<
     | {
@@ -175,6 +190,11 @@ export interface CollectionPayload {
   }
   slug?: {
     current: string
+  }
+  noteDrawing?: {
+    _id: string
+    title?: string
+    image: string
   }
   _type?: string
   overview?: PortableTextBlock[]

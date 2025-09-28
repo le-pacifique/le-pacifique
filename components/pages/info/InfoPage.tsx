@@ -4,7 +4,7 @@ import { theme } from '@/lib/theme'
 import { urlForImage } from '@/sanity/lib/utils'
 import type { MerchPayload } from '@/types'
 
-export interface MerchPageProps {
+export interface InfoPageProps {
   merch: MerchPayload[]
   menuImage?: {
     image: string
@@ -14,7 +14,7 @@ export interface MerchPageProps {
 
 const merchTypes = ['VINYL', 'TAPES', 'CLOTHES', 'BIBELOTS']
 
-const MerchPage = ({ merch, menuImage }: MerchPageProps) => {
+const InfoPage = ({ merch, menuImage }: InfoPageProps) => {
   const bgColor = theme.colors.menu.Merch.background
 
   return (
@@ -69,4 +69,4 @@ const MerchPage = ({ merch, menuImage }: MerchPageProps) => {
   )
 }
 
-export default MerchPage
+export default InfoPage

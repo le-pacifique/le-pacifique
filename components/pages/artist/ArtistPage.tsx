@@ -1,10 +1,12 @@
 import Image from 'next/image'
 
+import { theme } from '@/lib/theme'
 import { urlForImage } from '@/sanity/lib/utils'
 import type { ArtistPayload } from '@/types'
-import ArtistTitle from './ArtistTitle'
+
 import CollectionTitle from '../collection/CollectionTitle'
 import AnimatedArtistTitle from './AnimatedArtistTitle'
+import ArtistTitle from './ArtistTitle'
 
 export interface ArtistPageProps {
   data: ArtistPayload
@@ -12,12 +14,10 @@ export interface ArtistPageProps {
 
 const ArtistPage = ({ data }: ArtistPageProps) => {
   const artist = data
-  console.log('artistData', artist)
   const { noteDrawing, backgroundColor, socialMedia, layout } = data
 
   const isLeft = layout === 'left'
-
-  console.log(layout, 'layout', isLeft)
+  const bgColor = theme.colors.menu.Artists.background
 
   // Function to generate random styles
   const generateRandomStyles = (index: number) => {
@@ -30,6 +30,7 @@ const ArtistPage = ({ data }: ArtistPageProps) => {
       left: `${randomLeft}px`,
       transform: `rotate(${randomRotate}deg)`,
       '--initial-rotate': `${randomRotate}deg`,
+      backgroundColor: `${bgColor}`,
     }
   }
 
@@ -37,6 +38,7 @@ const ArtistPage = ({ data }: ArtistPageProps) => {
     <div
       className="min-h-screen w-full relative flex items-center justify-center"
       style={{ backgroundColor: backgroundColor?.hex }}
+      // style={{ backgroundColor: bgColor }}
     >
       <svg className="hidden">
         <filter id="roughText">
@@ -75,18 +77,18 @@ const ArtistPage = ({ data }: ArtistPageProps) => {
             }`}
           >
             <div className="lg:max-w-3xl">
-              <p className="mt-6 text-sm md:text-xl tracking-tight leading-snug text-white">
+              <p className="mt-6 text-sm md:text-xl tracking-tight leading-snug text-black">
                 {artist.biography}
               </p>
             </div>
-            <div className="mt-16 flex">
+            <div className="mt-8 flex">
               {artist.socialMedia?.map((link, index) => (
                 <a
                   key={link._key}
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white text-black text-sm md:text-xl mx-3 px-2 py-0 uppercase font-medium tracking-tight hover:animate-wiggle"
+                  className="bg-white text-black text-sm md:text-xl mx-3 first:ml-0 px-2 py-0 uppercase font-medium tracking-tight hover:animate-wiggle"
                   style={generateRandomStyles(index)}
                 >
                   {link.title}
@@ -94,15 +96,17 @@ const ArtistPage = ({ data }: ArtistPageProps) => {
               ))}
             </div>
           </div>
+
           {artist?.image && (
             <Image
               alt="Artist image"
-              src={urlForImage(artist?.image).url()}
+              src={urlForImage(artist.image)?.url() ?? ''}
               width={2432}
               height={1442}
-              className={`w-full max-w-none ring-1 ring-gray-400/10 md:-ml-4 lg:-ml-0 rounded-none border-4 border-[#C6F042] ${
+              className={`max-h-96 mx-auto lg:h-[75vh] lg:max-h-none w-auto md:-ml-4 lg:-ml-0 rounded-[8px] border-4 border-[${bgColor}] ${
                 isLeft ? 'order-1 lg:order-1' : 'order-1 lg:order-2'
               }`}
+              style={{ borderColor: bgColor }}
             />
           )}
         </div>

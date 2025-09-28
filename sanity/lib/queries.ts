@@ -144,6 +144,11 @@ export const collectionBySlugQuery = groq`
     title,
     backgroundColor,
     description,
+    "noteDrawing": noteDrawing->{
+      _id,
+      title,
+      "image": media.asset->url
+    },    
     "releases": releases[]->{
       _id,
       title,
@@ -166,7 +171,20 @@ export const collectionBySlugQuery = groq`
         graphicDesign,
         text
       },
-      bandcampPlayer
+      bandcampPlayer,
+      "artists": artists[]{
+        _type == "reference" => @->{
+          _id,
+          name,
+          "slug": slug.current,
+          _type
+        },
+        _type != "reference" => {
+          name,
+          url,
+          _type
+        }
+      }
     }
   }
 `
@@ -234,10 +252,20 @@ export const releaseBySlugQuery = groq`
       text
     },
     bandcampPlayer,
-    "artists": artists[]->{
-      _id,
-      name,
-      "slug": slug.current
+    "artists": artists[]{
+      // If it's a reference, fetch referenced artist fields
+      _type == "reference" => @->{
+        _id,
+        name,
+        "slug": slug.current,
+        _type
+      },
+      // If it's an object, just return the object
+      _type != "reference" => {
+        name,
+        url,
+        _type
+      }
     },
     "collection": *[_type == "collection" && references(^._id)][0] {
       _id,

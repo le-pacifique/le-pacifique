@@ -5,10 +5,10 @@ import { notFound } from 'next/navigation'
 import { toPlainText } from 'next-sanity'
 
 import ArtistPage from '@/components/pages/artist/ArtistPage'
+import CollectionPage from '@/components/pages/collection/CollectionPage'
 import { urlForOpenGraphImage } from '@/sanity/lib/utils'
 import { generateStaticSlugs } from '@/sanity/loader/generateStaticSlugs'
 import { loadCollection } from '@/sanity/loader/loadQuery'
-import CollectionPage from '@/components/pages/collection/CollectionPage'
 const ProjectPreview = dynamic(
   () => import('@/components/pages/project/ProjectPreview'),
 )

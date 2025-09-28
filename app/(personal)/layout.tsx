@@ -50,11 +50,11 @@ export default async function IndexRoute({
 }) {
   return (
     <>
-      <div className="flex h-svh flex-col text-black">
+      <div className="flex min-h-svh h-full flex-col text-black">
         <Suspense>
           <Navbar />
         </Suspense>
-        <div className="flex-grow">
+        <div className="h-full">
           <Suspense>{children}</Suspense>
         </div>
       </div>

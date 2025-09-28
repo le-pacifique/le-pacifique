@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import type { ArtistPayload } from '@/types'
+
 import { resolveHref } from '@/sanity/lib/utils'
+import type { ArtistPayload } from '@/types'
 
 export interface ArtistsPageProps {
   artists: ArtistPayload[]

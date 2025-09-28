@@ -5,10 +5,10 @@ import { notFound } from 'next/navigation'
 import { toPlainText } from 'next-sanity'
 
 import ArtistPage from '@/components/pages/artist/ArtistPage'
+import ReleasePage from '@/components/pages/release/ReleasePage'
 import { urlForOpenGraphImage } from '@/sanity/lib/utils'
 import { generateStaticSlugs } from '@/sanity/loader/generateStaticSlugs'
 import { loadRelease } from '@/sanity/loader/loadQuery'
-import ReleasePage from '@/components/pages/release/ReleasePage'
 
 type Props = {
   params: { slug: string }

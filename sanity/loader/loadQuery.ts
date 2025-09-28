@@ -5,28 +5,28 @@ import { draftMode } from 'next/headers'
 
 import { client } from '@/sanity/lib/client'
 import {
+  articleBySlugQuery,
   artistBySlugQuery,
   collectionBySlugQuery,
   homePageQuery,
+  merchBySlugQuery,
   pagesBySlugQuery,
   projectBySlugQuery,
   releaseBySlugQuery,
-  merchBySlugQuery,
-  articleBySlugQuery,
   settingsQuery,
   simplifiedPagesBySlugQuery,
 } from '@/sanity/lib/queries'
 import { token } from '@/sanity/lib/token'
 import {
-  ArtistPayload,
   ArticlePayload,
-  ReleasePayload,
+  ArtistPayload,
   CollectionPayload,
   HomePagePayload,
+  MerchPayload,
   PagePayload,
   ProjectPayload,
+  ReleasePayload,
   SettingsPayload,
-  MerchPayload,
 } from '@/types'
 
 const serverClient = client.withConfig({

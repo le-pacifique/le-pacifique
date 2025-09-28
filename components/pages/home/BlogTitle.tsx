@@ -2,14 +2,14 @@
 import { motion } from 'framer-motion'
 import { Fragment } from 'react'
 
-const LogoTitle = ({ name, style }) => {
+const BlogTitle = ({ name, style }) => {
   const words = name.split(' ') // Split the name into words
 
   // Function to generate style for each letter
   const generateLetterStyles = (wordIndex, letterIndex, wordLength) => {
-    const baseTop = 35 // Starting vertical position in 'vh'
+    const baseTop = 10 // Starting vertical position in 'vh'
     const topIncrement = 1 // Increment value for each letter in 'vh'
-    const baseLeft = 50 // Starting horizontal position in 'vw'
+    const baseLeft = 75 // Starting horizontal position in 'vw'
     const leftIncrement = 7 // Increment value for each letter in 'vw'
 
     // Offsets for each word
@@ -57,7 +57,7 @@ const LogoTitle = ({ name, style }) => {
 
   return (
     <div
-      className="hidden md:block absolute top-0 left-0 w-full h-full pointer-events-none z-20 mix-blend-difference"
+      className="hidden md:block absolute top-0 left-0 w-full h-full pointer-events-none z-20"
       style={style}
     >
       {words.map((word, wordIndex) => (
@@ -65,7 +65,7 @@ const LogoTitle = ({ name, style }) => {
           {word.split('').map((letter, letterIndex) => (
             <motion.span
               key={`${wordIndex}-${letterIndex}`}
-              className="absolute font-medium text-4xl md:text-[9rem] text-[#C6F042] uppercase"
+              className="absolute font-medium text-4xl md:text-[9rem] text-[#F6AB65] uppercase"
               style={generateLetterStyles(wordIndex, letterIndex, word.length)}
               animate={generateAnimationProps()}
             >
@@ -78,4 +78,4 @@ const LogoTitle = ({ name, style }) => {
   )
 }
 
-export default LogoTitle
+export default BlogTitle
