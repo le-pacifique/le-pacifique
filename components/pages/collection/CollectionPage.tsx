@@ -61,7 +61,7 @@ const CollectionPage = ({ data }: CollectionPageProps) => {
       )}
 
       {collection.description && (
-        <div className="absolute top-[30%] right-[5%] z-40 max-w-xl p-6 rounded-lg text-black max-h-[50vh] overflow-y-auto ">
+        <div className="absolute top-[30%] right-[5%] z-40 max-w-xl p-6 rounded-lg text-black max-h-[50vh] overflow-y-auto">
           {collection.description?.map((block: any) => {
             if (block._type === 'block') {
               return (

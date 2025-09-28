@@ -202,8 +202,10 @@ function MenuItemLink({
             {menuItem.title === 'Artists' && hoveredItem === 'Artists' && (
               <Dropdown
                 items={artists.map((a) => ({
-                  ...a,
-                  slug: a.slug?.current,
+                  _type: a._type ?? 'artist',
+                  slug: typeof a.slug === 'object' ? a.slug?.current : a.slug,
+                  title: a.name,
+                  name: a.name,
                 }))}
                 color={menuTheme.text}
                 onItemClick={() => setHoveredItem(null)}
@@ -213,9 +215,10 @@ function MenuItemLink({
               hoveredItem === 'Collections' && (
                 <Dropdown
                   items={collections.map((c) => ({
-                    ...c,
-                    slug: c.slug?.current,
-                    _type: c._type ?? 'collection', // Ensure _type is always a string
+                    _type: c._type ?? 'collection', // ensure _type is always a string
+                    slug: typeof c.slug === 'object' ? c.slug?.current : c.slug,
+                    title: c.title,
+                    name: c.title, // for Dropdown display
                   }))}
                   color={menuTheme.text}
                   onItemClick={() => setHoveredItem(null)}
