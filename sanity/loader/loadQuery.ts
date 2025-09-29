@@ -9,6 +9,7 @@ import {
   artistBySlugQuery,
   collectionBySlugQuery,
   homePageQuery,
+  infoQuery,
   merchBySlugQuery,
   pagesBySlugQuery,
   projectBySlugQuery,
@@ -22,6 +23,7 @@ import {
   ArtistPayload,
   CollectionPayload,
   HomePagePayload,
+  InfoPayload,
   MerchPayload,
   PagePayload,
   ProjectPayload,
@@ -142,5 +144,13 @@ export function loadMerch(slug: string) {
     merchBySlugQuery,
     { slug },
     { next: { tags: [`merch:${slug}`] } },
+  )
+}
+
+export function loadInfo() {
+  return loadQuery<InfoPayload | null>(
+    infoQuery,
+    {},
+    { next: { tags: ['info'] } },
   )
 }

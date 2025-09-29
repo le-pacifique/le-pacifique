@@ -4,6 +4,21 @@
 
 import { type DocumentDefinition } from 'sanity'
 import { type StructureResolver } from 'sanity/structure'
+import {
+  FaHome,
+  FaUserAstronaut,
+  FaCompactDisc,
+  FaMusic,
+  FaNewspaper,
+  FaTshirt,
+  FaPalette,
+  FaImage,
+  FaCog,
+  FaInfoCircle,
+  FaRecordVinyl,
+  FaTape,
+} from 'react-icons/fa'
+import { GiClothes, GiGemPendant } from 'react-icons/gi'
 
 export const singletonPlugin = (types: string[]) => {
   return {
@@ -63,33 +78,40 @@ export const pageStructure = (
       .items([
         S.listItem()
           .title('Home')
+          .icon(FaHome)
           .schemaType('home')
           .child(S.editor().id('home').schemaType('home').documentId('home')),
         S.divider(),
         S.listItem()
           .title('Artists')
+          .icon(FaUserAstronaut)
           .schemaType('artist')
           .child(S.documentTypeList('artist').title('Artists')),
         S.listItem()
           .title('Collections')
+          .icon(FaCompactDisc)
           .schemaType('collection')
           .child(S.documentTypeList('collection').title('Collections')),
         S.listItem()
           .title('Releases')
+          .icon(FaMusic)
           .schemaType('release')
           .child(S.documentTypeList('release').title('Releases')),
         S.listItem()
-          .title('Articles')
+          .title('Blog')
+          .icon(FaNewspaper)
           .schemaType('article')
           .child(S.documentTypeList('article').title('Articles')),
         S.listItem()
           .title('Merch')
+          .icon(FaTshirt)
           .child(
             S.list()
               .title('Merch Types')
               .items([
                 S.listItem()
                   .title('Vinyl')
+                  .icon(FaRecordVinyl)
                   .child(
                     S.documentTypeList('merch')
                       .title('Vinyl')
@@ -97,6 +119,7 @@ export const pageStructure = (
                   ),
                 S.listItem()
                   .title('Tapes')
+                  .icon(FaTape)
                   .child(
                     S.documentTypeList('merch')
                       .title('Tapes')
@@ -104,6 +127,7 @@ export const pageStructure = (
                   ),
                 S.listItem()
                   .title('Clothes')
+                  .icon(GiClothes)
                   .child(
                     S.documentTypeList('merch')
                       .title('Clothes')
@@ -111,6 +135,7 @@ export const pageStructure = (
                   ),
                 S.listItem()
                   .title('Bibelots')
+                  .icon(GiGemPendant)
                   .child(
                     S.documentTypeList('merch')
                       .title('Bibelots')
@@ -118,29 +143,33 @@ export const pageStructure = (
                   ),
               ]),
           ),
+        S.listItem()
+          .title('Info')
+          .icon(FaInfoCircle)
+          .schemaType('info')
+          .child(S.editor().id('info').schemaType('info').documentId('info')),
         S.divider(),
         S.listItem()
           .title('Media')
+          .icon(FaPalette)
           .child(
             S.list()
               .title('Media Types')
               .items([
                 S.listItem()
                   .title('Drawings')
+                  .icon(FaPalette)
                   .child(S.documentTypeList('drawingsBank').title('Drawings')),
                 S.listItem()
                   .title('Images')
+                  .icon(FaImage)
                   .child(S.documentTypeList('imagesBank').title('Images')),
               ]),
           ),
         S.divider(),
         S.listItem()
-          .title('Pages')
-          .schemaType('page')
-          .child(S.documentTypeList('page').title('Pages')),
-        S.divider(),
-        S.listItem()
           .title('Settings')
+          .icon(FaCog)
           .schemaType('settings')
           .child(
             S.editor()

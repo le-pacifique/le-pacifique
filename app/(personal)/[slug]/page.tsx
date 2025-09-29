@@ -11,11 +11,12 @@ import CollectionsPage from '@/components/pages/collection/CollectionsPage'
 import MerchPage from '@/components/pages/merch/MerchPage'
 import { Page } from '@/components/pages/page/Page'
 import { generateStaticSlugs } from '@/sanity/loader/generateStaticSlugs'
-import { loadHomePage, loadPage } from '@/sanity/loader/loadQuery'
+import { loadHomePage, loadInfo, loadPage } from '@/sanity/loader/loadQuery'
 const PagePreview = dynamic(() => import('@/components/pages/page/PagePreview'))
 
 import { theme } from '@/lib/theme'
 import { ArticlePayload } from '@/types'
+import InfoPage from '@/components/pages/info/InfoPage'
 type Props = {
   params: { slug: string }
 }
@@ -166,6 +167,15 @@ export default async function PageSlugRoute({ params }: Props) {
         menuImage={homepage?.data?.menuImages?.merch}
       />
     )
+  }
+
+  // Conditionally render the InfoPage component if the slug is 'info'
+  if (params.slug === 'info') {
+    const { data: info } = await loadInfo()
+    if (!info) {
+      notFound()
+    }
+    return <InfoPage info={info} menuImage={homepage?.data?.menuImages?.info} />
   }
 
   if (params.slug === 'blog') {

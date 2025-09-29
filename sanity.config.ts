@@ -29,6 +29,7 @@ import article from './sanity/schemas/documents/article'
 import drawings from './sanity/schemas/documents/drawings'
 import images from './sanity/schemas/documents/images'
 import merch from './sanity/schemas/documents/merch'
+import info from './sanity/schemas/singletons/info'
 
 const title =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE || 'Le Pacifique Records'
@@ -45,6 +46,7 @@ export default defineConfig({
       // Singletons
       home,
       settings,
+      info,
       // Documents
       duration,
       page,

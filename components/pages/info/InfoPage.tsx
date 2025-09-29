@@ -1,69 +1,146 @@
 import Image from 'next/image'
-
+import { PortableText } from '@portabletext/react'
 import { theme } from '@/lib/theme'
 import { urlForImage } from '@/sanity/lib/utils'
-import type { MerchPayload } from '@/types'
+import type { InfoPayload } from '@/types'
+import AnimatedArtistTitle from '../artist/AnimatedArtistTitle'
+import AnimatedTitle from './AnimatedTitle'
 
 export interface InfoPageProps {
-  merch: MerchPayload[]
+  info: InfoPayload
   menuImage?: {
     image: string
     title?: string
   }
 }
 
-const merchTypes = ['VINYL', 'TAPES', 'CLOTHES', 'BIBELOTS']
+const InfoPage = ({ info, menuImage }: InfoPageProps) => {
+  const bgColor =
+    info.backgroundColor?.hex || theme.colors.menu.Info?.background || '#222'
 
-const InfoPage = ({ merch, menuImage }: InfoPageProps) => {
-  const bgColor = theme.colors.menu.Merch.background
+  console.log(info)
 
   return (
     <div
       className="min-h-screen w-full relative"
       style={{ backgroundColor: bgColor }}
     >
-      {/* Background image from navbar */}
-      {menuImage?.image && (
-        <div className="absolute inset-0 overflow-hidden z-0">
-          <Image
-            className="absolute right-[13vw] md:left-32 bottom-16 md:-top-16 w-[80vw] md:w-[45vw] -rotate-12"
-            src={menuImage.image}
-            alt={menuImage.title || 'Merch Background'}
-            width={2500}
-            height={2500}
+      <svg className="hidden">
+        <filter id="roughText">
+          <feTurbulence
+            type="turbulence"
+            baseFrequency="0.02"
+            numOctaves="3"
+            result="noise"
           />
-        </div>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1" />
+        </filter>
+      </svg>
+      <div className="relative w-full flex py-16 pb-8 lg:py-32 lg:pb-16 px-8">
+        {info.logos?.map((logo: any, i: number) => {
+          // If logo.image exists, use it. Otherwise, use urlForImage(logo).url() if logo.asset exists.
+          const imageSrc =
+            logo.image ?? (logo.asset ? urlForImage(logo)?.url() : '')
+          return (
+            imageSrc && (
+              <Image
+                key={logo._id || logo._key || i}
+                src={imageSrc}
+                alt={logo.title || logo.alt || 'Logo'}
+                width={2000}
+                height={2000}
+                className="w-full h-full transition-all duration-500"
+              />
+            )
+          )
+        })}
+      </div>
+      {/* Background image from navbar or noteDrawing */}
+      {(menuImage?.image || info.noteDrawing?.image) && (
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${menuImage?.image || info.noteDrawing?.image})`,
+          }}
+        ></div>
       )}
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 lg:px-8 py-16 lg:py-24 tracking-tight">
-        <h1 className="text-6xl font-bold mb-12 text-white tracking-tight">
-          MERCH
-        </h1>
+      <div className="relative z-10 mx-auto px-8 tracking-tight">
+        {/* <h1 className="text-[6rem] font-bold mb-8 text-black tracking-tight uppercase leading-[0.75]">
+          {info.title}
+        </h1> */}
 
-        <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-6 lg:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-          {merchTypes.map((type) => (
-            <div key={type} className="bg-white/10 p-6 rounded-lg">
-              <h2 className="text-4xl font-bold text-white mb-4">{type}</h2>
-              <div className="space-y-6">
-                {merch
-                  .filter((merch) => merch.type.toUpperCase() === type)
-                  .map((merch) => (
-                    <div key={merch._id} className="bg-black/20 p-4 rounded">
-                      <h3 className="text-2xl text-white">{merch.name}</h3>
-                      <p className="text-white/80">Price: €{merch.price}</p>
-                      {merch.artist && (
-                        <p className="text-white/80">Artist: {merch.artist}</p>
-                      )}
-                      {merch.design && (
-                        <p className="text-white/80">Design: {merch.design}</p>
-                      )}
-                      <p className="text-white/80">Stock: {merch.stock}</p>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        <AnimatedTitle
+          text={info.title}
+          color="#000"
+          size="text-4xl lg:text-[6.5rem]"
+          style={{ filter: 'url(#roughText)' }}
+        />
+
+        {info.description && (
+          <div className="text-black columns-1 lg:columns-3 mb-8">
+            <PortableText value={info.description} />
+          </div>
+        )}
+
+        {info.contactEmail && (
+          <div className="mb-4 text-white">
+            <strong>Contact:</strong>{' '}
+            <a href={`mailto:${info.contactEmail}`}>{info.contactEmail}</a>
+          </div>
+        )}
+
+        {info.socialMedia && info.socialMedia.length > 0 && (
+          <div className="mb-4 text-white">
+            <strong>Social Media:</strong>
+            <ul>
+              {info.socialMedia.map((sm, i) => (
+                <li key={i}>
+                  <a href={sm.href} target="_blank" rel="noopener noreferrer">
+                    {sm.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {info.pressKit && info.pressKit.length > 0 && (
+          <div className="mb-4 text-white">
+            <strong>Press Kit:</strong>
+            <ul>
+              {info.pressKit.map((pk, i) => {
+                // Patch asset to always have _type
+                const fileObj =
+                  pk.file && pk.file.asset
+                    ? {
+                        ...pk.file,
+                        asset: {
+                          ...pk.file.asset,
+                          _type: pk.file.asset._type ?? 'reference',
+                        },
+                      }
+                    : undefined
+                const fileUrl = fileObj ? urlForImage(fileObj)?.url() ?? '' : ''
+                return (
+                  <li key={i}>
+                    {fileUrl ? (
+                      <a
+                        href={fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {pk.title}
+                      </a>
+                    ) : (
+                      <span>{pk.title}</span>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   )

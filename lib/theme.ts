@@ -27,6 +27,11 @@ export const theme = {
         hover: '#EED5F4',
         background: '#EED5F4',
       },
+      Info: {
+        border: '#C6F042',
+        hover: '#C6F042',
+        background: '#C6F042',
+      },
       default: {
         border: '#C6F042',
         hover: '#C6F042',

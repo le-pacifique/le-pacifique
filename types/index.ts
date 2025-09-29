@@ -50,6 +50,7 @@ export interface HomePagePayload {
     collections?: { image: string; title?: string }
     blog?: { image: string; title?: string }
     merch?: { image: string; title?: string }
+    info?: { image: string; title?: string } // <-- Add this line
   }
 }
 
@@ -64,6 +65,7 @@ export interface PagePayload {
   articles?: ArticlePayload[]
   releases?: ReleasePayload[]
   merch?: MerchPayload[]
+  info?: InfoPayload
 }
 
 export interface ArtistPayload {
@@ -251,4 +253,38 @@ export type MerchPayload = {
   }
   artist?: string // For VINYL and TAPES
   design?: string // For CLOTHES and BIBELOTS
+}
+
+export interface InfoPayload {
+  _id: string
+  title: string
+  backgroundColor?: { hex: string }
+  noteDrawing?: {
+    _id: string
+    title?: string
+    image: string
+  }
+  description?: Array<{ _type: string; children: Array<{ text: string }> }>
+  logos?: Array<
+    | {
+        _id: string
+        title?: string
+        image: string
+        alt?: string
+      }
+    | {
+        _key: string
+        asset: { _ref: string; _type?: string }
+        alt?: string
+      }
+  >
+  contactEmail?: string
+  socialMedia?: Array<{
+    title: string
+    href: string
+  }>
+  pressKit?: Array<{
+    title: string
+    file: { asset: { _ref: string; _type?: string } }
+  }>
 }

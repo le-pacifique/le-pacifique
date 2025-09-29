@@ -329,3 +329,26 @@ export const merchBySlugQuery = groq`
     }
   }
 `
+
+export const infoQuery = groq`
+  *[_type == "info"][0] {
+    _id,
+    title,
+    backgroundColor,
+    "noteDrawing": noteDrawing->{
+      _id,
+      title,
+      "image": media.asset->url
+    },
+    description,
+    logos[]->{
+      _id,
+      title,
+      "image": media.asset->url,
+      alt
+    },
+    contactEmail,
+    socialMedia[],
+    pressKit[]
+  }
+`
