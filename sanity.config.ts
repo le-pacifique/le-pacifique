@@ -76,7 +76,7 @@ export default defineConfig({
       },
     }),
     // Configures the global "new document" button, and document actions, to suit the Settings document singleton
-    singletonPlugin([home.name, settings.name]),
+    singletonPlugin([home.name, settings.name, info.name]),
     // Add an image asset source for Unsplash
     unsplashImageAsset(),
     // Vision lets you query your content with GROQ in the studio

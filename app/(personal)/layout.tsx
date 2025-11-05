@@ -58,7 +58,7 @@ export default async function IndexRoute({
           <Suspense>{children}</Suspense>
         </div>
       </div>
-      {/* {draftMode().isEnabled && <LiveVisualEditing />} */}
+      {draftMode().isEnabled && <LiveVisualEditing />}
     </>
   )
 }
