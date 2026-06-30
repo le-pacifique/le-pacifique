@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { memo, useSyncExternalStore } from 'react'
+import { memo, type ReactElement, useSyncExternalStore } from 'react'
 
 import { studioUrl } from '@/sanity/lib/api'
 
@@ -23,7 +23,8 @@ function useAfterHydration<Snapshot>(
 
 export default memo(function IntroTemplate() {
   const studioURL = useAfterHydration(
-    () => `${location.origin}${studioUrl}`,
+    () =>
+      studioUrl.startsWith('http') ? studioUrl : `${location.origin}${studioUrl}`,
     null,
   )
   const isLocalHost = useAfterHydration(
@@ -107,7 +108,7 @@ export default memo(function IntroTemplate() {
                     <div className="text-xs text-gray-700">
                       Start editing your content structure in
                       <div className="bg-slate-200 w-fit px-2">
-                        <pre>sanity.config.ts</pre>
+                        <pre>studio/sanity.config.ts</pre>
                       </div>
                     </div>
                   ) : (
@@ -214,7 +215,7 @@ function Box({
   element,
 }: {
   circleTitle: string
-  element: JSX.Element
+  element: ReactElement
 }) {
   return (
     <li className="mt-2 grid grid-flow-col grid-rows-1 place-content-start gap-3">

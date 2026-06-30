@@ -1,20 +1,20 @@
-import Image from 'next/image'
-import Link from 'next/link'
-
-import { urlForImage } from '@/sanity/lib/utils'
-import { resolveHref } from '@/sanity/lib/utils'
+import { PageScrollbarTheme } from '@/components/shared/PageScrollbarTheme'
+import {
+  getResolvedPageTheme,
+  getSectionTheme,
+  type SettingsTheme,
+} from '@/lib/theme'
 import type { CollectionPayload } from '@/types'
 
 import AnimatedArtistTitle from '../artist/AnimatedArtistTitle'
-import CollectionTitle from './CollectionTitle'
 import RotatingCarousel from './RotatingCarousel'
-import { theme } from '@/lib/theme'
 
 export interface CollectionPageProps {
   data: CollectionPayload
+  settingsTheme?: SettingsTheme
 }
 
-const CollectionPage = ({ data }: CollectionPageProps) => {
+const CollectionPage = ({ data, settingsTheme }: CollectionPageProps) => {
   const collection = data
 
   const formattedReleases =
@@ -34,13 +34,24 @@ const CollectionPage = ({ data }: CollectionPageProps) => {
       })),
     })) || []
 
-  const collectionColor = theme.colors.menu.Collections.background
+  const pageTheme = getResolvedPageTheme({
+    backgroundColor: collection.backgroundColor,
+    noteDrawing: collection.noteDrawing,
+    section: 'collections',
+    settingsTheme,
+  })
+  const collectionColor = getSectionTheme(
+    settingsTheme,
+    'collections',
+  ).backgroundColor
+  const collectionTitleColor = collection.titleColor?.hex || pageTheme.textColor
 
   return (
     <div
       className="h-full w-full absolute -z-0"
-      style={{ backgroundColor: collection.backgroundColor?.hex }}
+      style={{ backgroundColor: pageTheme.backgroundColor }}
     >
+      <PageScrollbarTheme backgroundColor={pageTheme.backgroundColor} />
       <svg className="hidden">
         <filter id="roughText">
           <feTurbulence
@@ -53,38 +64,28 @@ const CollectionPage = ({ data }: CollectionPageProps) => {
         </filter>
       </svg>
 
-      {collection.noteDrawing?.image && (
+      {pageTheme.noteDrawing?.image && (
         <div
           className="absolute inset-0 bg-cover bg-center pointer-events-none"
-          style={{ backgroundImage: `url(${collection.noteDrawing.image})` }}
+          style={{ backgroundImage: `url(${pageTheme.noteDrawing.image})` }}
         ></div>
       )}
 
       {collection.description && (
-        <div className="absolute top-[30%] right-[5%] z-40 max-w-xl p-6 rounded-lg text-black max-h-[50vh] overflow-y-auto">
+        <div
+          className="collection-description-scrollbar absolute top-[30%] right-[5%] z-40 max-w-xl p-6 text-black max-h-[50vh] overflow-y-auto"
+          style={{
+            scrollbarColor: `${collectionColor} transparent`,
+            ['--collection-scrollbar-thumb' as string]: collectionColor,
+          }}
+        >
           {collection.description?.map((block: any) => {
             if (block._type === 'block') {
               return (
                 <p
                   key={block._key}
-                  className="mb-3 text-sm md:text-xl leading-snug"
+                  className="distort mb-3 text-sm md:text-xl leading-snug"
                 >
-                  {block.children?.map((child: any) => {
-                    if (child._type === 'span') {
-                      return (
-                        <span
-                          key={child._key}
-                          className={
-                            child.marks?.includes('strong') ? 'font-bold' : ''
-                          }
-                        >
-                          {child.text}
-                        </span>
-                      )
-                    }
-
-                    return null
-                  })}
                   {block.children?.map((child: any) => {
                     if (child._type === 'span') {
                       return (
@@ -115,7 +116,12 @@ const CollectionPage = ({ data }: CollectionPageProps) => {
           No releases found for this collection
         </div>
       )}
-      <AnimatedArtistTitle name={collection.title} color={collectionColor} />
+      <AnimatedArtistTitle
+        name={collection.title}
+        color={collectionTitleColor}
+        blendMode={false}
+        distort
+      />
     </div>
   )
 }

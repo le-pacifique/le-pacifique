@@ -1,10 +1,15 @@
-import Image from 'next/image'
 import { PortableText } from '@portabletext/react'
-import { theme } from '@/lib/theme'
+import Image from 'next/image'
+
+import { PageScrollbarTheme } from '@/components/shared/PageScrollbarTheme'
+import { deterministicRange } from '@/lib/deterministicRandom'
+import {
+  getResolvedPageTheme,
+  getSectionTheme,
+  type SettingsTheme,
+} from '@/lib/theme'
 import { urlForImage } from '@/sanity/lib/utils'
 import type { InfoPayload } from '@/types'
-import AnimatedArtistTitle from '../artist/AnimatedArtistTitle'
-import AnimatedTitle from './AnimatedTitle'
 
 export interface InfoPageProps {
   info: InfoPayload
@@ -12,30 +17,44 @@ export interface InfoPageProps {
     image: string
     title?: string
   }
+  settingsTheme?: SettingsTheme
 }
 
-const InfoPage = ({ info, menuImage }: InfoPageProps) => {
-  const bgColor =
-    info.backgroundColor?.hex || theme.colors.menu.Info?.background || '#222'
+const InfoPage = ({ info, menuImage, settingsTheme }: InfoPageProps) => {
+  const pageTheme = getResolvedPageTheme({
+    backgroundColor: info.backgroundColor,
+    noteDrawing: info.noteDrawing,
+    section: 'info',
+    settingsTheme,
+  })
+  const drawing = pageTheme.noteDrawing ?? menuImage
+  const socialButtonColor = getSectionTheme(
+    settingsTheme,
+    'artists',
+  ).backgroundColor
 
-  console.log(info)
+  const generateSocialButtonStyles = (index: number) => {
+    const randomTop = deterministicRange(-10, 10, info._id, index, 'top')
+    const randomLeft = deterministicRange(-10, 10, info._id, index, 'left')
+    const randomRotate =
+      deterministicRange(0, 20, info._id, index, 'rotate') *
+      (index % 2 === 0 ? 1 : -1)
+
+    return {
+      top: `${randomTop}px`,
+      left: `${randomLeft}px`,
+      transform: `rotate(${randomRotate}deg)`,
+      '--initial-rotate': `${randomRotate}deg`,
+      backgroundColor: socialButtonColor,
+    }
+  }
 
   return (
     <div
       className="min-h-screen w-full relative"
-      style={{ backgroundColor: bgColor }}
+      style={{ backgroundColor: pageTheme.backgroundColor }}
     >
-      <svg className="hidden">
-        <filter id="roughText">
-          <feTurbulence
-            type="turbulence"
-            baseFrequency="0.02"
-            numOctaves="3"
-            result="noise"
-          />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1" />
-        </filter>
-      </svg>
+      <PageScrollbarTheme backgroundColor={pageTheme.backgroundColor} />
       <div className="relative w-full flex py-16 pb-8 lg:py-32 lg:pb-16 px-8">
         {info.logos?.map((logo: any, i: number) => {
           // If logo.image exists, use it. Otherwise, use urlForImage(logo).url() if logo.asset exists.
@@ -56,27 +75,16 @@ const InfoPage = ({ info, menuImage }: InfoPageProps) => {
         })}
       </div>
       {/* Background image from navbar or noteDrawing */}
-      {(menuImage?.image || info.noteDrawing?.image) && (
+      {drawing?.image && (
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url(${menuImage?.image || info.noteDrawing?.image})`,
+            backgroundImage: `url(${drawing.image})`,
           }}
         ></div>
       )}
 
-      <div className="relative z-10 mx-auto px-8 tracking-tight">
-        {/* <h1 className="text-[6rem] font-bold mb-8 text-black tracking-tight uppercase leading-[0.75]">
-          {info.title}
-        </h1> */}
-
-        <AnimatedTitle
-          text={info.title}
-          color="#000"
-          size="text-4xl lg:text-[6.5rem]"
-          style={{ filter: 'url(#roughText)' }}
-        />
-
+      <div className="distort-text relative z-10 mx-auto px-8 tracking-tight">
         {info.description && (
           <div className="text-black columns-1 lg:columns-3 mb-8">
             <PortableText value={info.description} />
@@ -84,24 +92,25 @@ const InfoPage = ({ info, menuImage }: InfoPageProps) => {
         )}
 
         {info.contactEmail && (
-          <div className="mb-4 text-white">
-            <strong>Contact:</strong>{' '}
+          <div className="mb-4 text-black">
             <a href={`mailto:${info.contactEmail}`}>{info.contactEmail}</a>
           </div>
         )}
 
         {info.socialMedia && info.socialMedia.length > 0 && (
-          <div className="mb-4 text-white">
-            <strong>Social Media:</strong>
-            <ul>
-              {info.socialMedia.map((sm, i) => (
-                <li key={i}>
-                  <a href={sm.href} target="_blank" rel="noopener noreferrer">
-                    {sm.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
+          <div className="mb-4 mt-8 flex">
+            {info.socialMedia.map((sm, i) => (
+              <a
+                key={sm._key || i}
+                href={sm.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mx-3 bg-white px-2 py-0 text-sm font-medium uppercase tracking-tight text-black first:ml-0 hover:animate-wiggle md:text-xl"
+                style={generateSocialButtonStyles(i)}
+              >
+                {sm.title}
+              </a>
+            ))}
           </div>
         )}
 

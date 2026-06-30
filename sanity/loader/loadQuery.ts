@@ -2,14 +2,18 @@ import 'server-only'
 
 import * as queryStore from '@sanity/react-loader'
 import { draftMode } from 'next/headers'
+import { connection } from 'next/server'
 
 import { client } from '@/sanity/lib/client'
 import {
   articleBySlugQuery,
+  articlesQuery,
   artistBySlugQuery,
+  blogQuery,
   collectionBySlugQuery,
   homePageQuery,
   infoQuery,
+  menuQuery,
   merchBySlugQuery,
   pagesBySlugQuery,
   projectBySlugQuery,
@@ -21,9 +25,11 @@ import { token } from '@/sanity/lib/token'
 import {
   ArticlePayload,
   ArtistPayload,
+  BlogPayload,
   CollectionPayload,
   HomePagePayload,
   InfoPayload,
+  MenuPayload,
   MerchPayload,
   PagePayload,
   ProjectPayload,
@@ -46,15 +52,25 @@ const serverClient = client.withConfig({
 queryStore.setServerClient(serverClient)
 
 const usingCdn = serverClient.config().useCdn
+const isDevelopment = process.env.NODE_ENV === 'development'
 // Automatically handle draft mode
-export const loadQuery = ((query, params = {}, options = {}) => {
-  const {
-    perspective = draftMode().isEnabled ? 'previewDrafts' : 'published',
-  } = options
+export const loadQuery = (async (query, params = {}, options = {}) => {
+  const draft = await draftMode()
+  const bypassCache = isDevelopment || draft.isEnabled
+  if (bypassCache) {
+    await connection()
+  }
+
+  const { perspective = draft.isEnabled ? 'previewDrafts' : 'published' } =
+    options
   // Don't cache by default
   let revalidate: NextFetchRequestConfig['revalidate'] = 0
-  // If `next.tags` is set, and we're not using the CDN, then it's safe to cache
-  if (!usingCdn && Array.isArray(options.next?.tags)) {
+  if (bypassCache) {
+    // Local Studio edits should be visible immediately after refresh.
+    // Draft/Presentation mode should also bypass the public-page cache.
+    revalidate = 0
+  } else if (!usingCdn && Array.isArray(options.next?.tags)) {
+    // If `next.tags` is set, and we're not using the CDN, then it's safe to cache.
     revalidate = false
   } else if (usingCdn) {
     revalidate = 60
@@ -62,12 +78,12 @@ export const loadQuery = ((query, params = {}, options = {}) => {
   return queryStore.loadQuery(query, params, {
     ...options,
     next: {
-      revalidate,
       ...(options.next || {}),
+      revalidate,
     },
     perspective,
     // Enable stega if in Draft Mode, to enable overlays when outside Sanity Studio
-    stega: draftMode().isEnabled,
+    stega: draft.isEnabled,
   })
 }) satisfies typeof queryStore.loadQuery
 
@@ -79,7 +95,7 @@ export function loadSettings() {
   return loadQuery<SettingsPayload>(
     settingsQuery,
     {},
-    { next: { tags: ['settings', 'home', 'page', 'project'] } },
+    { next: { tags: ['settings', 'artist', 'collection', 'drawingsBank'] } },
   )
 }
 
@@ -87,7 +103,23 @@ export function loadHomePage() {
   return loadQuery<HomePagePayload | null>(
     homePageQuery,
     {},
-    { next: { tags: ['home', 'project'] } },
+    { next: { tags: ['home', 'project', 'drawingsBank'] } },
+  )
+}
+
+export function loadBlog() {
+  return loadQuery<BlogPayload | null>(
+    blogQuery,
+    {},
+    { next: { tags: ['blog', 'drawingsBank'] } },
+  )
+}
+
+export function loadMenu() {
+  return loadQuery<MenuPayload | null>(
+    menuQuery,
+    {},
+    { next: { tags: ['menu', 'drawingsBank'] } },
   )
 }
 
@@ -95,7 +127,7 @@ export function loadProject(slug: string) {
   return loadQuery<ProjectPayload | null>(
     projectBySlugQuery,
     { slug },
-    { next: { tags: [`project:${slug}`] } },
+    { next: { tags: ['project', `project:${slug}`, 'drawingsBank'] } },
   )
 }
 
@@ -103,7 +135,7 @@ export function loadArtist(slug: string) {
   return loadQuery<ArtistPayload | null>(
     artistBySlugQuery,
     { slug },
-    { next: { tags: [`artist:${slug}`] } },
+    { next: { tags: ['artist', `artist:${slug}`, 'drawingsBank'] } },
   )
 }
 
@@ -111,7 +143,17 @@ export function loadCollection(slug: string) {
   return loadQuery<CollectionPayload | null>(
     collectionBySlugQuery,
     { slug },
-    { next: { tags: [`collection:${slug}`] } },
+    {
+      next: {
+        tags: [
+          'collection',
+          `collection:${slug}`,
+          'release',
+          'artist',
+          'drawingsBank',
+        ],
+      },
+    },
   )
 }
 
@@ -119,7 +161,19 @@ export function loadPage(slug: string) {
   return loadQuery<PagePayload | null>(
     pagesBySlugQuery,
     { slug },
-    { next: { tags: [`page:${slug}`] } },
+    {
+      next: {
+        tags: [
+          'page',
+          `page:${slug}`,
+          'artist',
+          'collection',
+          'article',
+          'merch',
+          'drawingsBank',
+        ],
+      },
+    },
   )
 }
 
@@ -127,7 +181,17 @@ export function loadRelease(slug: string) {
   return loadQuery<ReleasePayload | null>(
     releaseBySlugQuery,
     { slug },
-    { next: { tags: [`release:${slug}`] } },
+    {
+      next: {
+        tags: [
+          'release',
+          `release:${slug}`,
+          'artist',
+          'collection',
+          'drawingsBank',
+        ],
+      },
+    },
   )
 }
 
@@ -135,7 +199,15 @@ export function loadArticle(slug: string) {
   return loadQuery<ArticlePayload | null>(
     articleBySlugQuery,
     { slug },
-    { next: { tags: [`article:${slug}`] } },
+    { next: { tags: ['article', `article:${slug}`, 'drawingsBank'] } },
+  )
+}
+
+export function loadArticles() {
+  return loadQuery<ArticlePayload[]>(
+    articlesQuery,
+    {},
+    { next: { tags: ['article', 'drawingsBank'] } },
   )
 }
 
@@ -143,7 +215,7 @@ export function loadMerch(slug: string) {
   return loadQuery<MerchPayload | null>(
     merchBySlugQuery,
     { slug },
-    { next: { tags: [`merch:${slug}`] } },
+    { next: { tags: ['merch', `merch:${slug}`] } },
   )
 }
 
@@ -151,6 +223,6 @@ export function loadInfo() {
   return loadQuery<InfoPayload | null>(
     infoQuery,
     {},
-    { next: { tags: ['info'] } },
+    { next: { tags: ['info', 'drawingsBank'] } },
   )
 }

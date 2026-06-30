@@ -31,6 +31,16 @@ export default defineType({
       },
     }),
     defineField({
+      name: 'titleColor',
+      title: 'Collection Title Color',
+      type: 'color',
+      description:
+        'Optional color for the large animated collection title. Falls back to the default text color when empty.',
+      options: {
+        disableAlpha: true,
+      },
+    }),
+    defineField({
       name: 'noteDrawing',
       title: 'Notes Drawing',
       type: 'reference',

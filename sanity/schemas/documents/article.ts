@@ -1,5 +1,4 @@
-import { colorInput } from '@sanity/color-input'
-import { defineField, defineType } from 'sanity'
+import { defineArrayMember, defineField, defineType } from 'sanity'
 
 export default defineType({
   name: 'article',
@@ -27,17 +26,36 @@ export default defineType({
       name: 'backgroundColor',
       title: 'Background Color',
       type: 'color',
+      description:
+        'Overrides the default Blog background color from Settings > Theme.',
       options: {
         disableAlpha: true, // Disable alpha channel if not needed
       },
+    }),
+    defineField({
+      name: 'noteDrawing',
+      title: 'Drawing',
+      type: 'reference',
+      to: [{ type: 'drawingsBank' }],
+      description: 'Overrides the default Blog drawing from Settings > Theme.',
     }),
     defineField({
       name: 'content',
       title: 'Content',
       type: 'array',
       of: [
-        { type: 'block' },
-        {
+        defineArrayMember({
+          type: 'block',
+          styles: [
+            { title: 'Normal', value: 'normal' },
+            { title: 'Title', value: 'h1' },
+            { title: 'Heading', value: 'h2' },
+            { title: 'Subheading', value: 'h3' },
+            { title: 'Small heading', value: 'h4' },
+            { title: 'Quote', value: 'blockquote' },
+          ],
+        }),
+        defineArrayMember({
           type: 'image',
           options: {
             hotspot: true,
@@ -56,7 +74,39 @@ export default defineType({
               description: 'Important for SEO and accessiblity.',
             },
           ],
-        },
+        }),
+        defineArrayMember({
+          name: 'htmlEmbed',
+          title: 'HTML Embed',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'html',
+              title: 'HTML / iframe code',
+              type: 'text',
+              rows: 6,
+              description:
+                'Paste trusted embed code here, for example a YouTube iframe.',
+            }),
+            defineField({
+              name: 'caption',
+              title: 'Caption',
+              type: 'string',
+            }),
+          ],
+          preview: {
+            select: {
+              html: 'html',
+              caption: 'caption',
+            },
+            prepare({ caption, html }) {
+              return {
+                title: caption || 'HTML Embed',
+                subtitle: html,
+              }
+            },
+          },
+        }),
       ],
     }),
     defineField({

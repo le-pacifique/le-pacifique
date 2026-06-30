@@ -1,5 +1,7 @@
 import { Fragment } from 'react'
 
+import { deterministicRange } from '@/lib/deterministicRandom'
+
 const CollectionTitle = ({ name, style }) => {
   const words = name.split(' ') // Split the name into words
 
@@ -20,14 +22,14 @@ const CollectionTitle = ({ name, style }) => {
       baseTop +
       wordIndex * wordTopOffset +
       letterIndex * topIncrement +
-      (Math.random() * 4 - 2) // Randomly adjust 'top' for each letter
+      deterministicRange(-2, 2, name, wordIndex, letterIndex, 'top')
 
     const left =
       baseLeft +
       wordIndex * wordLeftOffset +
       letterIndex * leftIncrement -
       (wordLength * leftIncrement) / 2 // Center the word by subtracting half its total width
-    const rotate = Math.random() * 10 - 5 // Random rotation between -15 and 15 degrees
+    const rotate = deterministicRange(-5, 5, name, wordIndex, letterIndex, 'rotate')
 
     return {
       top: `${top}vh`,

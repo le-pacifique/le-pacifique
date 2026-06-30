@@ -28,6 +28,10 @@ export function resolveHref(
   switch (documentType) {
     case 'home':
       return '/'
+    case 'info':
+      return '/info'
+    case 'blog':
+      return '/blog'
     case 'page':
       return slug ? `/${slug}` : undefined
     case 'project':
@@ -40,6 +44,8 @@ export function resolveHref(
       return slug ? `/releases/${slug}` : undefined
     case 'article':
       return slug ? `/blog/${slug}` : undefined
+    case 'merch':
+      return '/merch'
     default:
       console.warn('Invalid document type:', documentType)
       return undefined

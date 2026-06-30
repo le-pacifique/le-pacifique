@@ -1,29 +1,46 @@
 import Image from 'next/image'
 
-import { theme } from '@/lib/theme'
+import { PageScrollbarTheme } from '@/components/shared/PageScrollbarTheme'
+import { deterministicRange } from '@/lib/deterministicRandom'
+import {
+  getResolvedPageTheme,
+  getSectionTheme,
+  type SettingsTheme,
+} from '@/lib/theme'
 import { urlForImage } from '@/sanity/lib/utils'
 import type { ArtistPayload } from '@/types'
 
+import { CustomPortableText } from '../../shared/CustomPortableText'
 import CollectionTitle from '../collection/CollectionTitle'
 import AnimatedArtistTitle from './AnimatedArtistTitle'
 import ArtistTitle from './ArtistTitle'
 
 export interface ArtistPageProps {
   data: ArtistPayload
+  settingsTheme?: SettingsTheme
 }
 
-const ArtistPage = ({ data }: ArtistPageProps) => {
+const ArtistPage = ({ data, settingsTheme }: ArtistPageProps) => {
   const artist = data
-  const { noteDrawing, backgroundColor, socialMedia, layout } = data
+  const { noteDrawing, backgroundColor, socialMedia, layout, titleColor } = data
 
   const isLeft = layout === 'left'
-  const bgColor = theme.colors.menu.Artists.background
+  const pageTheme = getResolvedPageTheme({
+    backgroundColor,
+    noteDrawing,
+    section: 'artists',
+    settingsTheme,
+  })
+  const bgColor = getSectionTheme(settingsTheme, 'artists').backgroundColor
+  const artistTitleColor = titleColor?.hex || pageTheme.textColor
 
   // Function to generate random styles
   const generateRandomStyles = (index: number) => {
-    const randomTop = Math.random() * 20 - 10 // Random value between -10 and 10
-    const randomLeft = Math.random() * 20 - 10 // Random value between -10 and 10
-    const randomRotate = Math.random() * 20 * (index % 2 === 0 ? 1 : -1) // Alternate rotation between positive and negative
+    const randomTop = deterministicRange(-10, 10, artist._id, index, 'top')
+    const randomLeft = deterministicRange(-10, 10, artist._id, index, 'left')
+    const randomRotate =
+      deterministicRange(0, 20, artist._id, index, 'rotate') *
+      (index % 2 === 0 ? 1 : -1)
 
     return {
       top: `${randomTop}px`,
@@ -37,21 +54,9 @@ const ArtistPage = ({ data }: ArtistPageProps) => {
   return (
     <div
       className="min-h-screen w-full relative flex items-center justify-center"
-      style={{ backgroundColor: backgroundColor?.hex }}
-      // style={{ backgroundColor: bgColor }}
+      style={{ backgroundColor: pageTheme.backgroundColor }}
     >
-      <svg className="hidden">
-        <filter id="roughText">
-          <feTurbulence
-            type="turbulence"
-            baseFrequency="0.02"
-            numOctaves="3"
-            result="noise"
-          />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1" />
-        </filter>
-      </svg>
-
+      <PageScrollbarTheme backgroundColor={pageTheme.backgroundColor} />
       {/* <CollectionTitle
         name={artist.name}
         style={{ filter: 'url(#roughText)' }}
@@ -59,13 +64,15 @@ const ArtistPage = ({ data }: ArtistPageProps) => {
 
       <AnimatedArtistTitle
         name={artist.name}
-        style={{ filter: 'url(#roughText)' }}
+        color={artistTitleColor}
+        blendMode={false}
+        distort
       />
 
-      {noteDrawing?.image && (
+      {pageTheme.noteDrawing?.image && (
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${noteDrawing.image})` }}
+          style={{ backgroundImage: `url(${pageTheme.noteDrawing.image})` }}
         ></div>
       )}
 
@@ -77,9 +84,18 @@ const ArtistPage = ({ data }: ArtistPageProps) => {
             }`}
           >
             <div className="lg:max-w-3xl">
-              <p className="mt-6 text-sm md:text-xl tracking-tight leading-snug text-black">
-                {artist.biography}
-              </p>
+              {Array.isArray(artist.biography) ? (
+                <div className="distort mt-6 text-sm md:text-xl tracking-tight leading-snug text-black">
+                  <CustomPortableText
+                    value={artist.biography}
+                    paragraphClasses="mb-4"
+                  />
+                </div>
+              ) : artist.biography ? (
+                <p className="distort mt-6 text-sm md:text-xl tracking-tight leading-snug text-black">
+                  {artist.biography}
+                </p>
+              ) : null}
             </div>
             <div className="mt-8 flex">
               {artist.socialMedia?.map((link, index) => (
@@ -103,10 +119,9 @@ const ArtistPage = ({ data }: ArtistPageProps) => {
               src={urlForImage(artist.image)?.url() ?? ''}
               width={2432}
               height={1442}
-              className={`max-h-96 mx-auto lg:h-[75vh] lg:max-h-none w-auto md:-ml-4 lg:-ml-0 rounded-[8px] border-4 border-[${bgColor}] ${
+              className={`max-h-96 mx-auto lg:h-[75vh] lg:max-h-none w-auto md:-ml-4 lg:-ml-0 ${
                 isLeft ? 'order-1 lg:order-1' : 'order-1 lg:order-2'
               }`}
-              style={{ borderColor: bgColor }}
             />
           )}
         </div>

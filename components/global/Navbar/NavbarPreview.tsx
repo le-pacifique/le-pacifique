@@ -10,6 +10,7 @@ type Props = {
 
 export default function NavbarPreview(props: Props) {
   const { data } = useSettings(props.initial)
+  const sections = data?.theme?.sections
 
   return (
     <NavbarLayout
@@ -17,10 +18,11 @@ export default function NavbarPreview(props: Props) {
       artists={[]}
       collections={[]}
       menuImages={{
-        artists: { image: '' },
-        collections: { image: '' },
-        blog: { image: '' },
-        merch: { image: '' },
+        artists: sections?.artists?.noteDrawing ?? {},
+        collections: sections?.collections?.noteDrawing ?? {},
+        blog: sections?.blog?.noteDrawing ?? {},
+        merch: sections?.merch?.noteDrawing ?? {},
+        info: sections?.info?.noteDrawing ?? {},
       }}
     />
   )

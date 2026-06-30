@@ -4,13 +4,18 @@ import type { Metadata, Viewport } from 'next'
 import dynamic from 'next/dynamic'
 import { draftMode } from 'next/headers'
 import { toPlainText } from 'next-sanity'
-import { Suspense } from 'react'
+import { Suspense, type CSSProperties } from 'react'
 
-import { Footer } from '@/components/global/Footer'
 import { Navbar } from '@/components/global/Navbar'
-import IntroTemplate from '@/intro-template'
+import { FloatingLogo } from '@/components/shared/FloatingLogo'
+import { colorToHex, getSectionTheme, sectionThemeKeys } from '@/lib/theme'
 import { urlForOpenGraphImage } from '@/sanity/lib/utils'
-import { loadHomePage, loadSettings } from '@/sanity/loader/loadQuery'
+import {
+  loadBlog,
+  loadHomePage,
+  loadInfo,
+  loadSettings,
+} from '@/sanity/loader/loadQuery'
 
 const LiveVisualEditing = dynamic(
   () => import('@/sanity/loader/LiveVisualEditing'),
@@ -22,18 +27,31 @@ export async function generateMetadata(): Promise<Metadata> {
     loadHomePage(),
   ])
 
-  const ogImage = urlForOpenGraphImage(settings?.ogImage)
+  const siteTitle = settings?.seo?.siteTitle || homePage?.title
+  const description =
+    settings?.seo?.description ||
+    (homePage?.overview ? toPlainText(homePage.overview) : undefined)
+  const ogImage = urlForOpenGraphImage(settings?.seo?.ogImage ?? settings?.ogImage)
+  const favicon = settings?.seo?.favicon?.asset?.url
+  const appleTouchIcon = settings?.seo?.appleTouchIcon?.asset?._ref
+    ? urlForOpenGraphImage(settings.seo.appleTouchIcon)
+    : undefined
+
   return {
-    title: homePage?.title
+    title: siteTitle
       ? {
-          template: `%s | ${homePage.title}`,
-          default: homePage.title || 'Personal website',
+          template: `%s | ${siteTitle}`,
+          default: siteTitle || 'Le Pacifique',
         }
       : undefined,
-    description: homePage?.overview
-      ? toPlainText(homePage.overview)
-      : undefined,
+    description,
+    icons: {
+      icon: favicon || '/favicon.ico',
+      apple: appleTouchIcon || '/iconpcfq.png',
+    },
     openGraph: {
+      title: siteTitle,
+      description,
       images: ogImage ? [ogImage] : [],
     },
   }
@@ -48,17 +66,49 @@ export default async function IndexRoute({
 }: {
   children: React.ReactNode
 }) {
+  const draft = await draftMode()
+  const [{ data: settings }, { data: homePage }, { data: blog }, { data: info }] =
+    await Promise.all([loadSettings(), loadHomePage(), loadBlog(), loadInfo()])
+  const loadingThemeStyle = sectionThemeKeys.reduce((styles, section) => {
+    styles[`--loading-background-${section}` as string] = getSectionTheme(
+      settings?.theme,
+      section,
+    ).backgroundColor
+
+    return styles
+  }, {} as CSSProperties)
+
+  loadingThemeStyle['--loading-background-home' as string] =
+    colorToHex(homePage?.backgroundColor) ??
+    loadingThemeStyle['--loading-background-home']
+  loadingThemeStyle['--loading-background-blog' as string] =
+    colorToHex(blog?.backgroundColor) ??
+    loadingThemeStyle['--loading-background-blog']
+  loadingThemeStyle['--loading-background-info' as string] =
+    colorToHex(info?.backgroundColor) ??
+    loadingThemeStyle['--loading-background-info']
+
   return (
     <>
-      <div className="flex min-h-svh h-full flex-col text-black">
+      <FloatingLogo
+        src="/images/logothique.png"
+        size={192}
+        mobileSize={128}
+        speed={26}
+        href="/"
+      />
+      <div
+        className="flex min-h-svh flex-col text-black"
+        style={loadingThemeStyle}
+      >
         <Suspense>
           <Navbar />
         </Suspense>
-        <div className="h-full">
+        <div className="flex-1">
           <Suspense>{children}</Suspense>
         </div>
       </div>
-      {draftMode().isEnabled && <LiveVisualEditing />}
+      {draft.isEnabled && <LiveVisualEditing />}
     </>
   )
 }

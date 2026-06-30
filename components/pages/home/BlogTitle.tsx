@@ -1,8 +1,18 @@
 'use client'
-import { motion } from 'framer-motion'
-import { Fragment } from 'react'
 
-const BlogTitle = ({ name, style }) => {
+import { motion } from 'framer-motion'
+import { type CSSProperties, Fragment } from 'react'
+
+import { deterministicRange } from '@/lib/deterministicRandom'
+
+interface BlogTitleProps {
+  name: string
+  style?: CSSProperties
+  color?: string
+  distort?: boolean
+}
+
+const BlogTitle = ({ name, style, color, distort = false }: BlogTitleProps) => {
   const words = name.split(' ') // Split the name into words
 
   // Function to generate style for each letter
@@ -22,14 +32,21 @@ const BlogTitle = ({ name, style }) => {
       baseTop +
       wordIndex * wordTopOffset +
       letterIndex * topIncrement +
-      (Math.random() * 4 - 2) // Randomly adjust 'top' for each letter
+      deterministicRange(-2, 2, name, wordIndex, letterIndex, 'top')
 
     const left =
       baseLeft +
       wordIndex * wordLeftOffset +
       letterIndex * leftIncrement -
       (wordLength * leftIncrement) / 2 // Center the word by subtracting half its total width
-    const rotate = Math.random() * 10 - 5 // Random rotation between -15 and 15 degrees
+    const rotate = deterministicRange(
+      -5,
+      5,
+      name,
+      wordIndex,
+      letterIndex,
+      'rotate',
+    )
 
     return {
       top: `${top}vh`,
@@ -39,15 +56,29 @@ const BlogTitle = ({ name, style }) => {
   }
 
   // Function to generate random animation properties
-  const generateAnimationProps = () => {
-    const duration = Math.random() * 2 + 1 // Random duration between 1 and 3 seconds
-    const delay = Math.random() * 2 // Random delay between 0 and 2 seconds
+  const generateAnimationProps = (wordIndex: number, letterIndex: number) => {
+    const duration = deterministicRange(
+      1,
+      3,
+      name,
+      wordIndex,
+      letterIndex,
+      'duration',
+    )
+    const delay = deterministicRange(
+      0,
+      2,
+      name,
+      wordIndex,
+      letterIndex,
+      'delay',
+    )
     return {
       x: [0, -2, 2, -2, 2, 0],
       y: [0, -2, 2, -2, 2, 0],
       transition: {
         duration,
-        ease: 'easeInOut',
+        ease: 'easeInOut' as const,
         repeat: Infinity,
         repeatType: 'mirror' as const,
         delay,
@@ -65,9 +96,14 @@ const BlogTitle = ({ name, style }) => {
           {word.split('').map((letter, letterIndex) => (
             <motion.span
               key={`${wordIndex}-${letterIndex}`}
-              className="absolute font-medium text-4xl md:text-[9rem] text-[#F6AB65] uppercase"
-              style={generateLetterStyles(wordIndex, letterIndex, word.length)}
-              animate={generateAnimationProps()}
+              className={`absolute font-medium text-4xl md:text-[9rem] uppercase ${
+                distort ? 'distort' : ''
+              }`}
+              style={{
+                ...generateLetterStyles(wordIndex, letterIndex, word.length),
+                color,
+              }}
+              animate={generateAnimationProps(wordIndex, letterIndex)}
             >
               {letter}
             </motion.span>

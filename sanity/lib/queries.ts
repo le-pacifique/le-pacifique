@@ -1,12 +1,66 @@
 import { groq } from 'next-sanity'
 
+const drawingFields = groq`
+  _id,
+  title,
+  "image": media.asset->url
+`
+
+const pageThemeFields = groq`
+  backgroundColor,
+  textColor,
+  "noteDrawing": noteDrawing->{
+    ${drawingFields}
+  }
+`
+
+const menuSectionFields = groq`
+  backgroundColor,
+  textColor,
+  "image": image->{
+    ${drawingFields}
+  }
+`
+
+const settingsThemeFields = groq`
+  theme{
+    sections{
+      home{
+        ${pageThemeFields}
+      },
+      artists{
+        ${pageThemeFields}
+      },
+      collections{
+        ${pageThemeFields}
+      },
+      blog{
+        ${pageThemeFields}
+      },
+      merch{
+        ${pageThemeFields}
+      },
+      info{
+        ${pageThemeFields}
+      },
+      releases{
+        ${pageThemeFields}
+      },
+      projects{
+        ${pageThemeFields}
+      },
+      pages{
+        ${pageThemeFields}
+      }
+    }
+  }
+`
+
 export const homePageQuery = groq`
   *[_type == "home"][0]{
     _id,
-    overview,
     title,
-    backgroundColor,
-    popupText,
+    ${pageThemeFields},
     "logos": logos[]->{
       _id,
       title,
@@ -32,9 +86,50 @@ export const homePageQuery = groq`
             _id,
             title,
             "image": media.asset->url
+          },
+          "info": menuImages.info->{
+            _id,
+            title,
+            "image": media.asset->url
           }
         },
-    popupText
+  }
+`
+
+export const blogQuery = groq`
+  *[_type == "blog"][0]{
+    _id,
+    title,
+    ${pageThemeFields}
+  }
+`
+
+export const menuQuery = groq`
+  *[_type == "menu"][0]{
+    _id,
+    "sections": {
+      "artists": sections.artists{
+        ${menuSectionFields}
+      },
+      "collections": sections.collections{
+        ${menuSectionFields}
+      },
+      "blog": sections.blog{
+        ${menuSectionFields}
+      },
+      "merch": sections.merch{
+        ${menuSectionFields}
+      },
+      "info": sections.info{
+        ${menuSectionFields}
+      },
+      "releases": sections.releases{
+        ${menuSectionFields}
+      },
+      "projects": sections.projects{
+        ${menuSectionFields}
+      }
+    }
   }
 `
 
@@ -49,6 +144,7 @@ export const simplifiedPagesBySlugQuery = groq`
 export const pagesBySlugQuery = groq`
   *[_type == "page" && slug.current == $slug][0] {
     _id,
+    ${pageThemeFields},
     body,
     overview,
     title,
@@ -94,7 +190,8 @@ export const pagesBySlugQuery = groq`
       title,
       slug,
       _type,
-      overview,
+      ${pageThemeFields},
+      excerpt,
       coverImage,
       date,
       content
@@ -127,13 +224,9 @@ export const artistBySlugQuery = groq`
     links,
     name,
     layout,
+    titleColor,
     "slug": slug.current,
-    "noteDrawing": noteDrawing->{
-      _id,
-      title,
-      "image": media.asset->url
-    },
-    backgroundColor,
+    ${pageThemeFields},
     socialMedia,
   }
 `
@@ -142,13 +235,9 @@ export const collectionBySlugQuery = groq`
   *[_type == "collection" && slug.current == $slug][0] {
     _id,
     title,
-    backgroundColor,
+    titleColor,
+    ${pageThemeFields},
     description,
-    "noteDrawing": noteDrawing->{
-      _id,
-      title,
-      "image": media.asset->url
-    },    
     "releases": releases[]->{
       _id,
       title,
@@ -197,6 +286,7 @@ export const projectBySlugQuery = groq`
     description,
     duration,
     overview,
+    ${pageThemeFields},
     site,
     "slug": slug.current,
     tags,
@@ -207,10 +297,25 @@ export const projectBySlugQuery = groq`
 export const settingsQuery = groq`
   *[_type == "settings"][0]{
     footer,
+    ${settingsThemeFields},
     menuItems[]->{
       _type,
       "slug": slug.current,
       title
+    },
+    seo{
+      siteTitle,
+      description,
+      favicon{
+        asset->{
+          _id,
+          url,
+          originalFilename,
+          mimeType
+        }
+      },
+      appleTouchIcon,
+      ogImage
     },
     ogImage,
         "artists": *[_type == "artist"] | order(name asc) {
@@ -232,8 +337,10 @@ export const releaseBySlugQuery = groq`
   *[_type == "release" && slug.current == $slug][0] {
     _id,
     title,
+    titleColor,
     "slug": slug.current,
     _type,
+    ${pageThemeFields},
     "image": image.asset->url,
     "backCover": backCover.asset->url,
     catalogNumber,
@@ -281,33 +388,30 @@ export const releaseBySlugQuery = groq`
   }
 `
 
+export const articlesQuery = groq`
+  *[_type == "article"] | order(date desc) {
+    _id,
+    title,
+    slug,
+    _type,
+    ${pageThemeFields},
+    excerpt,
+    coverImage,
+    date
+  }
+`
+
 export const articleBySlugQuery = groq`
   *[_type == "article" && slug.current == $slug][0] {
     _id,
     title,
     slug,
     _type,
-    backgroundColor,
+    ${pageThemeFields},
     excerpt,
-    coverImage {
-      asset->{
-        _id,
-        url
-      },
-      alt,
-      caption
-    },
+    coverImage,
     date,
-    content[]{
-      ...,
-      _type == "image" => {
-        ...,
-        asset->{
-          _id,
-          url
-        }
-      }
-    }
+    content
   }
 `
 
@@ -334,12 +438,7 @@ export const infoQuery = groq`
   *[_type == "info"][0] {
     _id,
     title,
-    backgroundColor,
-    "noteDrawing": noteDrawing->{
-      _id,
-      title,
-      "image": media.asset->url
-    },
+    ${pageThemeFields},
     description,
     logos[]->{
       _id,

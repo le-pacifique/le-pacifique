@@ -27,9 +27,56 @@ export interface ShowcaseProject {
   title?: string
 }
 
+export interface ColorPayload {
+  hex?: string
+}
+
+export interface DrawingPayload {
+  _id?: string
+  title?: string
+  image?: string
+}
+
+export interface PageThemePayload {
+  backgroundColor?: ColorPayload | string
+  textColor?: ColorPayload | string
+  noteDrawing?: DrawingPayload
+}
+
+export type SectionThemeKey =
+  | 'home'
+  | 'artists'
+  | 'collections'
+  | 'blog'
+  | 'merch'
+  | 'info'
+  | 'releases'
+  | 'projects'
+  | 'pages'
+
+export interface SettingsThemePayload {
+  sections?: Partial<Record<SectionThemeKey, PageThemePayload>>
+}
+
+export interface BlogPayload extends PageThemePayload {
+  _id: string
+  title?: string
+}
+
+export interface MenuSectionPayload {
+  backgroundColor?: ColorPayload | string
+  textColor?: ColorPayload | string
+  image?: DrawingPayload
+}
+
+export interface MenuPayload {
+  _id: string
+  sections?: Partial<Record<SectionThemeKey, MenuSectionPayload>>
+}
+
 // Page payloads
 
-export interface HomePagePayload {
+export interface HomePagePayload extends PageThemePayload {
   footer?: PortableTextBlock[]
   overview?: PortableTextBlock[]
   showcaseProjects?: ShowcaseProject[]
@@ -39,7 +86,6 @@ export interface HomePagePayload {
     title: string
     image: string
   }
-  popupText?: string
   logos?: {
     _id: string
     title: string
@@ -54,7 +100,7 @@ export interface HomePagePayload {
   }
 }
 
-export interface PagePayload {
+export interface PagePayload extends PageThemePayload {
   body?: PortableTextBlock[]
   name?: string
   overview?: PortableTextBlock[]
@@ -72,7 +118,7 @@ export interface ArtistPayload {
   _id: string
   name: string
   image: any
-  biography: string
+  biography?: PortableTextBlock[] | string
   slug?: {
     current: string
   }
@@ -83,9 +129,8 @@ export interface ArtistPayload {
     title: string
     image: string
   }
-  backgroundColor?: {
-    hex: string
-  }
+  backgroundColor?: ColorPayload
+  titleColor?: ColorPayload
   socialMedia?: {
     _key: string
     title: string
@@ -110,6 +155,9 @@ export interface ReleasePayload {
   }
   _type: string
   bandcampPlayer: string
+  backgroundColor?: ColorPayload
+  noteDrawing?: DrawingPayload
+  titleColor?: ColorPayload
   artists: Array<
     | {
         _id: string
@@ -144,35 +192,38 @@ export type ArticlePayload = {
     current: string
   }
   _type?: string
-  backgroundColor?: string
-  excerpt?: PortableTextBlock[]
+  backgroundColor?: ColorPayload | string
+  noteDrawing?: DrawingPayload
+  excerpt?: PortableTextBlock[] | string
   color?: string
   previewText?: string
   coverImage?: {
     asset: {
-      _ref: string
+      _ref?: string
+      url?: string
     }
     alt?: string
     caption?: string
   }
 
   date: string
-  content: Array<
+  content?: Array<
+    | PortableTextBlock
     | {
-        _type: 'block'
-        children: Array<{ text: string }>
-      }
-    | {
-        _type: 'image'
-        asset: {
-          _ref: string
-        }
-        alt?: string
+        _key?: string
+        _type: 'htmlEmbed'
         caption?: string
+        html?: string
       }
     | {
-        _type: 'embed'
-        url: string
+        _key?: string
+        _type: 'image'
+        alt?: string
+        asset?: {
+          _ref?: string
+          url?: string
+        }
+        caption?: string
       }
   >
 }
@@ -187,9 +238,8 @@ export interface CollectionPayload {
   description: PortableTextBlock[]
   tracklist: Track[]
   credits: Credits
-  backgroundColor: {
-    hex: string
-  }
+  backgroundColor?: ColorPayload
+  titleColor?: ColorPayload
   slug?: {
     current: string
   }
@@ -217,6 +267,7 @@ export interface Credits {
 }
 
 export interface ProjectPayload {
+  backgroundColor?: ColorPayload
   client?: string
   coverImage?: Image
   description?: PortableTextBlock[]
@@ -229,12 +280,28 @@ export interface ProjectPayload {
   slug: string
   tags?: string[]
   title?: string
+  noteDrawing?: DrawingPayload
 }
 
 export interface SettingsPayload {
   footer?: PortableTextBlock[]
   menuItems?: MenuItem[]
   ogImage?: Image
+  seo?: {
+    siteTitle?: string
+    description?: string
+    favicon?: {
+      asset?: {
+        _id?: string
+        url?: string
+        originalFilename?: string
+        mimeType?: string
+      }
+    }
+    appleTouchIcon?: Image
+    ogImage?: Image
+  }
+  theme?: SettingsThemePayload
   artists?: ArtistPayload[]
   collections?: CollectionPayload[]
 }
@@ -258,12 +325,8 @@ export type MerchPayload = {
 export interface InfoPayload {
   _id: string
   title: string
-  backgroundColor?: { hex: string }
-  noteDrawing?: {
-    _id: string
-    title?: string
-    image: string
-  }
+  backgroundColor?: ColorPayload
+  noteDrawing?: DrawingPayload
   description?: Array<{ _type: string; children: Array<{ text: string }> }>
   logos?: Array<
     | {
@@ -280,6 +343,7 @@ export interface InfoPayload {
   >
   contactEmail?: string
   socialMedia?: Array<{
+    _key?: string
     title: string
     href: string
   }>

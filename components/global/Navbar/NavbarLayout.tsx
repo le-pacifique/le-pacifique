@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
-import { theme } from '@/lib/theme'
+import { getSectionThemeByTitle, type SettingsTheme } from '@/lib/theme'
 import { resolveHref } from '@/sanity/lib/utils'
 import type {
   ArtistPayload,
@@ -16,6 +16,12 @@ import type {
 } from '@/types'
 
 const ITEMS_WITH_SUBMENU = ['Artists', 'Collections'] as const
+const ITEMS_WITH_BACKGROUND_OVERLAY = [
+  'Artists',
+  'Collections',
+  'Blog',
+  'Merch',
+] as const
 
 const menuImageConfig = {
   Artists: {
@@ -40,16 +46,30 @@ const menuImageConfig = {
   },
 } as const
 
+type MenuImageKey = keyof typeof menuImageConfig
+type BackgroundOverlayItem = (typeof ITEMS_WITH_BACKGROUND_OVERLAY)[number]
+type MenuImageSourceKey =
+  | (typeof menuImageConfig)[MenuImageKey]['srcKey']
+  | 'info'
+type MenuImageSource = {
+  image?: string
+  title?: string
+}
+
+const hasBackgroundOverlay = (
+  title: string | null,
+): title is BackgroundOverlayItem =>
+  Boolean(
+    title &&
+      ITEMS_WITH_BACKGROUND_OVERLAY.includes(title as BackgroundOverlayItem),
+  )
+
 interface NavbarLayoutProps {
   data: SettingsPayload
   artists: ArtistPayload[]
   collections: CollectionPayload[]
-  menuImages: {
-    artists: { image: string }
-    collections: { image: string }
-    blog: { image: string }
-    merch: { image: string }
-  }
+  menuTheme?: SettingsTheme
+  menuImages: Record<MenuImageSourceKey, MenuImageSource>
 }
 
 // --- Dropdown ---
@@ -57,10 +77,12 @@ function Dropdown<
   T extends { _type: string; slug?: string; name?: string; title?: string },
 >({
   items,
+  pathname,
   color,
   onItemClick,
 }: {
   items: T[]
+  pathname: string
   color: string
   onItemClick: () => void
 }) {
@@ -69,17 +91,29 @@ function Dropdown<
       {items.map((item, index) => {
         const href = resolveHref(item._type, item.slug)
         if (!href) return null
+        const isActive = pathname === href
+
         return (
           <motion.div
             key={item.slug?.toString() ?? index}
+            className="relative"
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.25, delay: index * 0.05 }}
           >
+            {isActive && (
+              <span
+                className="distort absolute -left-5 top-0 pointer-events-none"
+                style={{ color }}
+                aria-hidden="true"
+              >
+                &gt;
+              </span>
+            )}
             <Link
               href={href}
-              className="block hover:opacity-70"
+              className="distort block hover:opacity-70"
               style={{ color }}
               onClick={onItemClick}
             >
@@ -96,30 +130,38 @@ function Dropdown<
 function BackgroundOverlay({
   hovered,
   menuImages,
+  settingsTheme,
 }: {
-  hovered: keyof typeof menuImageConfig
+  hovered: string
   menuImages: NavbarLayoutProps['menuImages']
+  settingsTheme: SettingsTheme | null | undefined
 }) {
-  const config = menuImageConfig[hovered]
-  if (!config) return null
+  const config =
+    hovered in menuImageConfig
+      ? menuImageConfig[hovered as MenuImageKey]
+      : undefined
+  const sectionTheme = getSectionThemeByTitle(settingsTheme, hovered)
+  const image = config ? menuImages[config.srcKey] : undefined
 
   return (
     <motion.div
-      className="absolute inset-0 z-30 overflow-hidden pointer-events-none"
+      className="fixed inset-0 z-30 overflow-hidden pointer-events-none"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, transition: { duration: 0.3 } }}
       transition={{ duration: 0.2 }}
-      style={{ backgroundColor: theme.colors.menu[hovered]?.background }}
+      style={{ backgroundColor: sectionTheme.backgroundColor }}
     >
-      <Image
-        className={config.className}
-        src={menuImages[config.srcKey].image}
-        alt={`${hovered} Image`}
-        width={2500}
-        height={2500}
-        priority
-      />
+      {config && image?.image && (
+        <Image
+          className={config.className}
+          src={image.image}
+          alt={image.title || `${hovered} Image`}
+          width={2500}
+          height={2500}
+          priority
+        />
+      )}
     </motion.div>
   )
 }
@@ -133,6 +175,7 @@ function MenuItemLink({
   collections,
   isTop,
   pathname,
+  settingsTheme,
 }: {
   menuItem: MenuItem
   hoveredItem: string | null
@@ -141,26 +184,22 @@ function MenuItemLink({
   collections: CollectionPayload[]
   isTop?: boolean
   pathname: string
+  settingsTheme: SettingsTheme | null | undefined
 }) {
   if (!menuItem?.title) return null
 
   const href = resolveHref(menuItem._type, menuItem.slug) || '#'
-  const menuTheme =
-    theme.colors.menu[menuItem.title] || theme.colors.menu.default
-  const grayColor = theme.colors.text.muted
+  const menuTheme = getSectionThemeByTitle(settingsTheme, menuItem.title)
+  const grayColor = 'rgba(255, 255, 255, 0.25)'
 
   const active =
     pathname === '/' ||
     pathname === '/info' ||
     pathname.includes(menuItem.title.toLowerCase())
   const borderColor =
-    // hoveredItem === menuItem.title
-    //   ? menuTheme.border
-    //   : active
-    //     ? menuTheme.border
-    //     : grayColor
-    menuTheme.border
-  const textColor = active ? menuTheme.text : grayColor
+    hoveredItem === menuItem.title ? menuTheme.textColor : menuTheme.borderColor
+  const textColor =
+    hoveredItem === menuItem.title || active ? menuTheme.textColor : grayColor
 
   // Check if on homepage or if this section is active
   const isHomepage = pathname === '/'
@@ -173,7 +212,7 @@ function MenuItemLink({
 
   return (
     <div
-      className="relative px-0 pb-2"
+      className={`relative px-0 ${isTop ? 'pb-2' : ''}`}
       onMouseEnter={() => setHoveredItem(menuItem.title ?? null)}
       onMouseLeave={() => setHoveredItem(null)}
     >
@@ -184,7 +223,7 @@ function MenuItemLink({
             style={{ backgroundColor: borderColor }}
           />
           <div
-            className={`uppercase text-lg font-extrabold md:text-2xl transition-opacity duration-300 ${
+            className={`distort uppercase text-lg font-extrabold md:text-2xl transition-opacity duration-300 ${
               // Only show text when:
               // 1. This is the item being hovered, OR
               // 2. This is active AND no other item is being hovered
@@ -207,7 +246,8 @@ function MenuItemLink({
                   title: a.name,
                   name: a.name,
                 }))}
-                color={menuTheme.text}
+                pathname={pathname}
+                color={menuTheme.textColor}
                 onItemClick={() => setHoveredItem(null)}
               />
             )}
@@ -220,7 +260,8 @@ function MenuItemLink({
                     title: c.title,
                     name: c.title, // for Dropdown display
                   }))}
-                  color={menuTheme.text}
+                  pathname={pathname}
+                  color={menuTheme.textColor}
                   onItemClick={() => setHoveredItem(null)}
                 />
               )}
@@ -240,15 +281,16 @@ function MenuItemLink({
         //   {menuItem.title}
         <Link
           href={href}
-          className={`uppercase text-lg font-extrabold tracking-tighter md:text-2xl transition-colors duration-300 ${
+          className={`block uppercase text-lg font-extrabold tracking-tighter md:text-2xl transition-colors duration-300 ${
             !hasSubmenu ? 'hover:text-white' : ''
           }`}
           style={{
-            borderBottom: `8px solid ${hoveredItem === menuItem.title ? 'transparent' : borderColor}`,
+            borderBottom: `8px solid ${borderColor}`,
           }}
         >
           {/* Wrap the text in a span with controlled opacity */}
           <span
+            className="distort inline-block"
             style={{
               color: textColor,
               opacity:
@@ -270,20 +312,25 @@ export default function NavbarLayout({
   data,
   artists,
   collections,
+  menuTheme,
   menuImages,
 }: NavbarLayoutProps) {
   const pathname = usePathname()
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const menuItems = data?.menuItems || []
+  const backgroundOverlayItem = hasBackgroundOverlay(hoveredItem)
+    ? hoveredItem
+    : null
 
   return (
     <>
       {/* Background overlay */}
       <AnimatePresence>
-        {hoveredItem && (
+        {backgroundOverlayItem && (
           <BackgroundOverlay
-            hovered={hoveredItem as any}
+            hovered={backgroundOverlayItem}
             menuImages={menuImages}
+            settingsTheme={menuTheme ?? data.theme}
           />
         )}
       </AnimatePresence>
@@ -300,6 +347,7 @@ export default function NavbarLayout({
             collections={collections}
             isTop
             pathname={pathname}
+            settingsTheme={menuTheme ?? data.theme}
           />
         ))}
       </div>
@@ -318,6 +366,7 @@ export default function NavbarLayout({
               artists={artists}
               collections={collections}
               pathname={pathname}
+              settingsTheme={menuTheme ?? data.theme}
             />
           ))}
       </div>

@@ -5,20 +5,23 @@
 import { type DocumentDefinition } from 'sanity'
 import { type StructureResolver } from 'sanity/structure'
 import {
-  FaHome,
-  FaUserAstronaut,
-  FaCompactDisc,
-  FaMusic,
-  FaNewspaper,
-  FaTshirt,
-  FaPalette,
-  FaImage,
-  FaCog,
-  FaInfoCircle,
-  FaRecordVinyl,
-  FaTape,
-} from 'react-icons/fa'
-import { GiClothes, GiGemPendant } from 'react-icons/gi'
+  LuAlbum,
+  LuBadgeInfo,
+  LuCassetteTape,
+  LuDisc3,
+  LuFileText,
+  LuGem,
+  LuHouse,
+  LuImage,
+  LuMenu,
+  LuMusic,
+  LuNewspaper,
+  LuPalette,
+  LuSettings,
+  LuShirt,
+  LuShoppingBag,
+  LuUsers,
+} from 'react-icons/lu'
 
 export const singletonPlugin = (types: string[]) => {
   return {
@@ -50,68 +53,65 @@ export const singletonPlugin = (types: string[]) => {
 // The StructureResolver is how we're changing the DeskTool structure to linking to document (named Singleton)
 // like how "Home" is handled.
 export const pageStructure = (
-  typeDefArray: DocumentDefinition[],
+  _typeDefArray: DocumentDefinition[],
 ): StructureResolver => {
   return (S) => {
-    // Goes through all of the singletons that were provided and translates them into something the
-    // Desktool can understand
-    const singletonItems = typeDefArray.map((typeDef) => {
-      return S.listItem()
-        .title(typeDef.title!)
-        .icon(typeDef.icon)
-        .child(
-          S.editor()
-            .id(typeDef.name)
-            .schemaType(typeDef.name)
-            .documentId(typeDef.name),
-        )
-    })
-
-    // The default root list items (except custom ones)
-    const defaultListItems = S.documentTypeListItems().filter(
-      (listItem) =>
-        !typeDefArray.find((singleton) => singleton.name === listItem.getId()),
-    )
-
     return S.list()
       .title('Content')
       .items([
         S.listItem()
           .title('Home')
-          .icon(FaHome)
+          .icon(LuHouse)
           .schemaType('home')
           .child(S.editor().id('home').schemaType('home').documentId('home')),
         S.divider(),
         S.listItem()
           .title('Artists')
-          .icon(FaUserAstronaut)
+          .icon(LuUsers)
           .schemaType('artist')
           .child(S.documentTypeList('artist').title('Artists')),
         S.listItem()
           .title('Collections')
-          .icon(FaCompactDisc)
+          .icon(LuDisc3)
           .schemaType('collection')
           .child(S.documentTypeList('collection').title('Collections')),
         S.listItem()
           .title('Releases')
-          .icon(FaMusic)
+          .icon(LuMusic)
           .schemaType('release')
           .child(S.documentTypeList('release').title('Releases')),
         S.listItem()
           .title('Blog')
-          .icon(FaNewspaper)
-          .schemaType('article')
-          .child(S.documentTypeList('article').title('Articles')),
+          .icon(LuNewspaper)
+          .child(
+            S.list()
+              .title('Blog')
+              .items([
+                S.listItem()
+                  .title('Blog')
+                  .icon(LuSettings)
+                  .schemaType('blog')
+                  .child(
+                    S.editor().id('blog').schemaType('blog').documentId('blog'),
+                  ),
+                S.divider(),
+                S.listItem()
+                  .title('Articles')
+                  .icon(LuFileText)
+                  .schemaType('article')
+                  .child(S.documentTypeList('article').title('Articles')),
+              ]),
+          ),
         S.listItem()
           .title('Merch')
-          .icon(FaTshirt)
+          .icon(LuShoppingBag)
           .child(
             S.list()
               .title('Merch Types')
               .items([
                 S.listItem()
                   .title('Vinyl')
-                  .icon(FaRecordVinyl)
+                  .icon(LuAlbum)
                   .child(
                     S.documentTypeList('merch')
                       .title('Vinyl')
@@ -119,7 +119,7 @@ export const pageStructure = (
                   ),
                 S.listItem()
                   .title('Tapes')
-                  .icon(FaTape)
+                  .icon(LuCassetteTape)
                   .child(
                     S.documentTypeList('merch')
                       .title('Tapes')
@@ -127,7 +127,7 @@ export const pageStructure = (
                   ),
                 S.listItem()
                   .title('Clothes')
-                  .icon(GiClothes)
+                  .icon(LuShirt)
                   .child(
                     S.documentTypeList('merch')
                       .title('Clothes')
@@ -135,7 +135,7 @@ export const pageStructure = (
                   ),
                 S.listItem()
                   .title('Bibelots')
-                  .icon(GiGemPendant)
+                  .icon(LuGem)
                   .child(
                     S.documentTypeList('merch')
                       .title('Bibelots')
@@ -145,31 +145,36 @@ export const pageStructure = (
           ),
         S.listItem()
           .title('Info')
-          .icon(FaInfoCircle)
+          .icon(LuBadgeInfo)
           .schemaType('info')
           .child(S.editor().id('info').schemaType('info').documentId('info')),
         S.divider(),
         S.listItem()
           .title('Media')
-          .icon(FaPalette)
+          .icon(LuPalette)
           .child(
             S.list()
               .title('Media Types')
               .items([
                 S.listItem()
                   .title('Drawings')
-                  .icon(FaPalette)
+                  .icon(LuPalette)
                   .child(S.documentTypeList('drawingsBank').title('Drawings')),
                 S.listItem()
                   .title('Images')
-                  .icon(FaImage)
+                  .icon(LuImage)
                   .child(S.documentTypeList('imagesBank').title('Images')),
               ]),
           ),
         S.divider(),
         S.listItem()
+          .title('Menu')
+          .icon(LuMenu)
+          .schemaType('menu')
+          .child(S.editor().id('menu').schemaType('menu').documentId('menu')),
+        S.listItem()
           .title('Settings')
-          .icon(FaCog)
+          .icon(LuSettings)
           .schemaType('settings')
           .child(
             S.editor()

@@ -1,13 +1,18 @@
 'use client'
 
 import { endOfMonth, format, isWithinInterval, startOfMonth } from 'date-fns'
-import Image from 'next/image'
 import Link from 'next/link'
+import { toPlainText } from 'next-sanity'
 import { useState } from 'react'
 
-import { theme } from '@/lib/theme'
+import { PageScrollbarTheme } from '@/components/shared/PageScrollbarTheme'
+import {
+  colorToHex,
+  getResolvedPageTheme,
+  type SettingsTheme,
+} from '@/lib/theme'
 import { resolveHref } from '@/sanity/lib/utils'
-import type { ArticlePayload } from '@/types'
+import type { ArticlePayload, PageThemePayload } from '@/types'
 
 import BlogTitle from '../home/BlogTitle'
 import Calendar from './Calendar'
@@ -18,23 +23,73 @@ export interface BlogPageProps {
     image: string
     title?: string
   }
+  pageTheme?: PageThemePayload
+  settingsTheme?: SettingsTheme
 }
 
-const BlogPage = ({ articles, menuImage }: BlogPageProps) => {
-  const [currentMonth, setCurrentMonth] = useState(new Date())
-  const bgColor = theme.colors.menu.Blog.background
+function getArticleDate(article: ArticlePayload) {
+  const date = article.date ? new Date(article.date) : null
+  return date && !Number.isNaN(date.getTime()) ? date : null
+}
+
+function getInitialMonth(articles: ArticlePayload[]) {
+  const dates = articles
+    .map(getArticleDate)
+    .filter((date): date is Date => Boolean(date))
+    .sort((a, b) => b.getTime() - a.getTime())
+
+  return dates[0] ?? new Date()
+}
+
+function getArticlePreview(article: ArticlePayload) {
+  if (article.previewText) return article.previewText
+  if (typeof article.excerpt === 'string') return article.excerpt
+  if (Array.isArray(article.excerpt)) return toPlainText(article.excerpt)
+  return undefined
+}
+
+const BlogPage = ({
+  articles,
+  menuImage,
+  pageTheme: pageThemeOverride,
+  settingsTheme,
+}: BlogPageProps) => {
+  const [currentMonth, setCurrentMonth] = useState(() =>
+    getInitialMonth(articles),
+  )
+  const pageTheme = getResolvedPageTheme({
+    backgroundColor: pageThemeOverride?.backgroundColor,
+    textColor: pageThemeOverride?.textColor,
+    noteDrawing: pageThemeOverride?.noteDrawing,
+    section: 'blog',
+    settingsTheme,
+  })
+  const drawing = pageTheme.noteDrawing ?? menuImage
+  const datedArticles = articles
+    .filter((article) => getArticleDate(article))
+    .sort(
+      (a, b) =>
+        (getArticleDate(b)?.getTime() ?? 0) -
+        (getArticleDate(a)?.getTime() ?? 0),
+    )
 
   // Filter articles for current month
   const monthStart = startOfMonth(currentMonth)
   const monthEnd = endOfMonth(monthStart)
-  const monthArticles = articles.filter((a) =>
-    isWithinInterval(new Date(a.date), { start: monthStart, end: monthEnd }),
-  )
+  const monthArticles = datedArticles.filter((article) => {
+    const date = getArticleDate(article)
+    return date
+      ? isWithinInterval(date, { start: monthStart, end: monthEnd })
+      : false
+  })
 
   // Group by day
   const groupedArticles = monthArticles.reduce(
     (acc, article) => {
-      const dateKey = format(new Date(article.date), 'yyyy-MM-dd')
+      const date = getArticleDate(article)
+      if (!date) return acc
+
+      const dateKey = format(date, 'yyyy-MM-dd')
       if (!acc[dateKey]) acc[dateKey] = []
       acc[dateKey].push(article)
       return acc
@@ -49,102 +104,104 @@ const BlogPage = ({ articles, menuImage }: BlogPageProps) => {
 
   return (
     <div
-      className="h-[100svh] w-full relative flex flex-col md:flex-row"
-      style={{ backgroundColor: bgColor }}
+      className="relative min-h-svh w-full overflow-x-hidden px-5 pb-20 pt-24 md:px-10 md:py-24 lg:px-16"
+      style={{
+        backgroundColor: pageTheme.backgroundColor,
+        color: pageTheme.textColor,
+      }}
     >
-      <svg className="hidden">
-        <filter id="roughText">
-          <feTurbulence
-            type="turbulence"
-            baseFrequency="0.02"
-            numOctaves="3"
-            result="noise"
+      <PageScrollbarTheme backgroundColor={pageTheme.backgroundColor} />
+      <BlogTitle name="Blog" color={pageTheme.textColor} distort />
+
+      <div className="relative z-10 mx-auto grid min-h-[calc(100svh-8rem)] w-full max-w-[88rem] grid-cols-1 gap-10 md:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1fr)] md:items-center">
+        <section className="flex justify-center md:justify-start">
+          <Calendar
+            currentMonth={currentMonth}
+            events={datedArticles}
+            width="w-full max-w-xl"
+            color={pageTheme.textColor}
+            backgroundColor={pageTheme.backgroundColor}
+            onMonthChange={handleMonthChange}
           />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1" />
-        </filter>
-      </svg>
+        </section>
 
-      <BlogTitle name="Blog" style={{ filter: 'url(#roughText)' }} />
-
-      {/* Left: Calendar (50% on desktop) */}
-      <div className="md:w-1/2 p-6 flex flex-col items-center justify-center mt-16">
-        <Calendar
-          events={articles}
-          width="w-full max-w-3xl"
-          onMonthChange={handleMonthChange}
-        />
-      </div>
-
-      {/* Right: Events list (50% on desktop, scrollable) */}
-      <div className="md:w-1/2 h-full max-h-[100svh] overflow-y-auto p-6">
-        <div className="mx-4 mt-52 md:mt-52 mb-8">
+        <section className="w-full md:ml-auto">
           {Object.keys(groupedArticles).length > 0 ? (
-            Object.keys(groupedArticles)
-              .sort()
-              .map((date) => (
-                <div key={date} className="mb-8">
-                  <h3 className="text-xl font-semibold mb-3 text-black border-b border-black/30 pb-2">
-                    {format(new Date(date), 'EEEE, MMM d')}
-                  </h3>
-                  <ul className="space-y-6">
-                    {groupedArticles[date].map((article) => {
-                      const href = resolveHref(
-                        article._type,
-                        article.slug?.current,
-                      )
-                      return (
-                        <li
-                          key={article._id}
-                          className="group border-l-4 pl-4"
-                          style={{
-                            borderColor: article.color || '#FFFFFF', // Use the article's color or a default color
-                          }}
-                        >
-                          <Link
-                            href={href || '#'}
-                            className="block text-black hover:text-black transition-colors"
+            <div className="distort-text space-y-8">
+              {Object.keys(groupedArticles)
+                .sort()
+                .map((date) => (
+                  <div key={date}>
+                    <h3
+                      className="mb-3 border-b pb-2 text-lg font-semibold md:text-xl"
+                      style={{ borderColor: pageTheme.textColor }}
+                    >
+                      {format(new Date(date), 'EEEE, MMM d')}
+                    </h3>
+                    <ul className="space-y-6">
+                      {groupedArticles[date].map((article) => {
+                        const href = resolveHref(
+                          article._type,
+                          article.slug?.current,
+                        )
+                        const preview = getArticlePreview(article)
+
+                        return (
+                          <li
+                            key={article._id}
+                            className="group border-l-4 pl-4"
+                            style={{
+                              borderColor:
+                                article.color ||
+                                colorToHex(article.backgroundColor) ||
+                                '#FFFFFF',
+                            }}
                           >
-                            <h4 className="text-lg font-bold mb-2 group-hover:underline">
-                              {article.title}
-                            </h4>
-                          </Link>
-                          {article.previewText && (
-                            <div className="mb-3 text-black/80 text-sm leading-relaxed">
-                              {article.previewText}
-                            </div>
-                          )}
-                          <Link
-                            href={href || '#'}
-                            className="inline-block px-3 py-1 bg-black/20 hover:bg-black text-black hover:text-black rounded text-sm transition-colors"
-                          >
-                            Read more
-                          </Link>
-                        </li>
-                      )
-                    })}
-                  </ul>
-                </div>
-              ))
+                            <Link
+                              href={href || '#'}
+                              className="block transition-opacity hover:opacity-70"
+                            >
+                              <h4 className="mb-2 text-lg font-bold group-hover:underline md:text-2xl">
+                                {article.title}
+                              </h4>
+                            </Link>
+                            {preview && (
+                              <div className="mb-3 max-w-2xl text-sm leading-snug opacity-80 md:text-base">
+                                {preview}
+                              </div>
+                            )}
+                            <Link
+                              href={href || '#'}
+                              className="inline-block px-3 py-1 text-sm uppercase transition-opacity hover:opacity-80"
+                              style={{
+                                backgroundColor: pageTheme.textColor,
+                                color: pageTheme.backgroundColor,
+                              }}
+                            >
+                              READ MORE
+                            </Link>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  </div>
+                ))}
+            </div>
           ) : (
-            <div className="text-white text-center py-8">
-              No events this month. Check other months or stay tuned for
-              updates.
+            <div className="distort py-8 text-center">
+              No articles this month.
             </div>
           )}
-        </div>
+        </section>
       </div>
 
-      {/* Background image */}
-      {menuImage?.image && (
-        <div className="absolute inset-0 overflow-hidden mix-blend-difference bg-black pointer-events-none">
-          <Image
-            className="absolute right-[13vw] md:right-16 bottom-[-10%] w-[60vw] md:w-[30vw] -rotate-12"
-            src={menuImage.image}
-            alt={menuImage.title || 'Blog Background'}
-            width={2500}
-            height={2500}
-          />
-        </div>
+      {/* Note drawing */}
+      {drawing?.image && (
+        <div
+          className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${drawing.image})` }}
+          aria-label={drawing.title || 'Blog background drawing'}
+        />
       )}
     </div>
   )

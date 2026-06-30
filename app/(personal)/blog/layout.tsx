@@ -1,11 +1,7 @@
-export default function ArtistsLayout({
+export default function BlogLayout({
   children, // will be a page or nested layout
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <div className="bg-[#9D9998] h-full w-full flex items-center justify-center">
-      {children}
-    </div>
-  )
+  return <div className="min-h-svh w-full bg-[#9D9998]">{children}</div>
 }

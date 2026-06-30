@@ -1,5 +1,4 @@
-import { colorInput } from '@sanity/color-input'
-import { defineField, defineType } from 'sanity'
+import { defineArrayMember, defineField, defineType } from 'sanity'
 
 export default defineType({
   name: 'artist',
@@ -12,6 +11,16 @@ export default defineType({
       type: 'color',
       options: {
         disableAlpha: true, // Disable alpha channel if not needed
+      },
+    }),
+    defineField({
+      name: 'titleColor',
+      title: 'Artist Title Color',
+      type: 'color',
+      description:
+        'Optional color for the large animated artist title. Falls back to the default text color when empty.',
+      options: {
+        disableAlpha: true,
       },
     }),
     defineField({
@@ -52,7 +61,72 @@ export default defineType({
     defineField({
       name: 'biography',
       title: 'Biography',
-      type: 'text',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'block',
+          styles: [
+            { title: 'Normal', value: 'normal' },
+            { title: 'Title', value: 'h1' },
+            { title: 'Heading', value: 'h2' },
+            { title: 'Subheading', value: 'h3' },
+            { title: 'Small heading', value: 'h4' },
+            { title: 'Quote', value: 'blockquote' },
+          ],
+        }),
+        defineArrayMember({
+          type: 'image',
+          options: {
+            hotspot: true,
+          },
+          fields: [
+            {
+              name: 'caption',
+              type: 'string',
+              title: 'Image caption',
+              description: 'Caption displayed below the image.',
+            },
+            {
+              name: 'alt',
+              type: 'string',
+              title: 'Alternative text',
+              description: 'Important for SEO and accessibility.',
+            },
+          ],
+        }),
+        defineArrayMember({
+          name: 'htmlEmbed',
+          title: 'HTML Embed',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'html',
+              title: 'HTML / iframe code',
+              type: 'text',
+              rows: 6,
+              description:
+                'Paste trusted embed code here, for example a YouTube iframe.',
+            }),
+            defineField({
+              name: 'caption',
+              title: 'Caption',
+              type: 'string',
+            }),
+          ],
+          preview: {
+            select: {
+              html: 'html',
+              caption: 'caption',
+            },
+            prepare({ caption, html }) {
+              return {
+                title: caption || 'HTML Embed',
+                subtitle: html,
+              }
+            },
+          },
+        }),
+      ],
     }),
     defineField({
       name: 'releasesCatalog',

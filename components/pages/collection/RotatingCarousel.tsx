@@ -1,8 +1,10 @@
 'use client'
-import { useState } from 'react'
-import { resolveHref } from '@/sanity/lib/utils'
+
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+
+import { resolveHref } from '@/sanity/lib/utils'
 
 export interface RotatingCarouselProps {
   releases: {
@@ -26,8 +28,21 @@ export interface RotatingCarouselProps {
 
 const RotatingCarousel = ({ releases }: RotatingCarouselProps) => {
   const [focusedRelease, setFocusedRelease] = useState(releases[0])
-  const [radiusX, setRadiusX] = useState(500) // Adjust the radius to control the orbit size
-  const [radiusY, setRadiusY] = useState(200) // Adjust the radius to control the orbit size
+  const [viewport, setViewport] = useState({ width: 1024, height: 768 })
+
+  useEffect(() => {
+    const updateViewport = () => {
+      setViewport({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      })
+    }
+
+    updateViewport()
+    window.addEventListener('resize', updateViewport)
+
+    return () => window.removeEventListener('resize', updateViewport)
+  }, [])
 
   const handleMouseEnter = (release: {
     _id: string
@@ -42,40 +57,34 @@ const RotatingCarousel = ({ releases }: RotatingCarouselProps) => {
     setFocusedRelease(release)
   }
 
-  return (
-    <div className="fixed z-50 inset-0 flex items-center justify-center">
-      <div className="absolute top-1/2 -translate-y-1/2 left-[5%] text-8xl max-w-xl flex flex-col mix-blend-difference z-[1000] pointer-events-none">
-        <span className="text-[#FF4517] leading-[0.85]">
-          {focusedRelease.title}
-        </span>
-        {focusedRelease.artists && focusedRelease.artists.length > 0 && (
-          <span className="text-4xl mt-2">
-            {focusedRelease.artists.map((artist) => artist.name).join(', ')}
-          </span>
-        )}
-      </div>
+  const orbitRadius = Math.max(
+    96,
+    Math.min(viewport.width, viewport.height) / 2 - 96,
+  )
 
-      <div className="animate-orbit group hover:[animation-play-state:paused] relative">
+  return (
+    <div className="fixed z-50 inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+      <div className="absolute inset-0">
         {releases.map((release, index) => {
-          const angle = (2 * Math.PI * index) / releases.length // Calculate angle for each item
-          const x = radiusX * Math.cos(angle) // X position based on the angle
-          const y = radiusY * Math.sin(angle) // Y position based on the angle
+          const angle = (360 * index) / releases.length
           const href = resolveHref(release._type, release.slug.current) || '#'
 
           return (
             <div
               key={release._id}
-              className="absolute transform group-hover:[animation-play-state:paused] animate-backwards-rotation"
+              className="release-orbit-item absolute left-1/2 top-1/2 z-20 hover:[animation-play-state:paused]"
               style={{
-                left: `calc(10vw + ${x}px)`,
-                top: `calc(-10vh + ${y}px)`,
-                transform: `translate(-50%, -50%)`, // Center each item at its calculated position
-              }}
+                '--orbit-radius': `${orbitRadius}px`,
+                '--orbit-start': `${angle}deg`,
+                '--orbit-end': `${angle + 360}deg`,
+                '--orbit-start-inverse': `${-angle}deg`,
+                '--orbit-end-inverse': `${-(angle + 360)}deg`,
+              } as React.CSSProperties}
               onMouseEnter={() => handleMouseEnter(release)}
             >
               <Link
                 href={href}
-                className="block w-20 h-20 bg-blue-500 hover:scale-150 skew-x-6"
+                className="block w-20 h-20 pointer-events-auto bg-blue-500 -translate-x-1/2 -translate-y-1/2 hover:scale-150 skew-x-6 transition-transform"
                 style={{
                   backgroundImage: `url(${release.image})`,
                   backgroundSize: 'cover',
@@ -92,7 +101,7 @@ const RotatingCarousel = ({ releases }: RotatingCarouselProps) => {
         <>
           <div
             key={focusedRelease.title}
-            className="group w-[80vw] aspect-square md:w-96 [perspective:1000px]"
+            className="group pointer-events-auto relative z-10 w-[70vw] max-w-96 aspect-square [perspective:1000px]"
           >
             <div className="relative h-full w-full transition-all duration-500 [transform-style:preserve-3d] animate-continuousFlip">
               {/* Front Face */}

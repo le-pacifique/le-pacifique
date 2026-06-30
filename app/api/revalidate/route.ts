@@ -28,6 +28,22 @@ import { parseBody } from 'next-sanity/webhook'
 
 import { revalidateSecret } from '@/sanity/lib/api'
 
+const sharedReferenceTypes = new Set(['drawingsBank', 'imagesBank'])
+const publicContentTags = [
+  'settings',
+  'home',
+  'blog',
+  'menu',
+  'page',
+  'project',
+  'artist',
+  'collection',
+  'release',
+  'article',
+  'merch',
+  'info',
+]
+
 export async function POST(req: NextRequest) {
   try {
     const { body, isValidSignature } = await parseBody<{
@@ -43,9 +59,12 @@ export async function POST(req: NextRequest) {
       return new Response('Bad Request', { status: 400 })
     }
 
-    revalidateTag(body._type)
+    revalidateTag(body._type, 'max')
     if (body.slug) {
-      revalidateTag(`${body._type}:${body.slug}`)
+      revalidateTag(`${body._type}:${body.slug}`, 'max')
+    }
+    if (sharedReferenceTypes.has(body._type)) {
+      publicContentTags.forEach((tag) => revalidateTag(tag, 'max'))
     }
     return NextResponse.json({
       status: 200,

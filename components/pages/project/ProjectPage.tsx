@@ -4,32 +4,62 @@ import Link from 'next/link'
 import { CustomPortableText } from '@/components/shared/CustomPortableText'
 import { Header } from '@/components/shared/Header'
 import ImageBox from '@/components/shared/ImageBox'
+import { PageScrollbarTheme } from '@/components/shared/PageScrollbarTheme'
+import {
+  getResolvedPageTheme,
+  type SettingsTheme,
+} from '@/lib/theme'
 import type { ProjectPayload } from '@/types'
 
 export interface ProjectPageProps {
   data: ProjectPayload | null
   encodeDataAttribute?: EncodeDataAttributeCallback
+  settingsTheme?: SettingsTheme
 }
 
-export function ProjectPage({ data, encodeDataAttribute }: ProjectPageProps) {
+export function ProjectPage({
+  data,
+  encodeDataAttribute,
+  settingsTheme,
+}: ProjectPageProps) {
   // Default to an empty object to allow previews on non-existent documents
   const {
+    backgroundColor,
     client,
     coverImage,
     description,
     duration,
+    noteDrawing,
     overview,
     site,
     tags,
     title,
   } = data ?? {}
 
+  const pageTheme = getResolvedPageTheme({
+    backgroundColor,
+    noteDrawing,
+    section: 'projects',
+    settingsTheme,
+  })
   const startYear = new Date(duration?.start!).getFullYear()
   const endYear = duration?.end ? new Date(duration?.end).getFullYear() : 'Now'
 
   return (
-    <div>
-      <div className="mb-20 space-y-6">
+    <div
+      className="min-h-screen w-full relative"
+      style={{ backgroundColor: pageTheme.backgroundColor }}
+    >
+      <PageScrollbarTheme backgroundColor={pageTheme.backgroundColor} />
+      {pageTheme.noteDrawing?.image && (
+        <div
+          className="absolute inset-0 bg-cover bg-center pointer-events-none"
+          style={{
+            backgroundImage: `url(${pageTheme.noteDrawing.image})`,
+          }}
+        />
+      )}
+      <div className="relative z-10 mb-20 space-y-6">
         {/* Header */}
         <Header title={title} description={overview} />
 

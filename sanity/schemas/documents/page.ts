@@ -1,11 +1,11 @@
-import { DocumentIcon, ImageIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
+import { LuFileText, LuImage } from 'react-icons/lu'
 
 export default defineType({
   type: 'document',
   name: 'page',
   title: 'Page',
-  icon: DocumentIcon,
+  icon: LuFileText,
   fields: [
     defineField({
       type: 'string',
@@ -21,6 +21,24 @@ export default defineType({
         source: 'title',
       },
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'backgroundColor',
+      title: 'Background Color',
+      type: 'color',
+      description:
+        'Overrides the default section background color from Settings > Theme.',
+      options: {
+        disableAlpha: true,
+      },
+    }),
+    defineField({
+      name: 'noteDrawing',
+      title: 'Drawing',
+      type: 'reference',
+      to: [{ type: 'drawingsBank' }],
+      description:
+        'Overrides the default section drawing from Settings > Theme.',
     }),
     defineField({
       name: 'overview',
@@ -86,7 +104,7 @@ export default defineType({
         }),
         defineField({
           type: 'image',
-          icon: ImageIcon,
+          icon: LuImage,
           name: 'image',
           title: 'Image',
           options: {

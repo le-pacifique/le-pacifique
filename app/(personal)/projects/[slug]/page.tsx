@@ -1,26 +1,22 @@
 import type { Metadata, ResolvingMetadata } from 'next'
-import dynamic from 'next/dynamic'
-import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { toPlainText } from 'next-sanity'
 
 import { ProjectPage } from '@/components/pages/project/ProjectPage'
 import { urlForOpenGraphImage } from '@/sanity/lib/utils'
 import { generateStaticSlugs } from '@/sanity/loader/generateStaticSlugs'
-import { loadProject } from '@/sanity/loader/loadQuery'
-const ProjectPreview = dynamic(
-  () => import('@/components/pages/project/ProjectPreview'),
-)
+import { loadProject, loadSettings } from '@/sanity/loader/loadQuery'
 
 type Props = {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  const { data: project } = await loadProject(params.slug)
+  const { slug } = await params
+  const { data: project } = await loadProject(slug)
   const ogImage = urlForOpenGraphImage(project?.coverImage)
 
   return {
@@ -41,7 +37,11 @@ export function generateStaticParams() {
 }
 
 export default async function ProjectSlugRoute({ params }: Props) {
-  const initial = await loadProject(params.slug)
+  const { slug } = await params
+  const [initial, settings] = await Promise.all([
+    loadProject(slug),
+    loadSettings(),
+  ])
 
   // if (draftMode().isEnabled) {
   //   return <ProjectPreview params={params} initial={initial} />
@@ -51,5 +51,5 @@ export default async function ProjectSlugRoute({ params }: Props) {
     notFound()
   }
 
-  return <ProjectPage data={initial.data} />
+  return <ProjectPage data={initial.data} settingsTheme={settings.data.theme} />
 }

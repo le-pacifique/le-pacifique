@@ -9,7 +9,7 @@ The Studio connects to Sanity Content Lake, which gives you hosted content APIs 
 ## Features
 
 - A performant, static personal website with editable projects
-- A native and customizable authoring environment, accessible on `yourpersonalwebsite.com/studio`
+- A native and customizable authoring environment, deployed separately on Sanity's hosted Studio domain
 - Real-time and collaborative content editing with fine-grained revision history
 - Side-by-side instant content preview that works across your whole site
 - Support for block content and the most advanced custom fields capability in the industry
@@ -35,7 +35,7 @@ The Studio connects to Sanity Content Lake, which gives you hosted content APIs 
 
 ## Project Overview
 
-| [Personal Website](https://template-nextjs-personal-website.sanity.build/)                                                | [Studio](https://template-nextjs-personal-website.sanity.build/studio)                                                 |
+| [Personal Website](https://template-nextjs-personal-website.sanity.build/)                                                | [Studio](https://le-pacifique.sanity.studio)                                                                          |
 | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | ![Personal Website](https://user-images.githubusercontent.com/6951139/206395107-e58a796d-13a9-400a-94b6-31cb5df054ab.png) | ![Sanity Studio](https://user-images.githubusercontent.com/6951139/206395521-8a5f103d-4a0c-4da8-aff5-d2a1961fb2c0.png) |
 
@@ -43,9 +43,9 @@ The Studio connects to Sanity Content Lake, which gives you hosted content APIs 
 
 | File(s)                                                    | Description                                             |
 | ---------------------------------------------------------- | ------------------------------------------------------- |
-| `sanity.config.ts`                                         | Config file for Sanity Studio                           |
-| `sanity.cli.ts`                                            | Config file for Sanity CLI                              |
-| `/app/studio/[[...tool]]/Studio.tsx`                       | Where Sanity Studio is mounted                          |
+| `/studio/sanity.config.ts`                                 | Config file for the standalone Sanity Studio            |
+| `/studio/sanity.cli.ts`                                    | Config file for the Sanity CLI                          |
+| `/studio`                                                  | Standalone Sanity Studio workspace                      |
 | `/app/api/revalidate/route.ts`                             |  Serverless route for triggering ISR                    |
 | `/app/api/draft/route.ts`                                  | Serverless route for triggering Draft mode              |
 | `/sanity/schemas`                                          | Where Sanity Studio gets its content types from         |
@@ -80,9 +80,21 @@ npx vercel env pull
 npm install && npm run dev
 ```
 
-When you run this development server, the changes you make in your frontend and studio configuration will be applied live using hot reloading.
+When you run this development server, the changes you make in your frontend will be applied live using hot reloading.
 
-Your personal website should be up and running on [http://localhost:3000][localhost-3000]! You can create and edit content on [http://localhost:3000/studio][localhost-3000-studio].
+Your personal website should be up and running on [http://localhost:3000][localhost-3000]!
+
+Run the standalone Studio locally from the repository root:
+
+```bash
+npm run studio:dev
+```
+
+You can deploy the Studio to Sanity's hosted domain with:
+
+```bash
+npm run studio:deploy
+```
 
 ### Step 4. Deploy to production
 
@@ -135,7 +147,6 @@ You can remove it by deleting the `IntroTemplate` component in `/app/(personal)/
 [sanity-content-modelling]: https://www.sanity.io/docs/content-modelling?utm_source=github.com&utm_medium=referral&utm_campaign=nextjs-v3vercelstarter
 [sanity-webhooks]: https://www.sanity.io/docs/webhooks?utm_source=github.com&utm_medium=referral&utm_campaign=nextjs-v3vercelstarter
 [localhost-3000]: http://localhost:3000
-[localhost-3000-studio]: http://localhost:3000/studio
 [vercel]: https://vercel.com
 [vercel-github]: https://github.com/vercel/next.js/discussions
 [personal-website-pages]: https://github.com/sanity-io/template-nextjs-personal-website

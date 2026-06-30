@@ -37,6 +37,16 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'titleColor',
+      title: 'Title Color',
+      type: 'color',
+      description:
+        'Optional override for the large animated release title. Defaults to the release text color.',
+      options: {
+        disableAlpha: true,
+      },
+    }),
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',

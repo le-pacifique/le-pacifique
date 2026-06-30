@@ -1,5 +1,7 @@
 import { Fragment } from 'react'
 
+import { deterministicRange } from '@/lib/deterministicRandom'
+
 interface ArtistTitleProps {
   name: string
   style?: React.CSSProperties
@@ -57,7 +59,7 @@ const ArtistTitle = ({
       baseLeft + wordIndex * wordLeftOffset + letterIndex * leftIncrement
 
     // Random rotation between min and max
-    const rotate = Math.random() * (max - min) + min
+    const rotate = deterministicRange(min, max, name, wordIndex, letterIndex)
 
     return {
       top: `${top}vh`,

@@ -1,5 +1,7 @@
 import { Fragment } from 'react'
 
+import { deterministicRange } from '@/lib/deterministicRandom'
+
 interface MonthTitleProps {
   name: string
   style?: React.CSSProperties
@@ -58,7 +60,7 @@ const MonthTitle = ({
       baseLeft + wordIndex * wordLeftOffset + letterIndex * leftIncrement
 
     // Random rotation between min and max (less inclined)
-    const rotate = Math.random() * (max - min) + min
+    const rotate = deterministicRange(min, max, name, wordIndex, letterIndex)
 
     return {
       top: `${top}vh`,

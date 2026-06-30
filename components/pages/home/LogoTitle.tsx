@@ -2,7 +2,9 @@
 import { motion } from 'framer-motion'
 import { Fragment } from 'react'
 
-const LogoTitle = ({ name, style }) => {
+import { deterministicRange } from '@/lib/deterministicRandom'
+
+const LogoTitle = ({ name, color = '#C6F042', style }) => {
   const words = name.split(' ') // Split the name into words
 
   // Function to generate style for each letter
@@ -22,14 +24,21 @@ const LogoTitle = ({ name, style }) => {
       baseTop +
       wordIndex * wordTopOffset +
       letterIndex * topIncrement +
-      (Math.random() * 4 - 2) // Randomly adjust 'top' for each letter
+      deterministicRange(-2, 2, name, wordIndex, letterIndex, 'top')
 
     const left =
       baseLeft +
       wordIndex * wordLeftOffset +
       letterIndex * leftIncrement -
       (wordLength * leftIncrement) / 2 // Center the word by subtracting half its total width
-    const rotate = Math.random() * 10 - 5 // Random rotation between -15 and 15 degrees
+    const rotate = deterministicRange(
+      -5,
+      5,
+      name,
+      wordIndex,
+      letterIndex,
+      'rotate',
+    )
 
     return {
       top: `${top}vh`,
@@ -39,15 +48,29 @@ const LogoTitle = ({ name, style }) => {
   }
 
   // Function to generate random animation properties
-  const generateAnimationProps = () => {
-    const duration = Math.random() * 2 + 1 // Random duration between 1 and 3 seconds
-    const delay = Math.random() * 2 // Random delay between 0 and 2 seconds
+  const generateAnimationProps = (wordIndex: number, letterIndex: number) => {
+    const duration = deterministicRange(
+      1,
+      3,
+      name,
+      wordIndex,
+      letterIndex,
+      'duration',
+    )
+    const delay = deterministicRange(
+      0,
+      2,
+      name,
+      wordIndex,
+      letterIndex,
+      'delay',
+    )
     return {
       x: [0, -2, 2, -2, 2, 0],
       y: [0, -2, 2, -2, 2, 0],
       transition: {
         duration,
-        ease: 'easeInOut',
+        ease: 'easeInOut' as const,
         repeat: Infinity,
         repeatType: 'mirror' as const,
         delay,
@@ -57,7 +80,8 @@ const LogoTitle = ({ name, style }) => {
 
   return (
     <div
-      className="hidden md:block absolute top-0 left-0 w-full h-full pointer-events-none z-20 mix-blend-difference"
+      // mix-blend-difference disabled for now; add it back here if we return to that treatment.
+      className="hidden md:block absolute top-0 left-0 w-full h-full pointer-events-none z-20"
       style={style}
     >
       {words.map((word, wordIndex) => (
@@ -65,9 +89,12 @@ const LogoTitle = ({ name, style }) => {
           {word.split('').map((letter, letterIndex) => (
             <motion.span
               key={`${wordIndex}-${letterIndex}`}
-              className="absolute font-medium text-4xl md:text-[9rem] text-[#C6F042] uppercase"
-              style={generateLetterStyles(wordIndex, letterIndex, word.length)}
-              animate={generateAnimationProps()}
+              className="distort absolute font-medium text-4xl md:text-[9rem] uppercase"
+              style={{
+                ...generateLetterStyles(wordIndex, letterIndex, word.length),
+                color,
+              }}
+              animate={generateAnimationProps(wordIndex, letterIndex)}
             >
               {letter}
             </motion.span>

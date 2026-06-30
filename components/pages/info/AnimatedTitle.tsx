@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion'
 
+import { deterministicRange } from '@/lib/deterministicRandom'
+
 interface AnimatedTitleProps {
   text: string
   color?: string
@@ -34,7 +36,7 @@ const AnimatedTitle = ({
             rotate: [0, 2, -2, 2, 0],
           }}
           transition={{
-            duration: 2 + Math.random(),
+            duration: deterministicRange(2, 3, text, i, 'duration'),
             ease: 'easeInOut',
             repeat: Infinity,
             repeatType: 'reverse',

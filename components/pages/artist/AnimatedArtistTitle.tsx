@@ -1,18 +1,24 @@
 'use client'
 
 import { motion } from 'framer-motion'
+
+import { deterministicRange } from '@/lib/deterministicRandom'
 import { theme } from '@/lib/theme'
 
 interface AnimatedArtistTitleProps {
   name: string
   style?: React.CSSProperties
   color?: string // <-- Add color prop
+  blendMode?: boolean
+  distort?: boolean
 }
 
 const AnimatedArtistTitle = ({
   name,
   style,
   color,
+  blendMode = true,
+  distort = false,
 }: AnimatedArtistTitleProps) => {
   const words = name.split(' ')
 
@@ -32,7 +38,7 @@ const AnimatedArtistTitle = ({
       baseTop +
       wordIndex * wordTopOffset +
       letterIndex * topIncrement +
-      (Math.random() * 4 - 2)
+      deterministicRange(-2, 2, name, wordIndex, letterIndex, 'top')
 
     const left =
       baseLeft +
@@ -40,7 +46,7 @@ const AnimatedArtistTitle = ({
       letterIndex * leftIncrement -
       (wordLength * leftIncrement) / 2
 
-    const rotate = Math.random() * 10 - 5
+    const rotate = deterministicRange(-5, 5, name, wordIndex, letterIndex, 'rotate')
 
     return { top, left, rotate }
   }
@@ -50,7 +56,9 @@ const AnimatedArtistTitle = ({
 
   return (
     <div
-      className="absolute top-0 left-0 w-full h-full pointer-events-none z-[19] mix-blend-exclusion"
+      className={`absolute top-0 left-0 w-full h-full pointer-events-none z-[19] ${
+        blendMode ? 'mix-blend-exclusion' : ''
+      }`}
       style={style}
     >
       {words.map((word, wordIndex) => (
@@ -65,7 +73,9 @@ const AnimatedArtistTitle = ({
             return (
               <motion.span
                 key={`${wordIndex}-${letterIndex}`}
-                className="absolute text-5xl font-black md:font-normal md:text-9xl text-black uppercase"
+                className={`absolute text-5xl font-black md:font-normal md:text-9xl text-black uppercase ${
+                  distort ? 'distort' : ''
+                }`}
                 style={{ color: txtColor }}
                 initial={{
                   top: `${top}vh`,
@@ -73,12 +83,36 @@ const AnimatedArtistTitle = ({
                   rotate,
                 }}
                 animate={{
-                  top: [`${top}vh`, `${top + (Math.random() * 2 - 1)}vh`],
-                  left: [`${left}vw`, `${left + (Math.random() * 2 - 1)}vw`],
-                  rotate: [rotate, rotate + (Math.random() * 4 - 2)],
+                  top: [
+                    `${top}vh`,
+                    `${top + deterministicRange(-1, 1, name, wordIndex, letterIndex, 'animate-top')}vh`,
+                  ],
+                  left: [
+                    `${left}vw`,
+                    `${left + deterministicRange(-1, 1, name, wordIndex, letterIndex, 'animate-left')}vw`,
+                  ],
+                  rotate: [
+                    rotate,
+                    rotate +
+                      deterministicRange(
+                        -2,
+                        2,
+                        name,
+                        wordIndex,
+                        letterIndex,
+                        'animate-rotate',
+                      ),
+                  ],
                 }}
                 transition={{
-                  duration: 3 + Math.random() * 2,
+                  duration: deterministicRange(
+                    3,
+                    5,
+                    name,
+                    wordIndex,
+                    letterIndex,
+                    'duration',
+                  ),
                   ease: 'easeInOut',
                   repeat: Infinity,
                   repeatType: 'reverse',

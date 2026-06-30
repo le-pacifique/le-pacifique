@@ -1,17 +1,29 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { urlForImage } from '@/sanity/lib/utils'
+
+import { PageScrollbarTheme } from '@/components/shared/PageScrollbarTheme'
+import { getResolvedPageTheme, type SettingsTheme } from '@/lib/theme'
 import type { ReleasePayload } from '@/types'
-import CollectionTitle from '../collection/CollectionTitle'
+
 import AnimatedArtistTitle from '../artist/AnimatedArtistTitle'
-import frame from '/public/images/frames/player-4.png'
+
+const frame = '/images/frames/player-4.png'
 
 export interface ReleasePageProps {
   data: ReleasePayload
+  settingsTheme?: SettingsTheme
 }
 
-const ReleasePage = ({ data }: ReleasePageProps) => {
+const ReleasePage = ({ data, settingsTheme }: ReleasePageProps) => {
   const release = data
+  const pageTheme = getResolvedPageTheme({
+    backgroundColor: release.backgroundColor,
+    noteDrawing: release.noteDrawing,
+    section: 'releases',
+    settingsTheme,
+  })
+  const releaseTitleColor = release.titleColor?.hex || pageTheme.textColor
+  const scrollbarColor = releaseTitleColor
 
   // Find the index of the current release in the collection
   const currentIndex = release.collection?.releases.findIndex(
@@ -31,59 +43,67 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
       : null
 
   return (
-    <div className="h-full w-full min-h-screen relative flex items-center justify-center">
-      <svg className="hidden">
-        <filter id="roughText">
-          <feTurbulence
-            type="turbulence"
-            baseFrequency="0.02"
-            numOctaves="3"
-            result="noise"
-          />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1" />
-        </filter>
-      </svg>
-      <div className="mx-auto max-w-full px-4 lg:px-8 relative z-10 py-12 lg:py-24 tracking-tight flex items-center justify-center">
-        <AnimatedArtistTitle
-          name={release.title}
-          style={{ filter: 'url(#roughText)' }}
+    <div
+      className="release-page-scrollbar min-h-svh w-full relative overflow-x-hidden px-5 pb-28 pt-28 md:px-10 md:pb-32 md:pt-32 lg:px-16"
+      style={{
+        backgroundColor: pageTheme.backgroundColor,
+        color: pageTheme.textColor,
+        ['--release-scrollbar-thumb' as string]: scrollbarColor,
+        ['--release-scrollbar-track' as string]: pageTheme.backgroundColor,
+      }}
+    >
+      <PageScrollbarTheme backgroundColor={pageTheme.backgroundColor} />
+      {pageTheme.noteDrawing?.image && (
+        <div
+          className="absolute inset-0 min-h-full bg-cover bg-center pointer-events-none"
+          style={{ backgroundImage: `url(${pageTheme.noteDrawing.image})` }}
         />
+      )}
+      <AnimatedArtistTitle
+        name={release.title}
+        color={releaseTitleColor}
+        blendMode={false}
+        distort
+      />
 
-        {/* Release navigation counter */}
-        {totalReleases > 1 && (
-          <div className="fixed top-32 right-8 z-20 flex items-center gap-4">
-            <div className="bg-white/80 px-3 py-1 rounded-md text-black font-mono text-sm">
-              {currentIndex !== undefined ? currentIndex + 1 : '?'}/
-              {totalReleases}
-            </div>
-
-            <div className="flex gap-2">
-              {prevRelease && (
-                <Link
-                  href={`/releases/${prevRelease.slug}`}
-                  className="bg-black hover:bg-white text-white hover:text-black border border-white w-10 h-10 flex items-center justify-center rounded-full transition-colors"
-                >
-                  ←
-                </Link>
-              )}
-
-              {nextRelease && (
-                <Link
-                  href={`/releases/${nextRelease.slug}`}
-                  className="bg-black hover:bg-white text-white hover:text-black border border-white w-10 h-10 flex items-center justify-center rounded-full transition-colors"
-                >
-                  →
-                </Link>
-              )}
-            </div>
+      {/* Release navigation counter */}
+      {totalReleases > 1 && (
+        <div className="fixed right-5 top-28 z-20 flex items-center gap-3 md:right-10 md:top-32 lg:right-16">
+          <div className="distort bg-white/80 px-3 py-1 text-black font-mono text-sm md:text-base">
+            {currentIndex !== undefined ? currentIndex + 1 : '?'}/
+            {totalReleases}
           </div>
-        )}
 
-        <div className="hmx-auto grid max-w-2xl grid-cols-1 gap-x-8 lg:gap-x-8 gap-y-6 lg:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:mt-16 lg:items-center">
-          <div className="order-2 lg:order-1 lg:px-0">
-            <div className="lg:max-w-3xl">
+          <div className="flex gap-2">
+            {prevRelease && (
+              <Link
+                href={`/releases/${prevRelease.slug}`}
+                className="distort bg-black hover:bg-white text-white hover:text-black border border-white w-10 h-10 flex items-center justify-center rounded-full transition-colors"
+                aria-label={`Previous release: ${prevRelease.title}`}
+              >
+                ←
+              </Link>
+            )}
+
+            {nextRelease && (
+              <Link
+                href={`/releases/${nextRelease.slug}`}
+                className="distort bg-black hover:bg-white text-white hover:text-black border border-white w-10 h-10 flex items-center justify-center rounded-full transition-colors"
+                aria-label={`Next release: ${nextRelease.title}`}
+              >
+                →
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="relative z-10 mx-auto grid w-full max-w-[88rem] grid-cols-1 gap-12 tracking-tight xl:grid-cols-[minmax(0,1fr)_minmax(20rem,34rem)] xl:items-center">
+        <div className="order-2 xl:order-1">
+          <div className="max-w-5xl">
+            <div className="distort-text">
               <div className="flex flex-col">
-                <p className="text-3xl mb-0 leading-none mt-4">
+                <p className="mb-0 mt-4 text-3xl leading-none">
                   {release.title}
                 </p>
 
@@ -148,19 +168,19 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
                   })}
                 </div>
 
-                <div className="flex flex-wrap gap-2 mt-0">
+                <div className="mt-0 flex flex-wrap gap-2">
                   {release.genres?.map((genre, index) => (
                     <span
                       key={index}
-                      className="text-white px-2 border rounded-full leading-[1] py-1 pt-0.5 text-sm lowercase"
+                      className="bg-[#000] px-1 py-0.5 pb-1.5 li text-sm uppercase leading-none text-white"
                     >
-                      {genre}
+                      <span className="distort inline-block">{genre}</span>
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="mt-6 text-sm md:text-lg leading-snug">
+              <div className="mt-6 text-sm leading-snug md:text-lg">
                 {release.description?.map((block: any) => {
                   if (block._type === 'block') {
                     return (
@@ -184,7 +204,7 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
 
               {/* Tracklist dropdown */}
               <div className="mt-6">
-                <h3 className="font-bold text-sm md:text-base mb-2">
+                <h3 className="mb-2 text-sm font-bold md:text-base">
                   Tracklist
                 </h3>
                 <ol className="list-decimal list-inside mb-6">
@@ -218,15 +238,17 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
               {release.bandcampPlayer && (
                 <div className="mt-8 relative">
                   <Image
-                    className="absolute -left-4 -top-[0.55rem] w-[26rem] h-[4rem] pointer-events-none"
+                    className="absolute -left-4 -top-[0.55rem] h-16 w-[calc(100%+2rem)] max-w-[26rem] pointer-events-none"
                     src={frame}
                     alt="Player frame"
+                    width={7409}
+                    height={1327}
                   />
                   {/* <h3 className="font-bold text-sm md:text-base mb-3">
                     Listen
                   </h3> */}
                   <div
-                    className="w-full overflow-hidden rounded"
+                    className="w-full max-w-96 overflow-hidden"
                     style={{ maxWidth: '24rem' }}
                   >
                     <iframe
@@ -240,41 +262,41 @@ const ReleasePage = ({ data }: ReleasePageProps) => {
               )}
             </div>
           </div>
+        </div>
 
-          <div className="group lg:w-[90%] aspect-square [perspective:1000px] order-1 lg:order-2">
-            <div className="relative h-full w-full rounded-xl shadow-xl transition-all duration-500 [transform-style:preserve-3d] animate-continuousFlip pointer-events-none">
-              {/* Front Face */}
-              <div className="absolute inset-0 h-full w-full rounded-xl [backface-visibility:hidden]">
-                {release?.image && (
-                  <Image
-                    className="object-cover cursor-pointer object-left h-full w-full rounded-xl"
-                    src={release.image}
-                    alt={release.title}
-                    width={2432}
-                    height={1442}
-                  />
-                )}
-              </div>
-              {/* Back Face */}
-              <div className="absolute inset-0 h-full w-full rounded-xl [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                {release?.backCover ? (
-                  <Image
-                    className="object-cover cursor-pointer object-left h-full w-full rounded-xl"
-                    src={release.backCover}
-                    alt={release.title}
-                    width={2432}
-                    height={1442}
-                  />
-                ) : (
-                  <Image
-                    className="object-cover cursor-pointer object-left h-full w-full rounded-xl"
-                    src={release.image}
-                    alt={release.title}
-                    width={2432}
-                    height={1442}
-                  />
-                )}
-              </div>
+        <div className="order-1 mx-auto aspect-square w-full max-w-[30rem] [perspective:1000px] md:max-w-[34rem] xl:order-2">
+          <div className="relative h-full w-full shadow-xl transition-all duration-500 [transform-style:preserve-3d] animate-continuousFlip pointer-events-none">
+            {/* Front Face */}
+            <div className="absolute inset-0 h-full w-full [backface-visibility:hidden]">
+              {release?.image && (
+                <Image
+                  className="h-full w-full object-cover object-left"
+                  src={release.image}
+                  alt={release.title}
+                  width={2432}
+                  height={1442}
+                />
+              )}
+            </div>
+            {/* Back Face */}
+            <div className="absolute inset-0 h-full w-full [backface-visibility:hidden] [transform:rotateY(180deg)]">
+              {release?.backCover ? (
+                <Image
+                  className="h-full w-full object-cover object-left"
+                  src={release.backCover}
+                  alt={release.title}
+                  width={2432}
+                  height={1442}
+                />
+              ) : (
+                <Image
+                  className="h-full w-full object-cover object-left"
+                  src={release.image}
+                  alt={release.title}
+                  width={2432}
+                  height={1442}
+                />
+              )}
             </div>
           </div>
         </div>

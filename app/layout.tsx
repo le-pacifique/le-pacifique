@@ -3,6 +3,8 @@ import './globals.css'
 import { IBM_Plex_Mono, Inter, PT_Serif } from 'next/font/google'
 import localFont from 'next/font/local'
 
+import { DistortFilter } from '@/components/shared/DistortFilter'
+
 const mono = localFont({
   variable: '--font-supply-mono',
   src: [
@@ -50,7 +52,10 @@ export default async function RootLayout({
       lang="en"
       className={`${mono.variable} ${sans.variable} ${serif.variable}`}
     >
-      <body className="font-mono h-svh">{children}</body>
+      <body className="font-mono min-h-svh">
+        {children}
+        <DistortFilter />
+      </body>
     </html>
   )
 }

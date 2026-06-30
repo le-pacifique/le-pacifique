@@ -1,8 +1,11 @@
 import Image from 'next/image'
 
-import { theme } from '@/lib/theme'
-import { urlForImage } from '@/sanity/lib/utils'
-import type { MerchPayload } from '@/types'
+import { PageScrollbarTheme } from '@/components/shared/PageScrollbarTheme'
+import {
+  getResolvedPageTheme,
+  type SettingsTheme,
+} from '@/lib/theme'
+import type { MerchPayload, PageThemePayload } from '@/types'
 
 export interface MerchPageProps {
   merch: MerchPayload[]
@@ -10,25 +13,39 @@ export interface MerchPageProps {
     image: string
     title?: string
   }
+  pageTheme?: PageThemePayload
+  settingsTheme?: SettingsTheme
 }
 
 const merchTypes = ['VINYL', 'TAPES', 'CLOTHES', 'BIBELOTS']
 
-const MerchPage = ({ merch, menuImage }: MerchPageProps) => {
-  const bgColor = theme.colors.menu.Merch.background
+const MerchPage = ({
+  merch,
+  menuImage,
+  pageTheme: pageThemeOverride,
+  settingsTheme,
+}: MerchPageProps) => {
+  const pageTheme = getResolvedPageTheme({
+    backgroundColor: pageThemeOverride?.backgroundColor,
+    noteDrawing: pageThemeOverride?.noteDrawing,
+    section: 'merch',
+    settingsTheme,
+  })
+  const drawing = pageTheme.noteDrawing ?? menuImage
 
   return (
     <div
       className="min-h-screen w-full relative"
-      style={{ backgroundColor: bgColor }}
+      style={{ backgroundColor: pageTheme.backgroundColor }}
     >
+      <PageScrollbarTheme backgroundColor={pageTheme.backgroundColor} />
       {/* Background image from navbar */}
-      {menuImage?.image && (
+      {drawing?.image && (
         <div className="absolute inset-0 overflow-hidden z-0">
           <Image
             className="absolute right-[13vw] md:left-32 bottom-16 md:-top-16 w-[80vw] md:w-[45vw] -rotate-12"
-            src={menuImage.image}
-            alt={menuImage.title || 'Merch Background'}
+            src={drawing.image}
+            alt={drawing.title || 'Merch Background'}
             width={2500}
             height={2500}
           />
