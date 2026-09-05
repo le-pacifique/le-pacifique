@@ -2,7 +2,8 @@ import { PortableText } from '@portabletext/react'
 import Image from 'next/image'
 
 import { PageScrollbarTheme } from '@/components/shared/PageScrollbarTheme'
-import { deterministicRange } from '@/lib/deterministicRandom'
+import { SectionTabs } from '@/components/shared/SectionTabs'
+import { TitlePanelSpacing } from '@/components/shared/TitlePanelSpacing'
 import {
   getResolvedPageTheme,
   getSectionTheme,
@@ -10,6 +11,8 @@ import {
 } from '@/lib/theme'
 import { urlForImage } from '@/sanity/lib/utils'
 import type { InfoPayload } from '@/types'
+
+import AnimatedArtistTitle from '../artist/AnimatedArtistTitle'
 
 export interface InfoPageProps {
   info: InfoPayload
@@ -21,6 +24,9 @@ export interface InfoPageProps {
 }
 
 const InfoPage = ({ info, menuImage, settingsTheme }: InfoPageProps) => {
+  const isImageLeft = info.layout === 'left'
+  const hasImage = Boolean(info.image?.asset)
+  const hasTitle = Boolean(info.title?.trim())
   const pageTheme = getResolvedPageTheme({
     backgroundColor: info.backgroundColor,
     noteDrawing: info.noteDrawing,
@@ -33,123 +39,166 @@ const InfoPage = ({ info, menuImage, settingsTheme }: InfoPageProps) => {
     'artists',
   ).backgroundColor
 
-  const generateSocialButtonStyles = (index: number) => {
-    const randomTop = deterministicRange(-10, 10, info._id, index, 'top')
-    const randomLeft = deterministicRange(-10, 10, info._id, index, 'left')
-    const randomRotate =
-      deterministicRange(0, 20, info._id, index, 'rotate') *
-      (index % 2 === 0 ? 1 : -1)
-
-    return {
-      top: `${randomTop}px`,
-      left: `${randomLeft}px`,
-      transform: `rotate(${randomRotate}deg)`,
-      '--initial-rotate': `${randomRotate}deg`,
-      backgroundColor: socialButtonColor,
-    }
-  }
-
   return (
     <div
-      className="min-h-screen w-full relative"
-      style={{ backgroundColor: pageTheme.backgroundColor }}
+      className="info-page relative h-svh w-full overflow-hidden"
+      style={{
+        backgroundColor: pageTheme.backgroundColor,
+        color: pageTheme.textColor,
+        ['--info-selection-color' as string]: socialButtonColor,
+      }}
     >
+      <TitlePanelSpacing title={info.title} />
       <PageScrollbarTheme backgroundColor={pageTheme.backgroundColor} />
-      <div className="relative w-full flex py-16 pb-8 lg:py-32 lg:pb-16 px-8">
-        {info.logos?.map((logo: any, i: number) => {
-          // If logo.image exists, use it. Otherwise, use urlForImage(logo).url() if logo.asset exists.
-          const imageSrc =
-            logo.image ?? (logo.asset ? urlForImage(logo)?.url() : '')
-          return (
-            imageSrc && (
-              <Image
-                key={logo._id || logo._key || i}
-                src={imageSrc}
-                alt={logo.title || logo.alt || 'Logo'}
-                width={2000}
-                height={2000}
-                className="w-full h-full transition-all duration-500"
-              />
-            )
-          )
-        })}
-      </div>
-      {/* Background image from navbar or noteDrawing */}
-      {drawing?.image && (
+
+      {drawing?.image ? (
         <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${drawing.image})`,
-          }}
-        ></div>
+          aria-label={drawing.title || 'Info background drawing'}
+          className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${drawing.image})` }}
+        />
+      ) : null}
+
+      {info.title?.trim() && (
+        <div className="pointer-events-none absolute inset-0 z-20 mx-auto px-4 lg:px-12 xl:px-24 2xl:px-48">
+          <div className="mx-auto grid h-full max-w-2xl grid-cols-1 gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+            <div
+              className={`min-w-0 ${isImageLeft ? 'lg:col-start-2' : 'lg:col-start-1'}`}
+              data-testid="info-title-column"
+            >
+              <AnimatedArtistTitle
+                blendMode={false}
+                color={pageTheme.textColor}
+                distort
+                fitToColumn
+                name={info.title.trim()}
+              />
+            </div>
+          </div>
+        </div>
       )}
 
-      <div className="distort-text relative z-10 mx-auto px-8 tracking-tight">
-        {info.description && (
-          <div className="text-black columns-1 lg:columns-3 mb-8">
-            <PortableText value={info.description} />
+      <div className="relative z-10 mx-auto h-full px-4 tracking-tight lg:px-12 xl:px-24 2xl:px-48">
+        <div
+          className={`mx-auto grid h-full max-w-2xl grid-cols-1 gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:grid-rows-1 ${hasImage ? 'grid-rows-[42svh_minmax(0,1fr)]' : 'grid-rows-1'}`}
+        >
+          <div
+            className={`min-h-0 pb-12 lg:h-full lg:pb-[6vh] ${isImageLeft ? 'order-2 lg:order-2' : 'order-2 lg:order-1'} ${hasTitle ? (hasImage ? 'lg:pt-[var(--title-panel-offset,44vh)]' : 'pt-[42svh] lg:pt-[var(--title-panel-offset,44vh)]') : hasImage ? 'lg:pt-[16vh]' : 'pt-28 lg:pt-[16vh]'}`}
+          >
+            <SectionTabs
+              seed={info._id}
+              label="Info sections"
+              accentColor={socialButtonColor}
+              contrastColor="#000000"
+              sections={[
+                {
+                  key: 'info',
+                  label: 'Info',
+                  content: (
+                    <div className="info-description distort-text mt-6 text-sm leading-snug md:text-xl">
+                      {info.description?.length ? (
+                        <PortableText value={info.description} />
+                      ) : (
+                        <p className="uppercase opacity-60">
+                          About text coming soon.
+                        </p>
+                      )}
+                    </div>
+                  ),
+                },
+                {
+                  key: 'links',
+                  label: 'Links',
+                  content: (
+                    <div className="distort-text mt-6 space-y-8 text-sm md:text-xl">
+                      {info.socialMedia?.length ? (
+                        <ul className="space-y-2 uppercase">
+                          {info.socialMedia.map((link, index) => (
+                            <li key={link._key || index}>
+                              <a
+                                className="hover:opacity-60"
+                                href={link.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {link.title}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                      {info.pressKit?.length ? (
+                        <div>
+                          <h2 className="mb-3 text-xs font-bold uppercase opacity-60 md:text-sm">
+                            Press Kit
+                          </h2>
+                          <ul className="space-y-2">
+                            {info.pressKit.map((item, index) => (
+                              <li key={item._key || index}>
+                                {item.file?.asset?.url ? (
+                                  <a
+                                    className="underline underline-offset-4 hover:opacity-60"
+                                    href={item.file.asset.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    {item.title}
+                                  </a>
+                                ) : (
+                                  item.title
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                      {!info.socialMedia?.length && !info.pressKit?.length && (
+                        <p className="uppercase opacity-60">No links yet.</p>
+                      )}
+                    </div>
+                  ),
+                },
+                {
+                  key: 'contact',
+                  label: 'Contact',
+                  content: (
+                    <div className="distort-text mt-6 text-sm md:text-xl">
+                      {info.contactEmail ? (
+                        <a
+                          className="break-all font-bold underline underline-offset-4 hover:opacity-60"
+                          href={`mailto:${info.contactEmail}`}
+                        >
+                          {info.contactEmail}
+                        </a>
+                      ) : (
+                        <p className="uppercase opacity-60">
+                          Contact details coming soon.
+                        </p>
+                      )}
+                    </div>
+                  ),
+                },
+              ]}
+            />
           </div>
-        )}
-
-        {info.contactEmail && (
-          <div className="mb-4 text-black">
-            <a href={`mailto:${info.contactEmail}`}>{info.contactEmail}</a>
-          </div>
-        )}
-
-        {info.socialMedia && info.socialMedia.length > 0 && (
-          <div className="mb-4 mt-8 flex">
-            {info.socialMedia.map((sm, i) => (
-              <a
-                key={sm._key || i}
-                href={sm.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mx-3 bg-white px-2 py-0 text-sm font-medium uppercase tracking-tight text-black first:ml-0 hover:animate-wiggle md:text-xl"
-                style={generateSocialButtonStyles(i)}
-              >
-                {sm.title}
-              </a>
-            ))}
-          </div>
-        )}
-
-        {info.pressKit && info.pressKit.length > 0 && (
-          <div className="mb-4 text-white">
-            <strong>Press Kit:</strong>
-            <ul>
-              {info.pressKit.map((pk, i) => {
-                // Patch asset to always have _type
-                const fileObj =
-                  pk.file && pk.file.asset
-                    ? {
-                        ...pk.file,
-                        asset: {
-                          ...pk.file.asset,
-                          _type: pk.file.asset._type ?? 'reference',
-                        },
-                      }
-                    : undefined
-                const fileUrl = fileObj ? urlForImage(fileObj)?.url() ?? '' : ''
-                return (
-                  <li key={i}>
-                    {fileUrl ? (
-                      <a
-                        href={fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {pk.title}
-                      </a>
-                    ) : (
-                      <span>{pk.title}</span>
-                    )}
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-        )}
+          {hasImage && (
+            <div
+              className={`order-1 flex min-h-0 items-center justify-center ${isImageLeft ? 'lg:order-1' : 'lg:order-2'}`}
+              data-testid="info-image-column"
+            >
+              <div className="relative h-[34svh] w-full lg:h-[75vh]">
+                <Image
+                  alt={info.image?.alt || info.title || 'Le Pacifique'}
+                  className="object-contain"
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  src={urlForImage(info.image)?.url() ?? ''}
+                />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

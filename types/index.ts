@@ -58,15 +58,39 @@ export interface SettingsThemePayload {
   sections?: Partial<Record<SectionThemeKey, PageThemePayload>>
 }
 
+export interface SiteLogoPayload {
+  alt?: string
+  desktopWidth?: number
+  image?: string
+  mobileWidth?: number
+  dimensions?: {
+    aspectRatio?: number
+    height?: number
+    width?: number
+  }
+}
+
 export interface BlogPayload extends PageThemePayload {
   _id: string
   title?: string
+  layout?: 'left' | 'right'
+  titleColor?: ColorPayload
+  categoryButtonColor?: ColorPayload
+  categoryButtonContrastColor?: ColorPayload
+}
+
+export interface BlogCategoryPayload {
+  _id: string
+  color?: ColorPayload
+  slug?: string
+  title: string
 }
 
 export interface MenuSectionPayload {
   backgroundColor?: ColorPayload | string
   textColor?: ColorPayload | string
   image?: DrawingPayload
+  overlayImageFit?: 'contain' | 'cover'
 }
 
 export interface MenuPayload {
@@ -131,16 +155,32 @@ export interface ArtistPayload {
   }
   backgroundColor?: ColorPayload
   titleColor?: ColorPayload
-  socialMedia?: {
-    _key: string
+  sectionButtonColor?: ColorPayload
+  sectionButtonContrastColor?: ColorPayload
+  email?: string
+  linkedReleases?: Array<{
+    _id: string
+    slug?: string
     title: string
-    _type: string
-    href: string
+  }>
+  radioShows?: ArtistLinkPayload[]
+  releasesCatalog?: ArtistLinkPayload[]
+  socialMedia?: {
+    _key?: string
+    title?: string
+    href?: string
   }[]
   layout?: 'left' | 'right'
 }
 
+export interface ArtistLinkPayload {
+  _key?: string
+  href?: string
+  title?: string
+}
+
 export interface ReleasePayload {
+  imageLqip?: string
   _id: string
   image: any
   title: string
@@ -158,6 +198,7 @@ export interface ReleasePayload {
   backgroundColor?: ColorPayload
   noteDrawing?: DrawingPayload
   titleColor?: ColorPayload
+  layout?: 'left' | 'right'
   artists: Array<
     | {
         _id: string
@@ -197,6 +238,7 @@ export type ArticlePayload = {
   excerpt?: PortableTextBlock[] | string
   color?: string
   previewText?: string
+  categories?: BlogCategoryPayload[]
   coverImage?: {
     asset: {
       _ref?: string
@@ -240,6 +282,8 @@ export interface CollectionPayload {
   credits: Credits
   backgroundColor?: ColorPayload
   titleColor?: ColorPayload
+  titleScale?: number
+  layout?: 'left' | 'right'
   slug?: {
     current: string
   }
@@ -287,6 +331,7 @@ export interface SettingsPayload {
   footer?: PortableTextBlock[]
   menuItems?: MenuItem[]
   ogImage?: Image
+  siteLogo?: SiteLogoPayload
   seo?: {
     siteTitle?: string
     description?: string
@@ -324,6 +369,8 @@ export type MerchPayload = {
 
 export interface InfoPayload {
   _id: string
+  image?: Image & { alt?: string }
+  layout?: 'left' | 'right'
   title: string
   backgroundColor?: ColorPayload
   noteDrawing?: DrawingPayload
@@ -348,7 +395,14 @@ export interface InfoPayload {
     href: string
   }>
   pressKit?: Array<{
+    _key?: string
     title: string
-    file: { asset: { _ref: string; _type?: string } }
+    file?: {
+      asset?: {
+        _id?: string
+        originalFilename?: string
+        url?: string
+      }
+    }
   }>
 }

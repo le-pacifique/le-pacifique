@@ -1,5 +1,5 @@
-import { defineArrayMember, defineField, defineType } from 'sanity'
 import { LuFileText, LuImage } from 'react-icons/lu'
+import { defineArrayMember, defineField, defineType } from 'sanity'
 
 export default defineType({
   type: 'document',
@@ -11,7 +11,7 @@ export default defineType({
       type: 'string',
       name: 'title',
       title: 'Title',
-      validation: (rule) => rule.required(),
+      description: 'Optional. Leave blank to show the page without a heading.',
     }),
     defineField({
       type: 'slug',

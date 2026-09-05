@@ -24,26 +24,10 @@ const ITEMS_WITH_BACKGROUND_OVERLAY = [
 ] as const
 
 const menuImageConfig = {
-  Artists: {
-    srcKey: 'artists',
-    className:
-      'absolute rotate-[20deg] left-[10%] md:right-0 top-[2%] md:-top-[50%] w-[100vw] md:w-[100vw] md:rotate-12',
-  },
-  Collections: {
-    srcKey: 'collections',
-    className:
-      'absolute right-[13vw] md:left-32 bottom-16 md:-top-16 w-[80vw] md:w-[45vw] -rotate-12',
-  },
-  Blog: {
-    srcKey: 'blog',
-    className:
-      'absolute right-[13vw] md:left-32 bottom-16 md:-top-16 w-[80vw] md:w-[45vw] -rotate-12',
-  },
-  Merch: {
-    srcKey: 'merch',
-    className:
-      'absolute right-[13vw] md:left-32 bottom-16 md:-top-16 w-[80vw] md:w-[45vw] -rotate-12',
-  },
+  Artists: { srcKey: 'artists' },
+  Collections: { srcKey: 'collections' },
+  Blog: { srcKey: 'blog' },
+  Merch: { srcKey: 'merch' },
 } as const
 
 type MenuImageKey = keyof typeof menuImageConfig
@@ -54,6 +38,7 @@ type MenuImageSourceKey =
 type MenuImageSource = {
   image?: string
   title?: string
+  fit?: 'contain' | 'cover'
 }
 
 const hasBackgroundOverlay = (
@@ -154,11 +139,12 @@ function BackgroundOverlay({
     >
       {config && image?.image && (
         <Image
-          className={config.className}
+          className="object-center"
           src={image.image}
           alt={image.title || `${hovered} Image`}
-          width={2500}
-          height={2500}
+          fill
+          sizes="100vw"
+          style={{ objectFit: image.fit ?? 'contain' }}
           priority
         />
       )}

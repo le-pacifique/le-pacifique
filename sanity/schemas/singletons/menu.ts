@@ -1,5 +1,5 @@
-import { defineField, defineType } from 'sanity'
 import { LuMenu } from 'react-icons/lu'
+import { defineField, defineType } from 'sanity'
 
 const menuSections = [
   { name: 'artists', title: 'Artists' },
@@ -37,12 +37,29 @@ const menuSectionFields = menuSections.map(({ name, title }) =>
       }),
       defineField({
         name: 'image',
-        title: 'Menu Image',
+        title: 'Overlay Image',
         type: 'reference',
+        description:
+          'Shown centered across the full screen while this menu item is hovered.',
         to: [{ type: 'drawingsBank' }],
         options: {
           filter: 'category == $category',
           filterParams: { category: 'menuImages' },
+        },
+      }),
+      defineField({
+        name: 'overlayImageFit',
+        title: 'Overlay Image Fit',
+        type: 'string',
+        description:
+          'Contain shows the complete artwork. Cover fills the screen and may crop its edges.',
+        initialValue: 'contain',
+        options: {
+          list: [
+            { title: 'Contain — show the whole image', value: 'contain' },
+            { title: 'Cover — fill the screen', value: 'cover' },
+          ],
+          layout: 'radio',
         },
       }),
     ],

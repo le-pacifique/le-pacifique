@@ -16,12 +16,21 @@ export async function Navbar() {
   const draft = await draftMode()
 
   if (draft.isEnabled) {
-    return <NavbarPreview initial={initial} />
+    return <NavbarPreview initial={initial} initialMenu={menu} />
   }
 
   const sections = initial.data.theme?.sections
   const menuSections = menu.data?.sections
   const menuTheme = mergeMenuTheme(initial.data.theme, menu.data)
+  const menuImageFor = (
+    section: 'artists' | 'collections' | 'blog' | 'merch' | 'info',
+  ) => ({
+    ...(menuSections?.[section]?.image ??
+      sections?.[section]?.noteDrawing ??
+      homepage?.data?.menuImages?.[section] ??
+      {}),
+    fit: menuSections?.[section]?.overlayImageFit ?? ('contain' as const),
+  })
 
   return (
     <NavbarLayout
@@ -30,31 +39,11 @@ export async function Navbar() {
       collections={initial.data.collections ?? []}
       menuTheme={menuTheme}
       menuImages={{
-        artists:
-          menuSections?.artists?.image ??
-          sections?.artists?.noteDrawing ??
-          homepage?.data?.menuImages?.artists ??
-          {},
-        collections:
-          menuSections?.collections?.image ??
-          sections?.collections?.noteDrawing ??
-          homepage?.data?.menuImages?.collections ??
-          {},
-        blog:
-          menuSections?.blog?.image ??
-          sections?.blog?.noteDrawing ??
-          homepage?.data?.menuImages?.blog ??
-          {},
-        merch:
-          menuSections?.merch?.image ??
-          sections?.merch?.noteDrawing ??
-          homepage?.data?.menuImages?.merch ??
-          {},
-        info:
-          menuSections?.info?.image ??
-          sections?.info?.noteDrawing ??
-          homepage?.data?.menuImages?.info ??
-          {},
+        artists: menuImageFor('artists'),
+        collections: menuImageFor('collections'),
+        blog: menuImageFor('blog'),
+        merch: menuImageFor('merch'),
+        info: menuImageFor('info'),
       }}
     />
   )

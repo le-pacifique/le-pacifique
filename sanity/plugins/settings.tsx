@@ -2,8 +2,6 @@
  * This plugin contains all the logic for setting up the singletons
  */
 
-import { type DocumentDefinition } from 'sanity'
-import { type StructureResolver } from 'sanity/structure'
 import {
   LuAlbum,
   LuBadgeInfo,
@@ -20,8 +18,10 @@ import {
   LuSettings,
   LuShirt,
   LuShoppingBag,
+  LuTags,
   LuUsers,
 } from 'react-icons/lu'
+import { type StructureResolver } from 'sanity/structure'
 
 export const singletonPlugin = (types: string[]) => {
   return {
@@ -52,9 +52,7 @@ export const singletonPlugin = (types: string[]) => {
 
 // The StructureResolver is how we're changing the DeskTool structure to linking to document (named Singleton)
 // like how "Home" is handled.
-export const pageStructure = (
-  _typeDefArray: DocumentDefinition[],
-): StructureResolver => {
+export const pageStructure = (): StructureResolver => {
   return (S) => {
     return S.list()
       .title('Content')
@@ -100,6 +98,13 @@ export const pageStructure = (
                   .icon(LuFileText)
                   .schemaType('article')
                   .child(S.documentTypeList('article').title('Articles')),
+                S.listItem()
+                  .title('Categories')
+                  .icon(LuTags)
+                  .schemaType('blogCategory')
+                  .child(
+                    S.documentTypeList('blogCategory').title('Blog Categories'),
+                  ),
               ]),
           ),
         S.listItem()

@@ -1,5 +1,8 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
+import { useCallback, useLayoutEffect, useRef } from 'react'
 
 import { PageScrollbarTheme } from '@/components/shared/PageScrollbarTheme'
 import { getResolvedPageTheme, type SettingsTheme } from '@/lib/theme'
@@ -23,20 +26,26 @@ const ReleasePage = ({ data, settingsTheme }: ReleasePageProps) => {
     settingsTheme,
   })
   const releaseTitleColor = release.titleColor?.hex || pageTheme.textColor
-  const scrollbarColor = releaseTitleColor
+  const isTextLeft = release.layout !== 'right'
+  const informationScrollRef = useRef<HTMLDivElement>(null)
+  const resetInformationScroll = useCallback(() => {
+    if (informationScrollRef.current) {
+      informationScrollRef.current.scrollTop = 0
+    }
+  }, [])
 
-  // Find the index of the current release in the collection
+  useLayoutEffect(() => {
+    resetInformationScroll()
+  }, [release._id, resetInformationScroll])
+
   const currentIndex = release.collection?.releases.findIndex(
-    (r) => r._id === release._id,
+    (collectionRelease) => collectionRelease._id === release._id,
   )
   const totalReleases = release.collection?.releases.length || 0
-
-  // Get previous and next releases
-  const prevRelease =
+  const previousRelease =
     currentIndex !== undefined && currentIndex > 0
       ? release.collection.releases[currentIndex - 1]
       : null
-
   const nextRelease =
     currentIndex !== undefined && currentIndex < totalReleases - 1
       ? release.collection.releases[currentIndex + 1]
@@ -44,261 +53,263 @@ const ReleasePage = ({ data, settingsTheme }: ReleasePageProps) => {
 
   return (
     <div
-      className="release-page-scrollbar min-h-svh w-full relative overflow-x-hidden px-5 pb-28 pt-28 md:px-10 md:pb-32 md:pt-32 lg:px-16"
+      className="release-page relative h-svh w-full overflow-hidden"
       style={{
         backgroundColor: pageTheme.backgroundColor,
         color: pageTheme.textColor,
-        ['--release-scrollbar-thumb' as string]: scrollbarColor,
-        ['--release-scrollbar-track' as string]: pageTheme.backgroundColor,
+        ['--release-scrollbar-thumb' as string]: releaseTitleColor,
+        ['--release-scrollbar-track' as string]: 'transparent',
       }}
     >
       <PageScrollbarTheme backgroundColor={pageTheme.backgroundColor} />
-      {pageTheme.noteDrawing?.image && (
+
+      {pageTheme.noteDrawing?.image ? (
         <div
-          className="absolute inset-0 min-h-full bg-cover bg-center pointer-events-none"
+          aria-label={
+            pageTheme.noteDrawing.title || 'Release background drawing'
+          }
+          className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${pageTheme.noteDrawing.image})` }}
         />
-      )}
-      <AnimatedArtistTitle
-        name={release.title}
-        color={releaseTitleColor}
-        blendMode={false}
-        distort
-      />
+      ) : null}
 
-      {/* Release navigation counter */}
-      {totalReleases > 1 && (
-        <div className="fixed right-5 top-28 z-20 flex items-center gap-3 md:right-10 md:top-32 lg:right-16">
-          <div className="distort bg-white/80 px-3 py-1 text-black font-mono text-sm md:text-base">
+      <div className="pointer-events-none absolute inset-0 z-20 mx-auto px-4 lg:px-12 xl:px-24 2xl:px-48">
+        <div className="mx-auto grid h-full max-w-2xl grid-cols-1 gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+          <div
+            className={`min-w-0 ${isTextLeft ? 'lg:col-start-1' : 'lg:col-start-2'}`}
+            data-testid="release-title-column"
+          >
+            <AnimatedArtistTitle
+              blendMode={false}
+              color={releaseTitleColor}
+              distort
+              fitToColumn
+              name={release.title}
+            />
+          </div>
+        </div>
+      </div>
+
+      {totalReleases > 1 ? (
+        <div
+          className={`absolute top-24 z-30 flex items-center gap-3 md:top-28 ${
+            isTextLeft
+              ? 'right-5 md:right-10 lg:right-16'
+              : 'left-5 md:left-10 lg:left-16'
+          }`}
+        >
+          <div className="distort bg-white/80 px-3 py-1 font-mono text-sm text-black md:text-base">
             {currentIndex !== undefined ? currentIndex + 1 : '?'}/
             {totalReleases}
           </div>
 
           <div className="flex gap-2">
-            {prevRelease && (
+            {previousRelease ? (
               <Link
-                href={`/releases/${prevRelease.slug}`}
-                className="distort bg-black hover:bg-white text-white hover:text-black border border-white w-10 h-10 flex items-center justify-center rounded-full transition-colors"
-                aria-label={`Previous release: ${prevRelease.title}`}
+                aria-label={`Previous release: ${previousRelease.title}`}
+                className="distort flex h-10 w-10 items-center justify-center rounded-full border border-white bg-black text-white transition-colors hover:bg-white hover:text-black"
+                href={`/releases/${previousRelease.slug}`}
               >
                 ←
               </Link>
-            )}
+            ) : null}
 
-            {nextRelease && (
+            {nextRelease ? (
               <Link
-                href={`/releases/${nextRelease.slug}`}
-                className="distort bg-black hover:bg-white text-white hover:text-black border border-white w-10 h-10 flex items-center justify-center rounded-full transition-colors"
                 aria-label={`Next release: ${nextRelease.title}`}
+                className="distort flex h-10 w-10 items-center justify-center rounded-full border border-white bg-black text-white transition-colors hover:bg-white hover:text-black"
+                href={`/releases/${nextRelease.slug}`}
               >
                 →
               </Link>
-            )}
+            ) : null}
           </div>
         </div>
-      )}
+      ) : null}
 
-      <div className="relative z-10 mx-auto grid w-full max-w-[88rem] grid-cols-1 gap-12 tracking-tight xl:grid-cols-[minmax(0,1fr)_minmax(20rem,34rem)] xl:items-center">
-        <div className="order-2 xl:order-1">
-          <div className="max-w-5xl">
-            <div className="distort-text">
-              <div className="flex flex-col">
-                <p className="mb-0 mt-4 text-3xl leading-none">
-                  {release.title}
-                </p>
+      <div className="relative z-10 mx-auto h-full px-4 tracking-tight lg:px-12 xl:px-24 2xl:px-48">
+        <div className="mx-auto grid h-full max-w-2xl grid-cols-1 grid-rows-[42svh_minmax(0,1fr)] gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:grid-rows-1">
+          <section
+            className={`order-2 min-h-0 pb-12 lg:h-full lg:pb-[6vh] lg:pt-[44vh] ${
+              isTextLeft ? 'lg:order-1' : 'lg:order-2'
+            }`}
+            data-testid="release-information-column"
+          >
+            <div
+              className="release-page-scrollbar h-full min-h-0 overflow-y-auto overscroll-contain pr-4"
+              ref={informationScrollRef}
+            >
+              <div className="distort-text pb-4">
+                {release.artists?.length ? (
+                  <div className="mb-3 flex flex-wrap items-center text-2xl font-bold leading-none md:text-3xl">
+                    {release.artists.map((artist, index) => {
+                      if (!artist) return null
 
-                <div className="flex -mt-3 mb-2">
-                  {release.artists?.map((artist, index) => {
-                    if (!artist) return null
+                      const separator =
+                        index < release.artists.length - 1 ? (
+                          <span className="mr-2">,</span>
+                        ) : null
 
-                    // Internal artist reference (from Sanity)
-                    if (
-                      artist._type === 'artist' &&
-                      'slug' in artist &&
-                      artist.slug &&
-                      typeof artist.slug === 'object'
-                    ) {
-                      return (
-                        <div
-                          key={artist._id || artist.name}
-                          className="flex items-center"
-                        >
-                          <Link
-                            href={`/artists/${artist.slug.current}`}
-                            className="hover:text-[#C6F042] hover:underline transition-colors"
-                          >
-                            {artist.name}
-                          </Link>
-                          {index < release.artists.length - 1 && (
-                            <span className="mx-1">, </span>
-                          )}
-                        </div>
-                      )
-                    }
-                    // External artist object
-                    if ('url' in artist && artist.url) {
-                      return (
-                        <div key={artist.name} className="flex items-center">
-                          <a
-                            href={artist.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:text-[#FF4517] hover:underline transition-colors"
-                          >
-                            {artist.name}
-                          </a>
-                          {index < release.artists.length - 1 && (
-                            <span className="mx-1">, </span>
-                          )}
-                        </div>
-                      )
-                    }
-                    // Fallback for external artist without URL
-                    if (artist.name) {
-                      return (
-                        <div key={artist.name} className="flex items-center">
-                          <span>{artist.name}</span>
-                          {index < release.artists.length - 1 && (
-                            <span className="mx-1">, </span>
-                          )}
-                        </div>
-                      )
-                    }
-                    return null
-                  })}
-                </div>
+                      if (
+                        artist._type === 'artist' &&
+                        'slug' in artist &&
+                        artist.slug &&
+                        typeof artist.slug === 'object'
+                      ) {
+                        return (
+                          <span className="flex items-center" key={artist._id}>
+                            <Link
+                              className="transition-opacity hover:opacity-60 hover:underline"
+                              href={`/artists/${artist.slug.current}`}
+                            >
+                              {artist.name}
+                            </Link>
+                            {separator}
+                          </span>
+                        )
+                      }
 
-                <div className="mt-0 flex flex-wrap gap-2">
-                  {release.genres?.map((genre, index) => (
+                      if ('url' in artist && artist.url) {
+                        return (
+                          <span className="flex items-center" key={artist.name}>
+                            <a
+                              className="transition-opacity hover:opacity-60 hover:underline"
+                              href={artist.url}
+                              rel="noopener noreferrer"
+                              target="_blank"
+                            >
+                              {artist.name}
+                            </a>
+                            {separator}
+                          </span>
+                        )
+                      }
+
+                      return artist.name ? (
+                        <span className="flex items-center" key={artist.name}>
+                          {artist.name}
+                          {separator}
+                        </span>
+                      ) : null
+                    })}
+                  </div>
+                ) : null}
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {release.catalogNumber ? (
+                    <span className="text-xs font-bold uppercase opacity-65 md:text-sm">
+                      {release.catalogNumber}
+                    </span>
+                  ) : null}
+                  {release.releaseDate ? (
+                    <span className="text-xs uppercase opacity-65 md:text-sm">
+                      {release.releaseDate}
+                    </span>
+                  ) : null}
+                  {release.genres?.map((genre) => (
                     <span
-                      key={index}
-                      className="bg-[#000] px-1 py-0.5 pb-1.5 li text-sm uppercase leading-none text-white"
+                      className="bg-black px-1 py-0.5 pb-1.5 text-sm uppercase leading-none text-white"
+                      key={genre}
                     >
                       <span className="distort inline-block">{genre}</span>
                     </span>
                   ))}
                 </div>
-              </div>
 
-              <div className="mt-6 text-sm leading-snug md:text-lg">
-                {release.description?.map((block: any) => {
-                  if (block._type === 'block') {
-                    return (
-                      <p key={block._key} className="mb-4">
-                        {block.children?.map((child: any) => {
-                          if (child._type === 'span') {
-                            return (
-                              <span key={child._key} className="mb-10">
-                                {child.text}
-                              </span>
-                            )
-                          }
-                          return null
-                        })}
-                      </p>
-                    )
-                  }
-                  return null
-                })}
-              </div>
-
-              {/* Tracklist dropdown */}
-              <div className="mt-6">
-                <h3 className="mb-2 text-sm font-bold md:text-base">
-                  Tracklist
-                </h3>
-                <ol className="list-decimal list-inside mb-6">
-                  {release.tracklist?.map((track: any, index: number) => (
-                    <li key={index} className="text-sm md:text-base">
-                      {track.title} - {track.duration}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-              {/* <label>
-                <input
-                  className="peer/showLabel absolute scale-0"
-                  type="checkbox"
-                />
-                <span className="block max-h-14 max-w-xs overflow-hidden py-0 transition-all duration-300 peer-checked/showLabel:max-h-64">
-                  <h3 className="flex h-14 cursor-pointer items-center font-bold text-sm md:text-base">
-                    Tracklist
-                  </h3>
-                  <ol className="list-decimal list-inside mb-2">
-                    {release.tracklist?.map((track: any, index: number) => (
-                      <li key={index} className="text-sm md:text-md">
-                        {track.title} - {track.duration}
-                      </li>
-                    ))}
-                  </ol>
-                </span>
-              </label> */}
-
-              {/* Bandcamp Player */}
-              {release.bandcampPlayer && (
-                <div className="mt-8 relative">
-                  <Image
-                    className="absolute -left-4 -top-[0.55rem] h-16 w-[calc(100%+2rem)] max-w-[26rem] pointer-events-none"
-                    src={frame}
-                    alt="Player frame"
-                    width={7409}
-                    height={1327}
-                  />
-                  {/* <h3 className="font-bold text-sm md:text-base mb-3">
-                    Listen
-                  </h3> */}
-                  <div
-                    className="w-full max-w-96 overflow-hidden"
-                    style={{ maxWidth: '24rem' }}
-                  >
-                    <iframe
-                      style={{ border: 0, width: '100%', height: '120px' }}
-                      src={release.bandcampPlayer}
-                      seamless
-                      allow="autoplay"
-                    ></iframe>
+                {release.description?.length ? (
+                  <div className="mt-6 text-sm leading-snug md:text-lg">
+                    {release.description.map((block: any) =>
+                      block._type === 'block' ? (
+                        <p className="mb-4" key={block._key}>
+                          {block.children?.map((child: any) =>
+                            child._type === 'span' ? (
+                              <span key={child._key}>{child.text}</span>
+                            ) : null,
+                          )}
+                        </p>
+                      ) : null,
+                    )}
                   </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+                ) : null}
 
-        <div className="order-1 mx-auto aspect-square w-full max-w-[30rem] [perspective:1000px] md:max-w-[34rem] xl:order-2">
-          <div className="relative h-full w-full shadow-xl transition-all duration-500 [transform-style:preserve-3d] animate-continuousFlip pointer-events-none">
-            {/* Front Face */}
-            <div className="absolute inset-0 h-full w-full [backface-visibility:hidden]">
-              {release?.image && (
-                <Image
-                  className="h-full w-full object-cover object-left"
-                  src={release.image}
-                  alt={release.title}
-                  width={2432}
-                  height={1442}
-                />
-              )}
+                {release.tracklist?.length ? (
+                  <div className="mt-6">
+                    <h2 className="mb-2 text-sm font-bold uppercase md:text-base">
+                      Tracklist
+                    </h2>
+                    <ol className="list-inside list-decimal space-y-1 text-sm md:text-base">
+                      {release.tracklist.map((track, index) => (
+                        <li key={`${track.title}-${index}`}>
+                          {track.title}
+                          {track.duration ? ` — ${track.duration}` : ''}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ) : null}
+
+                {release.bandcampPlayer ? (
+                  <div className="relative mt-8 max-w-96">
+                    <Image
+                      alt="Player frame"
+                      className="pointer-events-none absolute -left-4 -top-[0.55rem] h-16 w-[calc(100%+2rem)] max-w-[26rem]"
+                      height={1327}
+                      src={frame}
+                      width={7409}
+                    />
+                    <div className="w-full overflow-hidden">
+                      <iframe
+                        allow="autoplay"
+                        className="h-[120px] w-full border-0"
+                        loading="lazy"
+                        onLoad={resetInformationScroll}
+                        seamless
+                        src={release.bandcampPlayer}
+                        tabIndex={-1}
+                        title={`${release.title} player`}
+                      />
+                    </div>
+                  </div>
+                ) : null}
+              </div>
             </div>
-            {/* Back Face */}
-            <div className="absolute inset-0 h-full w-full [backface-visibility:hidden] [transform:rotateY(180deg)]">
-              {release?.backCover ? (
-                <Image
-                  className="h-full w-full object-cover object-left"
-                  src={release.backCover}
-                  alt={release.title}
-                  width={2432}
-                  height={1442}
-                />
-              ) : (
-                <Image
-                  className="h-full w-full object-cover object-left"
-                  src={release.image}
-                  alt={release.title}
-                  width={2432}
-                  height={1442}
-                />
-              )}
+          </section>
+
+          <section
+            className={`order-1 flex min-h-0 items-center justify-center pt-[6svh] lg:h-full lg:pt-0 ${
+              isTextLeft ? 'lg:order-2' : 'lg:order-1'
+            }`}
+            data-testid="release-artwork-column"
+          >
+            <div className="relative aspect-square w-full max-w-[34svh] [perspective:1000px] lg:max-w-[72vh]">
+              <div className="pointer-events-none relative h-full w-full animate-continuousFlip shadow-xl transition-all duration-500 [transform-style:preserve-3d]">
+                <div className="absolute inset-0 [backface-visibility:hidden]">
+                  {release.image ? (
+                    <Image
+                      alt={release.title}
+                      className="object-cover"
+                      fill
+                      priority
+                      sizes="(min-width: 1024px) 50vw, 100vw"
+                      src={release.image}
+                    />
+                  ) : null}
+                </div>
+
+                <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                  {release.backCover || release.image ? (
+                    <Image
+                      alt={`${release.title} back cover`}
+                      className="object-cover"
+                      fill
+                      sizes="(min-width: 1024px) 50vw, 100vw"
+                      src={release.backCover || release.image}
+                    />
+                  ) : null}
+                </div>
+              </div>
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </div>

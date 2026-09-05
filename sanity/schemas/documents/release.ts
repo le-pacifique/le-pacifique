@@ -47,6 +47,24 @@ export default defineType({
       },
     }),
     defineField({
+      name: 'layout',
+      title: 'Page Layout',
+      type: 'string',
+      description:
+        'Choose which side contains the title and release information. The artwork always uses the opposite column.',
+      initialValue: 'left',
+      options: {
+        list: [
+          {
+            title: 'Text Left / Artwork Right (Default)',
+            value: 'left',
+          },
+          { title: 'Text Right / Artwork Left', value: 'right' },
+        ],
+        layout: 'radio',
+      },
+    }),
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',

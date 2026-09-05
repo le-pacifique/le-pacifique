@@ -1,4 +1,3 @@
-import { colorInput } from '@sanity/color-input'
 import { defineField, defineType } from 'sanity'
 
 export default defineType({
@@ -6,6 +5,30 @@ export default defineType({
   title: 'Info',
   type: 'document',
   fields: [
+    defineField({
+      name: 'image',
+      title: 'Image',
+      type: 'image',
+      options: { hotspot: true },
+      description:
+        'Optional image displayed beside the text, like an artist page.',
+      fields: [
+        defineField({ name: 'alt', title: 'Alternative Text', type: 'string' }),
+      ],
+    }),
+    defineField({
+      name: 'layout',
+      title: 'Image Position',
+      type: 'string',
+      initialValue: 'right',
+      options: {
+        layout: 'radio',
+        list: [
+          { title: 'Left', value: 'left' },
+          { title: 'Right', value: 'right' },
+        ],
+      },
+    }),
     defineField({
       name: 'backgroundColor',
       title: 'Background Color',
@@ -27,7 +50,7 @@ export default defineType({
       name: 'title',
       title: 'Page Title',
       type: 'string',
-      validation: (rule) => rule.required(),
+      description: 'Optional. Leave blank to show the page without a heading.',
     }),
     defineField({
       name: 'description',

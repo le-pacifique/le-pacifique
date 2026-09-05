@@ -8,6 +8,7 @@ import { unsplashImageAsset } from 'sanity-plugin-asset-source-unsplash'
 import { pageStructure, singletonPlugin } from '../sanity/plugins/settings'
 import article from '../sanity/schemas/documents/article'
 import artist from '../sanity/schemas/documents/artist'
+import blogCategory from '../sanity/schemas/documents/blogCategory'
 import collection from '../sanity/schemas/documents/collection'
 import drawings from '../sanity/schemas/documents/drawings'
 import images from '../sanity/schemas/documents/images'
@@ -58,6 +59,7 @@ export default defineConfig({
       collection,
       release,
       article,
+      blogCategory,
       project,
       page,
       merch,
@@ -71,7 +73,7 @@ export default defineConfig({
   },
   plugins: [
     structureTool({
-      structure: pageStructure([home, blog, menu, settings, info]),
+      structure: pageStructure(),
     }),
     presentationTool({
       resolve,
@@ -82,7 +84,13 @@ export default defineConfig({
         },
       },
     }),
-    singletonPlugin([home.name, blog.name, menu.name, settings.name, info.name]),
+    singletonPlugin([
+      home.name,
+      blog.name,
+      menu.name,
+      settings.name,
+      info.name,
+    ]),
     unsplashImageAsset(),
     visionTool({ defaultApiVersion: apiVersion }),
     colorInput(),

@@ -1,7 +1,7 @@
 import Image from 'next/image'
 
 import { PageScrollbarTheme } from '@/components/shared/PageScrollbarTheme'
-import { deterministicRange } from '@/lib/deterministicRandom'
+import { TitlePanelSpacing } from '@/components/shared/TitlePanelSpacing'
 import {
   getResolvedPageTheme,
   getSectionTheme,
@@ -10,10 +10,8 @@ import {
 import { urlForImage } from '@/sanity/lib/utils'
 import type { ArtistPayload } from '@/types'
 
-import { CustomPortableText } from '../../shared/CustomPortableText'
-import CollectionTitle from '../collection/CollectionTitle'
 import AnimatedArtistTitle from './AnimatedArtistTitle'
-import ArtistTitle from './ArtistTitle'
+import ArtistSections from './ArtistSections'
 
 export interface ArtistPageProps {
   data: ArtistPayload
@@ -22,7 +20,7 @@ export interface ArtistPageProps {
 
 const ArtistPage = ({ data, settingsTheme }: ArtistPageProps) => {
   const artist = data
-  const { noteDrawing, backgroundColor, socialMedia, layout, titleColor } = data
+  const { noteDrawing, backgroundColor, layout, titleColor } = data
 
   const isLeft = layout === 'left'
   const pageTheme = getResolvedPageTheme({
@@ -33,41 +31,33 @@ const ArtistPage = ({ data, settingsTheme }: ArtistPageProps) => {
   })
   const bgColor = getSectionTheme(settingsTheme, 'artists').backgroundColor
   const artistTitleColor = titleColor?.hex || pageTheme.textColor
-
-  // Function to generate random styles
-  const generateRandomStyles = (index: number) => {
-    const randomTop = deterministicRange(-10, 10, artist._id, index, 'top')
-    const randomLeft = deterministicRange(-10, 10, artist._id, index, 'left')
-    const randomRotate =
-      deterministicRange(0, 20, artist._id, index, 'rotate') *
-      (index % 2 === 0 ? 1 : -1)
-
-    return {
-      top: `${randomTop}px`,
-      left: `${randomLeft}px`,
-      transform: `rotate(${randomRotate}deg)`,
-      '--initial-rotate': `${randomRotate}deg`,
-      backgroundColor: `${bgColor}`,
-    }
-  }
+  const sectionButtonColor = artist.sectionButtonColor?.hex || bgColor
+  const sectionButtonContrastColor =
+    artist.sectionButtonContrastColor?.hex || '#000000'
 
   return (
     <div
-      className="min-h-screen w-full relative flex items-center justify-center"
+      className="relative h-svh w-full overflow-hidden"
       style={{ backgroundColor: pageTheme.backgroundColor }}
     >
+      <TitlePanelSpacing title={artist.name} />
       <PageScrollbarTheme backgroundColor={pageTheme.backgroundColor} />
-      {/* <CollectionTitle
-        name={artist.name}
-        style={{ filter: 'url(#roughText)' }}
-      /> */}
 
-      <AnimatedArtistTitle
-        name={artist.name}
-        color={artistTitleColor}
-        blendMode={false}
-        distort
-      />
+      <div className="pointer-events-none absolute inset-0 z-[19] mx-auto px-4 lg:px-12 xl:px-24 2xl:px-48">
+        <div className="mx-auto grid h-full max-w-2xl grid-cols-1 gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+          <div
+            className={`min-w-0 ${isLeft ? 'lg:col-start-2' : 'lg:col-start-1'}`}
+            data-testid="artist-title-column"
+          >
+            <AnimatedArtistTitle
+              name={artist.name}
+              color={artistTitleColor}
+              blendMode={false}
+              distort
+            />
+          </div>
+        </div>
+      </div>
 
       {pageTheme.noteDrawing?.image && (
         <div
@@ -76,53 +66,45 @@ const ArtistPage = ({ data, settingsTheme }: ArtistPageProps) => {
         ></div>
       )}
 
-      <div className="mx-auto px-4 lg:px-48 z-10 py-12 lg:py-24 tracking-tight">
-        <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-0 lg:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 items-center">
+      <div className="relative z-10 mx-auto h-full px-4 tracking-tight lg:px-12 xl:px-24 2xl:px-48">
+        <div className="mx-auto grid h-full max-w-2xl grid-cols-1 grid-rows-[42svh_minmax(0,1fr)] gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:grid-rows-1">
           <div
             className={`${
               isLeft ? 'order-2 lg:order-2' : 'order-2 lg:order-1'
-            }`}
+            } min-h-0 pb-12 lg:h-full lg:pb-[6vh] lg:pt-[var(--title-panel-offset,44vh)]`}
+            data-testid="artist-biography-column"
           >
-            <div className="lg:max-w-3xl">
-              {Array.isArray(artist.biography) ? (
-                <div className="distort mt-6 text-sm md:text-xl tracking-tight leading-snug text-black">
-                  <CustomPortableText
-                    value={artist.biography}
-                    paragraphClasses="mb-4"
-                  />
-                </div>
-              ) : artist.biography ? (
-                <p className="distort mt-6 text-sm md:text-xl tracking-tight leading-snug text-black">
-                  {artist.biography}
-                </p>
-              ) : null}
-            </div>
-            <div className="mt-8 flex">
-              {artist.socialMedia?.map((link, index) => (
-                <a
-                  key={link._key}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white text-black text-sm md:text-xl mx-3 first:ml-0 px-2 py-0 uppercase font-medium tracking-tight hover:animate-wiggle"
-                  style={generateRandomStyles(index)}
-                >
-                  {link.title}
-                </a>
-              ))}
-            </div>
+            <ArtistSections
+              _id={artist._id}
+              accentColor={sectionButtonColor}
+              biography={artist.biography}
+              contrastColor={sectionButtonContrastColor}
+              email={artist.email}
+              linkedReleases={artist.linkedReleases}
+              radioShows={artist.radioShows}
+              releasesCatalog={artist.releasesCatalog}
+              socialMedia={artist.socialMedia}
+            />
           </div>
 
           {artist?.image && (
-            <Image
-              alt="Artist image"
-              src={urlForImage(artist.image)?.url() ?? ''}
-              width={2432}
-              height={1442}
-              className={`max-h-96 mx-auto lg:h-[75vh] lg:max-h-none w-auto md:-ml-4 lg:-ml-0 ${
+            <div
+              className={`flex min-h-0 items-center justify-center ${
                 isLeft ? 'order-1 lg:order-1' : 'order-1 lg:order-2'
               }`}
-            />
+              data-testid="artist-image-column"
+            >
+              <div className="relative h-[34svh] w-full lg:h-[75vh]">
+                <Image
+                  alt={artist.image?.alt || artist.name}
+                  className="object-contain"
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  src={urlForImage(artist.image)?.url() ?? ''}
+                />
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -1,10 +1,7 @@
 import { CustomPortableText } from '@/components/shared/CustomPortableText'
 import { Header } from '@/components/shared/Header'
 import { PageScrollbarTheme } from '@/components/shared/PageScrollbarTheme'
-import {
-  getResolvedPageTheme,
-  type SettingsTheme,
-} from '@/lib/theme'
+import { getResolvedPageTheme, type SettingsTheme } from '@/lib/theme'
 import type { PagePayload } from '@/types'
 
 export interface PageProps {
@@ -36,7 +33,7 @@ export function Page({ data, settingsTheme }: PageProps) {
       )}
       <div className="relative z-10 mb-14 h-36 flex justify-center items-center">
         {/* Header */}
-        <Header title={title} description={overview} />
+        <Header title={title?.trim()} description={overview} />
 
         {/* Body */}
         {body && (

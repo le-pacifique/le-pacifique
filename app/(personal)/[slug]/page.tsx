@@ -102,9 +102,9 @@ export default async function PageSlugRoute({ params }: Props) {
       loadArticles(),
       loadBlog(),
     ])
-    const articles = initial.data?.articles?.length
-      ? initial.data.articles
-      : allArticles
+    const articles = allArticles?.length
+      ? allArticles
+      : initial.data?.articles ?? []
 
     return (
       <BlogPage

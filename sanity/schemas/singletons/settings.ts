@@ -1,5 +1,5 @@
+import { LuImage, LuPanelBottom, LuSearch, LuSettings } from 'react-icons/lu'
 import { defineArrayMember, defineField, defineType } from 'sanity'
-import { LuPanelBottom, LuSearch, LuSettings } from 'react-icons/lu'
 
 export default defineType({
   name: 'settings',
@@ -8,10 +8,15 @@ export default defineType({
   icon: LuSettings,
   groups: [
     {
+      name: 'branding',
+      title: 'Branding',
+      icon: LuImage,
+      default: true,
+    },
+    {
       name: 'general',
       title: 'General',
       icon: LuSettings,
-      default: true,
     },
     {
       name: 'seo',
@@ -27,6 +32,44 @@ export default defineType({
   // Uncomment below to have edits publish automatically as you type
   // liveEdit: true,
   fields: [
+    defineField({
+      name: 'siteLogo',
+      title: 'Header Logo',
+      type: 'image',
+      group: 'branding',
+      description:
+        'Displayed at the top center of every page. A transparent PNG works best.',
+      options: {
+        hotspot: true,
+      },
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alternative Text',
+          type: 'string',
+          description:
+            'A short accessible description, for example “Le Pacifique”.',
+          initialValue: 'Le Pacifique',
+        }),
+        defineField({
+          name: 'desktopWidth',
+          title: 'Desktop Width (px)',
+          type: 'number',
+          description:
+            'Logo width on tablets and desktop screens. Default: 96.',
+          initialValue: 96,
+          validation: (rule) => rule.integer().min(48).max(280),
+        }),
+        defineField({
+          name: 'mobileWidth',
+          title: 'Mobile Width (px)',
+          type: 'number',
+          description: 'Logo width on phones. Default: 64.',
+          initialValue: 64,
+          validation: (rule) => rule.integer().min(32).max(160),
+        }),
+      ],
+    }),
     defineField({
       name: 'menuItems',
       title: 'Menu Item list',
@@ -118,7 +161,8 @@ export default defineType({
           name: 'appleTouchIcon',
           title: 'Apple Touch Icon',
           type: 'image',
-          description: 'Icon used when saving the site to an iPhone/iPad home screen.',
+          description:
+            'Icon used when saving the site to an iPhone/iPad home screen.',
           options: {
             hotspot: true,
           },
@@ -127,7 +171,8 @@ export default defineType({
           name: 'ogImage',
           title: 'Open Graph Image',
           type: 'image',
-          description: 'Default image for social cards and search result previews.',
+          description:
+            'Default image for social cards and search result previews.',
           options: {
             hotspot: true,
           },
@@ -136,9 +181,14 @@ export default defineType({
     }),
   ],
   preview: {
-    prepare() {
+    select: {
+      media: 'siteLogo',
+    },
+    prepare({ media }) {
       return {
-        title: 'Settings',
+        title: 'Site Settings',
+        subtitle: 'Branding, navigation, SEO and footer',
+        media,
       }
     },
   },

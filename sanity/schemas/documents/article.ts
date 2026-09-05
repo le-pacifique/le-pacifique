@@ -4,17 +4,24 @@ export default defineType({
   name: 'article',
   title: 'Article',
   type: 'document',
+  groups: [
+    { name: 'content', title: 'Article Content', default: true },
+    { name: 'publishing', title: 'Publishing & Categories' },
+    { name: 'design', title: 'Design' },
+  ],
   fields: [
     defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
+      group: 'content',
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
+      group: 'content',
       options: {
         source: 'title',
         maxLength: 96,
@@ -26,6 +33,7 @@ export default defineType({
       name: 'backgroundColor',
       title: 'Background Color',
       type: 'color',
+      group: 'design',
       description:
         'Overrides the default Blog background color from Settings > Theme.',
       options: {
@@ -36,6 +44,7 @@ export default defineType({
       name: 'noteDrawing',
       title: 'Drawing',
       type: 'reference',
+      group: 'design',
       to: [{ type: 'drawingsBank' }],
       description: 'Overrides the default Blog drawing from Settings > Theme.',
     }),
@@ -43,6 +52,7 @@ export default defineType({
       name: 'content',
       title: 'Content',
       type: 'array',
+      group: 'content',
       of: [
         defineArrayMember({
           type: 'block',
@@ -113,11 +123,13 @@ export default defineType({
       name: 'excerpt',
       title: 'Excerpt',
       type: 'text',
+      group: 'content',
     }),
     defineField({
       name: 'coverImage',
       title: 'Cover Image',
       type: 'image',
+      group: 'content',
       options: {
         hotspot: true,
       },
@@ -126,7 +138,23 @@ export default defineType({
       name: 'date',
       title: 'Date',
       type: 'datetime',
+      group: 'publishing',
       initialValue: () => new Date().toISOString(),
+    }),
+    defineField({
+      name: 'categories',
+      title: 'Categories',
+      type: 'array',
+      group: 'publishing',
+      description:
+        'Choose one or more filters for this article. Categories are managed under Blog → Categories.',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{ type: 'blogCategory' }],
+        }),
+      ],
+      validation: (rule) => rule.unique(),
     }),
   ],
 })

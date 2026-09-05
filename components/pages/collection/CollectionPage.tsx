@@ -7,7 +7,7 @@ import {
 import type { CollectionPayload } from '@/types'
 
 import AnimatedArtistTitle from '../artist/AnimatedArtistTitle'
-import RotatingCarousel from './RotatingCarousel'
+import FloatingReleases from './FloatingReleases'
 
 export interface CollectionPageProps {
   data: CollectionPayload
@@ -22,6 +22,7 @@ const CollectionPage = ({ data, settingsTheme }: CollectionPageProps) => {
       _id: release._id,
       title: release.title,
       image: release.image || '',
+      imageLqip: release.imageLqip,
       _type: release._type,
       slug: {
         current: release.slug?.current || '',
@@ -45,11 +46,16 @@ const CollectionPage = ({ data, settingsTheme }: CollectionPageProps) => {
     'collections',
   ).backgroundColor
   const collectionTitleColor = collection.titleColor?.hex || pageTheme.textColor
+  const isTextLeft = collection.layout === 'left'
 
   return (
     <div
-      className="h-full w-full absolute -z-0"
-      style={{ backgroundColor: pageTheme.backgroundColor }}
+      className="collection-page relative h-svh w-full overflow-hidden"
+      style={{
+        backgroundColor: pageTheme.backgroundColor,
+        ['--collection-accent' as string]: collectionColor,
+        ['--collection-scrollbar-thumb' as string]: collectionColor,
+      }}
     >
       <PageScrollbarTheme backgroundColor={pageTheme.backgroundColor} />
       <svg className="hidden">
@@ -71,57 +77,82 @@ const CollectionPage = ({ data, settingsTheme }: CollectionPageProps) => {
         ></div>
       )}
 
-      {collection.description && (
-        <div
-          className="collection-description-scrollbar absolute top-[30%] right-[5%] z-40 max-w-xl p-6 text-black max-h-[50vh] overflow-y-auto"
-          style={{
-            scrollbarColor: `${collectionColor} transparent`,
-            ['--collection-scrollbar-thumb' as string]: collectionColor,
-          }}
-        >
-          {collection.description?.map((block: any) => {
-            if (block._type === 'block') {
-              return (
-                <p
-                  key={block._key}
-                  className="distort mb-3 text-sm md:text-xl leading-snug"
-                >
-                  {block.children?.map((child: any) => {
-                    if (child._type === 'span') {
-                      return (
-                        <span
-                          key={child._key}
-                          className={
-                            child.marks?.includes('strong') ? 'font-bold' : ''
-                          }
-                        >
-                          {child.text}
-                        </span>
-                      )
-                    }
+      <div className="pointer-events-none absolute inset-0 z-20 mx-auto px-4 lg:px-12 xl:px-24 2xl:px-48">
+        <div className="mx-auto grid h-full max-w-2xl grid-cols-1 gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+          <div
+            className={`min-w-0 ${isTextLeft ? 'lg:col-start-1' : 'lg:col-start-2'}`}
+            data-testid="collection-title-column"
+          >
+            <AnimatedArtistTitle
+              name={collection.title}
+              color={collectionTitleColor}
+              blendMode={false}
+              distort
+              fitToColumn
+              scale={
+                collection.titleScale ? collection.titleScale / 100 : undefined
+              }
+            />
+          </div>
+        </div>
+      </div>
 
-                    return null
-                  })}
-                </p>
-              )
-            }
-            return null
-          })}
+      <div className="relative z-10 mx-auto h-full px-4 tracking-tight lg:px-12 xl:px-24 2xl:px-48">
+        <div className="mx-auto grid h-full max-w-2xl grid-cols-1 grid-rows-[42svh_minmax(0,1fr)] gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:grid-rows-1">
+          <div
+            className={`order-1 min-h-0 lg:h-full ${isTextLeft ? 'lg:order-2' : 'lg:order-1'}`}
+          >
+            {formattedReleases.length > 0 ? (
+              <FloatingReleases releases={formattedReleases} />
+            ) : (
+              <div className="distort flex h-full items-center justify-center text-sm uppercase md:text-xl">
+                No releases found for this collection
+              </div>
+            )}
+          </div>
+
+          <div
+            className={`order-2 min-h-0 pb-12 lg:h-full lg:pb-[6vh] lg:pt-[44vh] ${isTextLeft ? 'lg:order-1' : 'lg:order-2'}`}
+            data-testid="collection-description-column"
+          >
+            {collection.description && (
+              <div className="collection-description-scrollbar h-full min-h-0 overflow-y-auto pr-4 text-black">
+                {collection.description.map((block: any) => {
+                  if (block._type === 'block') {
+                    return (
+                      <p
+                        key={block._key}
+                        className="distort mb-3 text-sm leading-snug md:text-xl"
+                      >
+                        {block.children?.map((child: any) => {
+                          if (child._type === 'span') {
+                            return (
+                              <span
+                                key={child._key}
+                                className={
+                                  child.marks?.includes('strong')
+                                    ? 'font-bold'
+                                    : ''
+                                }
+                              >
+                                {child.text}
+                              </span>
+                            )
+                          }
+
+                          return null
+                        })}
+                      </p>
+                    )
+                  }
+
+                  return null
+                })}
+              </div>
+            )}
+          </div>
         </div>
-      )}
-      {formattedReleases.length > 0 ? (
-        <RotatingCarousel releases={formattedReleases} />
-      ) : (
-        <div className="flex h-screen items-center justify-center text-white text-2xl">
-          No releases found for this collection
-        </div>
-      )}
-      <AnimatedArtistTitle
-        name={collection.title}
-        color={collectionTitleColor}
-        blendMode={false}
-        distort
-      />
+      </div>
     </div>
   )
 }

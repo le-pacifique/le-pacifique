@@ -17,6 +17,7 @@ const pageThemeFields = groq`
 const menuSectionFields = groq`
   backgroundColor,
   textColor,
+  overlayImageFit,
   "image": image->{
     ${drawingFields}
   }
@@ -100,6 +101,10 @@ export const blogQuery = groq`
   *[_type == "blog"][0]{
     _id,
     title,
+    layout,
+    titleColor,
+    categoryButtonColor,
+    categoryButtonContrastColor,
     ${pageThemeFields}
   }
 `
@@ -194,6 +199,12 @@ export const pagesBySlugQuery = groq`
       excerpt,
       coverImage,
       date,
+      "categories": categories[]->{
+        _id,
+        title,
+        color,
+        "slug": slug.current
+      },
       content
     },
   "merch": merch[]->{
@@ -225,9 +236,19 @@ export const artistBySlugQuery = groq`
     name,
     layout,
     titleColor,
+    sectionButtonColor,
+    sectionButtonContrastColor,
+    email,
+    radioShows[]{_key, href, title},
+    releasesCatalog[]{_key, href, title},
     "slug": slug.current,
     ${pageThemeFields},
-    socialMedia,
+    socialMedia[]{_key, href, title},
+    "linkedReleases": *[_type == "release" && references(^._id)] | order(releaseDate desc) {
+      _id,
+      title,
+      "slug": slug.current
+    },
   }
 `
 
@@ -236,6 +257,8 @@ export const collectionBySlugQuery = groq`
     _id,
     title,
     titleColor,
+    titleScale,
+    layout,
     ${pageThemeFields},
     description,
     "releases": releases[]->{
@@ -244,6 +267,7 @@ export const collectionBySlugQuery = groq`
       "slug": slug,
       _type,
       "image": image.asset->url,
+      "imageLqip": image.asset->metadata.lqip,
       "backCover": backCover.asset->url,
       catalogNumber,
       releaseDate,
@@ -298,6 +322,13 @@ export const settingsQuery = groq`
   *[_type == "settings"][0]{
     footer,
     ${settingsThemeFields},
+    "siteLogo": siteLogo{
+      alt,
+      desktopWidth,
+      "image": asset->url,
+      "dimensions": asset->metadata.dimensions,
+      mobileWidth
+    },
     menuItems[]->{
       _type,
       "slug": slug.current,
@@ -338,6 +369,7 @@ export const releaseBySlugQuery = groq`
     _id,
     title,
     titleColor,
+    layout,
     "slug": slug.current,
     _type,
     ${pageThemeFields},
@@ -397,7 +429,13 @@ export const articlesQuery = groq`
     ${pageThemeFields},
     excerpt,
     coverImage,
-    date
+    date,
+    "categories": categories[]->{
+      _id,
+      title,
+      color,
+      "slug": slug.current
+    }
   }
 `
 
@@ -411,6 +449,12 @@ export const articleBySlugQuery = groq`
     excerpt,
     coverImage,
     date,
+    "categories": categories[]->{
+      _id,
+      title,
+      color,
+      "slug": slug.current
+    },
     content
   }
 `
@@ -438,6 +482,8 @@ export const infoQuery = groq`
   *[_type == "info"][0] {
     _id,
     title,
+    image,
+    layout,
     ${pageThemeFields},
     description,
     logos[]->{
@@ -448,6 +494,16 @@ export const infoQuery = groq`
     },
     contactEmail,
     socialMedia[],
-    pressKit[]
+    pressKit[]{
+      _key,
+      title,
+      file{
+        asset->{
+          _id,
+          url,
+          originalFilename
+        }
+      }
+    }
   }
 `

@@ -4,10 +4,10 @@ import type { Metadata, Viewport } from 'next'
 import dynamic from 'next/dynamic'
 import { draftMode } from 'next/headers'
 import { toPlainText } from 'next-sanity'
-import { Suspense, type CSSProperties } from 'react'
+import { type CSSProperties,Suspense } from 'react'
 
 import { Navbar } from '@/components/global/Navbar'
-import { FloatingLogo } from '@/components/shared/FloatingLogo'
+import { SiteLogo } from '@/components/shared/SiteLogo'
 import { colorToHex, getSectionTheme, sectionThemeKeys } from '@/lib/theme'
 import { urlForOpenGraphImage } from '@/sanity/lib/utils'
 import {
@@ -31,7 +31,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const description =
     settings?.seo?.description ||
     (homePage?.overview ? toPlainText(homePage.overview) : undefined)
-  const ogImage = urlForOpenGraphImage(settings?.seo?.ogImage ?? settings?.ogImage)
+  const ogImage = urlForOpenGraphImage(
+    settings?.seo?.ogImage ?? settings?.ogImage,
+  )
   const favicon = settings?.seo?.favicon?.asset?.url
   const appleTouchIcon = settings?.seo?.appleTouchIcon?.asset?._ref
     ? urlForOpenGraphImage(settings.seo.appleTouchIcon)
@@ -67,8 +69,17 @@ export default async function IndexRoute({
   children: React.ReactNode
 }) {
   const draft = await draftMode()
-  const [{ data: settings }, { data: homePage }, { data: blog }, { data: info }] =
-    await Promise.all([loadSettings(), loadHomePage(), loadBlog(), loadInfo()])
+  const [
+    { data: settings },
+    { data: homePage },
+    { data: blog },
+    { data: info },
+  ] = await Promise.all([
+    loadSettings(),
+    loadHomePage(),
+    loadBlog(),
+    loadInfo(),
+  ])
   const loadingThemeStyle = sectionThemeKeys.reduce((styles, section) => {
     styles[`--loading-background-${section}` as string] = getSectionTheme(
       settings?.theme,
@@ -90,13 +101,7 @@ export default async function IndexRoute({
 
   return (
     <>
-      <FloatingLogo
-        src="/images/logothique.png"
-        size={192}
-        mobileSize={128}
-        speed={26}
-        href="/"
-      />
+      <SiteLogo logo={settings?.siteLogo} />
       <div
         className="flex min-h-svh flex-col text-black"
         style={loadingThemeStyle}

@@ -31,7 +31,7 @@ const ArticlePage = ({ data, blogTheme, settingsTheme }: ArticlePageProps) => {
 
   return (
     <div
-      className="relative min-h-svh w-full overflow-x-hidden px-5 pb-24 pt-28 md:px-10 md:pb-28 md:pt-32 lg:px-16"
+      className="relative h-svh w-full overflow-hidden"
       style={{
         backgroundColor: pageTheme.backgroundColor,
         color: pageTheme.textColor,
@@ -45,49 +45,51 @@ const ArticlePage = ({ data, blogTheme, settingsTheme }: ArticlePageProps) => {
         />
       )}
 
-      <article className="distort-text relative z-10 mx-auto max-w-5xl tracking-tight">
-        {formattedDate && (
-          <p className="mb-3 text-sm uppercase leading-none md:text-base">
-            {formattedDate}
-          </p>
-        )}
+      <div className="artist-section-scrollbar relative z-10 h-full overflow-y-auto overscroll-contain">
+        <article className="distort-text mx-auto max-w-5xl px-5 pb-24 pt-28 tracking-tight md:px-10 md:pb-28 md:pt-32 lg:px-16">
+          {formattedDate && (
+            <p className="mb-3 text-sm uppercase leading-none md:text-base">
+              {formattedDate}
+            </p>
+          )}
 
-        <AnimatedInlineText
-          as="h1"
-          className="max-w-6xl text-6xl font-black leading-none md:text-9xl lg:text-[10rem]"
-          text={article.title}
-        />
+          <AnimatedInlineText
+            as="h1"
+            className="max-w-6xl text-6xl font-black leading-none md:text-9xl lg:text-[10rem]"
+            text={article.title}
+          />
 
-        {excerpt && (
-          <p className="mt-6 max-w-3xl text-lg leading-snug md:text-2xl">
-            {excerpt}
-          </p>
-        )}
+          {excerpt && (
+            <p className="mt-6 max-w-3xl text-lg leading-snug md:text-2xl">
+              {excerpt}
+            </p>
+          )}
 
-        {article.coverImage?.asset && (
-          <div className="mt-8 max-w-4xl">
-            <ImageBox
-              image={article.coverImage}
-              alt={article.coverImage.alt || article.title}
-              classesWrapper="relative aspect-[4/3] md:aspect-[16/9] rounded-none bg-transparent"
-            />
-            {article.coverImage.caption && (
-              <p className="mt-2 text-xs leading-tight md:text-sm">
-                {article.coverImage.caption}
-              </p>
-            )}
-          </div>
-        )}
+          {article.coverImage?.asset && (
+            <div className="mt-8 max-w-4xl">
+              <ImageBox
+                image={article.coverImage}
+                alt={article.coverImage.alt || article.title}
+                classesWrapper="relative aspect-[4/3] md:aspect-[16/9] rounded-none bg-transparent"
+              />
+              {article.coverImage.caption && (
+                <p className="mt-2 text-xs leading-tight md:text-sm">
+                  {article.coverImage.caption}
+                </p>
+              )}
+            </div>
+          )}
 
-        {article.content && article.content.length > 0 && (
-          <div className="mt-10 max-w-4xl text-base leading-snug md:text-xl">
-            <CustomPortableText
-              paragraphClasses="mb-5"
-              value={article.content as PortableTextBlock[]}
-            />
-          </div>
-        )}
-      </article>
+          {article.content && article.content.length > 0 && (
+            <div className="mt-10 max-w-4xl text-base leading-snug md:text-xl">
+              <CustomPortableText
+                paragraphClasses="mb-5"
+                value={article.content as PortableTextBlock[]}
+              />
+            </div>
+          )}
+        </article>
+      </div>
     </div>
   )
 }

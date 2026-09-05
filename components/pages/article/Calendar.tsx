@@ -108,7 +108,7 @@ export default function Calendar({
         const cell = (
           <div
             key={day.toString()}
-            className="calendar-grid-cell-distorted relative flex min-h-14 flex-col overflow-visible p-1 md:min-h-20 md:p-1.5"
+            className="calendar-grid-cell-distorted relative flex min-h-10 flex-col overflow-visible p-1 sm:min-h-12 md:min-h-20 md:p-1.5"
           >
             <span
               className="distort mb-1 text-xs md:text-sm"

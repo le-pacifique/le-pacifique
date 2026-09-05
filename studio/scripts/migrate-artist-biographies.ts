@@ -33,9 +33,10 @@ async function main() {
 
   artists.forEach((artist) => {
     if (typeof artist.biography !== 'string') return
+    const biography = textToBlocks(artist.biography)
 
     transaction.patch(artist._id, (patch) =>
-      patch.set({ biography: textToBlocks(artist.biography) }),
+      patch.set({ biography }),
     )
     migrated += 1
   })

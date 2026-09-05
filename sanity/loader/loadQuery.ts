@@ -1,8 +1,11 @@
 import 'server-only'
 
+import type { QueryParams } from '@sanity/client'
+import type { QueryResponseInitial } from '@sanity/react-loader'
 import * as queryStore from '@sanity/react-loader'
 import { draftMode } from 'next/headers'
 import { connection } from 'next/server'
+import { cache } from 'react'
 
 import { client } from '@/sanity/lib/client'
 import {
@@ -19,7 +22,6 @@ import {
   projectBySlugQuery,
   releaseBySlugQuery,
   settingsQuery,
-  simplifiedPagesBySlugQuery,
 } from '@/sanity/lib/queries'
 import { token } from '@/sanity/lib/token'
 import {
@@ -53,8 +55,59 @@ queryStore.setServerClient(serverClient)
 
 const usingCdn = serverClient.config().useCdn
 const isDevelopment = process.env.NODE_ENV === 'development'
+
+type LoadQueryOptions = NonNullable<Parameters<typeof queryStore.loadQuery>[2]>
+
+const globalForSanityCache = globalThis as typeof globalThis & {
+  __lePacifiqueSanityPublishedQueryCache?: Map<
+    string,
+    QueryResponseInitial<unknown>
+  >
+}
+
+// Keep the last good published response across Turbopack module reloads. This
+// is only a local-development safety net for intermittent VPN/TLS failures;
+// draft queries must always come directly from Sanity.
+const publishedQueryCache =
+  globalForSanityCache.__lePacifiqueSanityPublishedQueryCache ??
+  new Map<string, QueryResponseInitial<unknown>>()
+
+if (isDevelopment) {
+  globalForSanityCache.__lePacifiqueSanityPublishedQueryCache =
+    publishedQueryCache
+}
+
+const isNetworkError = (error: unknown) => {
+  if (!error || typeof error !== 'object') return false
+
+  const candidate = error as {
+    cause?: unknown
+    code?: string
+    isNetworkError?: boolean
+    message?: string
+  }
+
+  return (
+    candidate.isNetworkError === true ||
+    candidate.message === 'fetch failed' ||
+    ['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'EAI_AGAIN'].includes(
+      candidate.code || '',
+    ) ||
+    isNetworkError(candidate.cause)
+  )
+}
+
+const createSafeSanityNetworkError = () =>
+  new Error(
+    'Sanity could not be reached. Check the VPN connection or bypass *.sanity.io and try again.',
+  )
+
 // Automatically handle draft mode
-export const loadQuery = (async (query, params = {}, options = {}) => {
+export const loadQuery = async <QueryResponseResult>(
+  query: string,
+  params: QueryParams = {},
+  options: LoadQueryOptions = {},
+): Promise<QueryResponseInitial<QueryResponseResult>> => {
   const draft = await draftMode()
   const bypassCache = isDevelopment || draft.isEnabled
   if (bypassCache) {
@@ -64,7 +117,7 @@ export const loadQuery = (async (query, params = {}, options = {}) => {
   const { perspective = draft.isEnabled ? 'previewDrafts' : 'published' } =
     options
   // Don't cache by default
-  let revalidate: NextFetchRequestConfig['revalidate'] = 0
+  let revalidate: number | false = 0
   if (bypassCache) {
     // Local Studio edits should be visible immediately after refresh.
     // Draft/Presentation mode should also bypass the public-page cache.
@@ -75,7 +128,7 @@ export const loadQuery = (async (query, params = {}, options = {}) => {
   } else if (usingCdn) {
     revalidate = 60
   }
-  return queryStore.loadQuery(query, params, {
+  const queryOptions: LoadQueryOptions = {
     ...options,
     next: {
       ...(options.next || {}),
@@ -84,62 +137,122 @@ export const loadQuery = (async (query, params = {}, options = {}) => {
     perspective,
     // Enable stega if in Draft Mode, to enable overlays when outside Sanity Studio
     stega: draft.isEnabled,
-  })
-}) satisfies typeof queryStore.loadQuery
+  }
+  const canUseDevelopmentFallback = isDevelopment && perspective === 'published'
+  const cacheKey = canUseDevelopmentFallback
+    ? JSON.stringify([query, params])
+    : undefined
+  const rememberPublishedResult = (
+    result: QueryResponseInitial<QueryResponseResult>,
+  ) => {
+    if (cacheKey) {
+      publishedQueryCache.set(cacheKey, result as QueryResponseInitial<unknown>)
+    }
+
+    return result
+  }
+
+  try {
+    return rememberPublishedResult(
+      await queryStore.loadQuery<QueryResponseResult>(
+        query,
+        params,
+        queryOptions,
+      ),
+    )
+  } catch (error) {
+    const canFallBackToCdn = canUseDevelopmentFallback && isNetworkError(error)
+
+    if (!canFallBackToCdn) {
+      if (isNetworkError(error)) throw createSafeSanityNetworkError()
+
+      throw error
+    }
+
+    console.warn(
+      '[Sanity] API connection failed; retrying this published query through the CDN.',
+    )
+
+    try {
+      return rememberPublishedResult(
+        await queryStore.loadQuery<QueryResponseResult>(query, params, {
+          ...queryOptions,
+          useCdn: true,
+        }),
+      )
+    } catch (cdnError) {
+      const cachedResult = cacheKey
+        ? publishedQueryCache.get(cacheKey)
+        : undefined
+
+      if (cachedResult && isNetworkError(cdnError)) {
+        console.warn(
+          '[Sanity] API and CDN connections failed; using the last successful published response.',
+        )
+
+        return cachedResult as QueryResponseInitial<QueryResponseResult>
+      }
+
+      if (isNetworkError(cdnError)) throw createSafeSanityNetworkError()
+
+      throw cdnError
+    }
+  }
+}
 
 /**
  * Loaders that are used in more than one place are declared here, otherwise they're colocated with the component
  */
 
-export function loadSettings() {
+export const loadSettings = cache(function loadSettings() {
   return loadQuery<SettingsPayload>(
     settingsQuery,
     {},
     { next: { tags: ['settings', 'artist', 'collection', 'drawingsBank'] } },
   )
-}
+})
 
-export function loadHomePage() {
+export const loadHomePage = cache(function loadHomePage() {
   return loadQuery<HomePagePayload | null>(
     homePageQuery,
     {},
     { next: { tags: ['home', 'project', 'drawingsBank'] } },
   )
-}
+})
 
-export function loadBlog() {
+export const loadBlog = cache(function loadBlog() {
   return loadQuery<BlogPayload | null>(
     blogQuery,
     {},
     { next: { tags: ['blog', 'drawingsBank'] } },
   )
-}
+})
 
-export function loadMenu() {
+export const loadMenu = cache(function loadMenu() {
   return loadQuery<MenuPayload | null>(
     menuQuery,
     {},
     { next: { tags: ['menu', 'drawingsBank'] } },
   )
-}
+})
 
-export function loadProject(slug: string) {
+export const loadProject = cache(function loadProject(slug: string) {
   return loadQuery<ProjectPayload | null>(
     projectBySlugQuery,
     { slug },
     { next: { tags: ['project', `project:${slug}`, 'drawingsBank'] } },
   )
-}
+})
 
-export function loadArtist(slug: string) {
+export const loadArtist = cache(function loadArtist(slug: string) {
   return loadQuery<ArtistPayload | null>(
     artistBySlugQuery,
     { slug },
     { next: { tags: ['artist', `artist:${slug}`, 'drawingsBank'] } },
   )
-}
+})
 
-export function loadCollection(slug: string) {
+export const loadCollection = cache(function loadCollection(slug: string) {
   return loadQuery<CollectionPayload | null>(
     collectionBySlugQuery,
     { slug },
@@ -155,9 +268,9 @@ export function loadCollection(slug: string) {
       },
     },
   )
-}
+})
 
-export function loadPage(slug: string) {
+export const loadPage = cache(function loadPage(slug: string) {
   return loadQuery<PagePayload | null>(
     pagesBySlugQuery,
     { slug },
@@ -175,9 +288,9 @@ export function loadPage(slug: string) {
       },
     },
   )
-}
+})
 
-export function loadRelease(slug: string) {
+export const loadRelease = cache(function loadRelease(slug: string) {
   return loadQuery<ReleasePayload | null>(
     releaseBySlugQuery,
     { slug },
@@ -193,36 +306,40 @@ export function loadRelease(slug: string) {
       },
     },
   )
-}
+})
 
-export function loadArticle(slug: string) {
+export const loadArticle = cache(function loadArticle(slug: string) {
   return loadQuery<ArticlePayload | null>(
     articleBySlugQuery,
     { slug },
-    { next: { tags: ['article', `article:${slug}`, 'drawingsBank'] } },
+    {
+      next: {
+        tags: ['article', `article:${slug}`, 'blogCategory', 'drawingsBank'],
+      },
+    },
   )
-}
+})
 
-export function loadArticles() {
+export const loadArticles = cache(function loadArticles() {
   return loadQuery<ArticlePayload[]>(
     articlesQuery,
     {},
-    { next: { tags: ['article', 'drawingsBank'] } },
+    { next: { tags: ['article', 'blogCategory', 'drawingsBank'] } },
   )
-}
+})
 
-export function loadMerch(slug: string) {
+export const loadMerch = cache(function loadMerch(slug: string) {
   return loadQuery<MerchPayload | null>(
     merchBySlugQuery,
     { slug },
     { next: { tags: ['merch', `merch:${slug}`] } },
   )
-}
+})
 
-export function loadInfo() {
+export const loadInfo = cache(function loadInfo() {
   return loadQuery<InfoPayload | null>(
     infoQuery,
     {},
     { next: { tags: ['info', 'drawingsBank'] } },
   )
-}
+})
