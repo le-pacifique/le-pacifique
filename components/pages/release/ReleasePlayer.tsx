@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
-import { getBandcampEmbedPath, type PlayerAlbum } from '@/lib/bandcamp'
+import { getBandcampEmbedPath, getBandcampReleaseUrl, type PlayerAlbum } from '@/lib/bandcamp'
 
 type IconName = 'play' | 'pause' | 'previous' | 'next' | 'volume' | 'muted'
 
@@ -76,10 +76,14 @@ export default function ReleasePlayer({
   useEffect(() => {
     const controller = new AbortController()
     const path = getBandcampEmbedPath(embedUrl)
+    const releaseUrl = getBandcampReleaseUrl(embedUrl)
     async function load() {
       try {
-        if (!path) throw new Error('Unsupported Bandcamp link')
-        const response = await fetch(`/api/bandcamp/${path}`, {
+        if (!path && !releaseUrl) throw new Error('Unsupported Bandcamp link')
+        const endpoint = path
+          ? `/api/bandcamp/${path}`
+          : `/api/bandcamp/release?url=${encodeURIComponent(releaseUrl!)}`
+        const response = await fetch(endpoint, {
           signal: controller.signal,
         })
         if (!response.ok) throw new Error('Unable to load tracks')

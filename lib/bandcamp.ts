@@ -27,6 +27,34 @@ export function getBandcampEmbedPath(value: string) {
   }
 }
 
+export function getBandcampReleaseUrl(value: string) {
+  try {
+    const url = new URL(value)
+    if (
+      url.protocol !== 'https:' || url.username || url.password || url.port ||
+      !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.bandcamp\.com$/.test(url.hostname) ||
+      !/^\/(album|track)\/[^/]+\/?$/.test(url.pathname)
+    ) return null
+    return `${url.origin}${url.pathname}`
+  } catch {
+    return null
+  }
+}
+
+export function getBandcampEmbedPathFromPage(html: string) {
+  for (const [tag] of html.matchAll(/<meta\b[^>]*>/gi)) {
+    if (!/\bname=["']bc-page-properties["']/i.test(tag)) continue
+    const attribute = tag.match(/\bcontent=(["'])([\s\S]*?)\1/i)?.[2]
+    if (!attribute) break
+    const data = JSON.parse(decodeAttribute(attribute))
+    const kind = data.item_type === 'a' ? 'album' : data.item_type === 't' ? 'track' : null
+    if (!kind || !Number.isSafeInteger(data.item_id) || data.item_id <= 0 ||
+      !/^\d{1,12}$/.test(String(data.item_id))) break
+    return `${kind}/${data.item_id}`
+  }
+  throw new Error('Bandcamp release metadata is unavailable')
+}
+
 function decodeAttribute(value: string) {
   return value.replace(
     /&(#x[\da-f]+|#\d+|quot|apos|amp|lt|gt);/gi,

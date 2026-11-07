@@ -122,7 +122,7 @@ const InfoPage = ({ info, menuImage, settingsTheme }: InfoPageProps) => {
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                {link.title}
+                                {link.title?.trim()}
                               </a>
                             </li>
                           ))}
@@ -143,7 +143,7 @@ const InfoPage = ({ info, menuImage, settingsTheme }: InfoPageProps) => {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                   >
-                                    {item.title}
+                                    {item.title?.trim()}
                                   </a>
                                 ) : (
                                   item.title

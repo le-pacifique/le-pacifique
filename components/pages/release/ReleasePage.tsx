@@ -309,7 +309,7 @@ const ReleasePage = ({ data, settingsTheme }: ReleasePageProps) => {
               </div>
 
               {release.bandcampPlayer ? (
-                <div className="release-artwork-player relative z-30 mt-4 h-16 w-full lg:absolute lg:top-full">
+                <div className="release-artwork-player relative z-30 mt-4 h-16 w-full lg:absolute lg:top-[calc(100%-2rem)]">
                   <ReleasePlayer
                     key={release._id}
                     embedUrl={release.bandcampPlayer}
