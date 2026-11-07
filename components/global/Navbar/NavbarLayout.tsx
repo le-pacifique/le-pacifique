@@ -271,12 +271,12 @@ function MenuItemLink({
               <Dropdown
                 above
                 items={[
-                  { _type: 'blogCategory', title: 'All', href: '/blog' },
                   ...blogCategories.map((category) => ({
                     _type: 'blogCategory',
                     title: category.title,
                     href: `/blog?category=${encodeURIComponent(getBlogCategoryKey(category))}`,
                   })),
+                  { _type: 'blogCategory', title: 'All', href: '/blog' },
                 ]}
                 pathname={
                   pathname === '/blog' && searchParams.get('category')

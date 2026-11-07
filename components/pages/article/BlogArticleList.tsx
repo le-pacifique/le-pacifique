@@ -140,15 +140,16 @@ export default function BlogArticleList({
         className="mb-4 flex shrink-0 flex-wrap gap-x-3 gap-y-4 py-2"
         role="tablist"
       >
-        {filterOptions.map((category) => {
+        {filterOptions.map((category, index) => {
           const active = activeCategory === category.key
-          const rotate = deterministicRange(
-            -8,
-            8,
-            'blog-category',
-            category.key,
-            'rotate',
-          )
+          const rotate =
+            deterministicRange(
+              4,
+              8,
+              'blog-category',
+              category.key,
+              'rotate',
+            ) * (index % 2 === 0 ? 1 : -1)
           const top = deterministicRange(
             -4,
             4,
@@ -223,9 +224,10 @@ export default function BlogArticleList({
 
                         return (
                           <li
-                            className="group border-l-4 pl-4"
+                            className="group border-l-4 p-4"
                             key={article._id}
                             style={{
+                              backgroundColor: `var(--site-theme-on-solid, ${pageBackgroundColor})`,
                               borderColor:
                                 article.color ||
                                 colorToHex(article.backgroundColor) ||
