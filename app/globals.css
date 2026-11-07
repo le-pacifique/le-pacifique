@@ -944,23 +944,41 @@ html[data-cursor-spinning] * {
 
 .theme-toggle {
   position: fixed;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+  transform: translateX(-50%) rotate(-2deg);
   z-index: 60;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.55rem 0.7rem;
-  border: 1px solid currentColor;
-  border-radius: 4px 8px 5px 7px;
-  background: rgba(255, 255, 255, 0.8);
-  color: #171717;
-  font-size: 0.65rem;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 48px;
+  height: 44px;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: var(--site-theme-text, #171717);
+  font-family: inherit;
+  font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  backdrop-filter: blur(10px);
+}
+
+.theme-mode-icon {
+  width: 30px;
+  height: 30px;
+}
+
+@media (min-width: 768px) {
+  .theme-toggle {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+  }
+
+  .theme-mode-icon {
+    width: 36px;
+    height: 36px;
+  }
 }
 
 .theme-toggle:focus-visible {
@@ -1012,8 +1030,6 @@ html[data-theme='dark'] img[alt='PCFQ Logo'] {
 }
 
 html[data-theme='dark'] .theme-toggle {
-  background: rgba(18, 18, 18, 0.85);
-  border-color: #929292;
   color: #ededed;
 }
 
@@ -1027,20 +1043,7 @@ html[data-theme='dark'] [role='tab'][aria-selected='true'] {
   color: #111 !important;
 }
 
-@media (max-width: 640px) {
-  .theme-toggle {
-    right: 0.75rem;
-    padding: 0.5rem;
-  }
 
-  .theme-toggle span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-}
 
 
 html[data-theme='negative'] {
@@ -1088,9 +1091,7 @@ html[data-theme='negative']:has(.menu-background-overlay) [data-testid='site-log
 }
 
 html[data-theme='negative'] .theme-toggle {
-  background: #fff;
-  color: #000;
-  border-color: #000;
+  color: var(--site-theme-text);
 }
 
 html[data-theme='negative'] [role='tab'] {

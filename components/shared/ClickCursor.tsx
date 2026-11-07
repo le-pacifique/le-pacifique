@@ -71,8 +71,9 @@ export function ClickCursor() {
 
       animation?.cancel()
       move(event)
+      const rotation = Math.random() < 0.5 ? 360 : -360
       animation = cursor.animate(
-        [{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }],
+        [{ transform: 'rotate(0deg)' }, { transform: `rotate(${rotation}deg)` }],
         { duration: 420, easing: 'ease-out' },
       )
       render()
