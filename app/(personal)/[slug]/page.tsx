@@ -22,6 +22,7 @@ import {
 
 type Props = {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ category?: string | string[] }>
 }
 
 export async function generateMetadata(
@@ -43,7 +44,7 @@ export function generateStaticParams() {
   return generateStaticSlugs('page')
 }
 
-export default async function PageSlugRoute({ params }: Props) {
+export default async function PageSlugRoute({ params, searchParams }: Props) {
   const { slug } = await params
   const [initial, homepage, settings, menu] = await Promise.all([
     loadPage(slug),
@@ -98,6 +99,7 @@ export default async function PageSlugRoute({ params }: Props) {
 
   // Conditionally render the BlogPage component if the slug is 'blog'
   if (slug === 'blog') {
+    const { category } = await searchParams
     const [{ data: allArticles }, { data: blog }] = await Promise.all([
       loadArticles(),
       loadBlog(),
@@ -109,6 +111,7 @@ export default async function PageSlugRoute({ params }: Props) {
     return (
       <BlogPage
         articles={articles ?? []}
+        category={typeof category === 'string' ? category : 'all'}
         menuImage={menuImageFor('blog')}
         pageTheme={blog ?? initial.data ?? undefined}
         settingsTheme={settingsTheme}

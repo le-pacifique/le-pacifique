@@ -3,13 +3,15 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
+import { getBlogCategoryKey } from '@/lib/blogCategories'
 import { getSectionThemeByTitle, type SettingsTheme } from '@/lib/theme'
 import { resolveHref } from '@/sanity/lib/utils'
 import type {
   ArtistPayload,
+  BlogCategoryPayload,
   CollectionPayload,
   MenuItem,
   SettingsPayload,
@@ -17,7 +19,7 @@ import type {
 
 import { MenuStroke } from './MenuStroke'
 
-const ITEMS_WITH_SUBMENU = ['Artists', 'Collections'] as const
+const ITEMS_WITH_SUBMENU = ['Artists', 'Collections', 'Blog'] as const
 const ITEMS_WITH_BACKGROUND_OVERLAY = [
   'Artists',
   'Collections',
@@ -55,34 +57,45 @@ interface NavbarLayoutProps {
   data: SettingsPayload
   artists: ArtistPayload[]
   collections: CollectionPayload[]
+  blogCategories: BlogCategoryPayload[]
   menuTheme?: SettingsTheme
   menuImages: Record<MenuImageSourceKey, MenuImageSource>
 }
 
 // --- Dropdown ---
 function Dropdown<
-  T extends { _type: string; slug?: string; name?: string; title?: string },
+  T extends {
+    _type: string
+    slug?: string
+    name?: string
+    title?: string
+    href?: string
+  },
 >({
   items,
   pathname,
   color,
   onItemClick,
+  above = false,
 }: {
   items: T[]
   pathname: string
   color: string
   onItemClick: () => void
+  above?: boolean
 }) {
   return (
-    <div className="absolute left-0 ml-3 md:ml-6 uppercase text-lg font-extrabold md:text-2xl min-w-max">
+    <div
+      className={`absolute left-0 ml-3 md:ml-6 uppercase text-lg font-extrabold md:text-2xl min-w-max ${above ? 'bottom-full pb-2' : ''}`}
+    >
       {items.map((item, index) => {
-        const href = resolveHref(item._type, item.slug)
+        const href = item.href || resolveHref(item._type, item.slug)
         if (!href) return null
         const isActive = pathname === href
 
         return (
           <motion.div
-            key={item.slug?.toString() ?? index}
+            key={item.href || item.slug?.toString() || index}
             className="relative"
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -161,6 +174,7 @@ function MenuItemLink({
   setHoveredItem,
   artists,
   collections,
+  blogCategories,
   isTop,
   pathname,
   settingsTheme,
@@ -170,10 +184,12 @@ function MenuItemLink({
   setHoveredItem: (item: string | null) => void
   artists: ArtistPayload[]
   collections: CollectionPayload[]
+  blogCategories: BlogCategoryPayload[]
   isTop?: boolean
   pathname: string
   settingsTheme: SettingsTheme | null | undefined
 }) {
+  const searchParams = useSearchParams()
   if (!menuItem?.title) return null
 
   const href = resolveHref(menuItem._type, menuItem.slug) || '#'
@@ -238,20 +254,41 @@ function MenuItemLink({
           </AnimatePresence>
         </>
       ) : (
-        <Link
-          href={href}
-          className={`block uppercase text-lg font-extrabold tracking-tighter md:text-2xl transition-colors duration-300 ${
-            !hasSubmenu ? 'hover:text-white' : ''
-          }`}
-        >
-          <span
-            className="distort inline-block"
-            style={{ color: textColor }}
+        <>
+          <Link
+            href={href}
+            className={`block uppercase text-lg font-extrabold tracking-tighter md:text-2xl transition-colors duration-300 ${
+              !hasSubmenu ? 'hover:text-white' : ''
+            }`}
           >
-            {menuItem.title}
-          </span>
-          <MenuStroke color={borderColor} edge="bottom" />
-        </Link>
+            <span className="distort inline-block" style={{ color: textColor }}>
+              {menuItem.title}
+            </span>
+            <MenuStroke color={borderColor} edge="bottom" />
+          </Link>
+          <AnimatePresence>
+            {menuItem.title === 'Blog' && hoveredItem === 'Blog' && (
+              <Dropdown
+                above
+                items={[
+                  { _type: 'blogCategory', title: 'All', href: '/blog' },
+                  ...blogCategories.map((category) => ({
+                    _type: 'blogCategory',
+                    title: category.title,
+                    href: `/blog?category=${encodeURIComponent(getBlogCategoryKey(category))}`,
+                  })),
+                ]}
+                pathname={
+                  pathname === '/blog' && searchParams.get('category')
+                    ? `/blog?category=${encodeURIComponent(searchParams.get('category')!)}`
+                    : pathname
+                }
+                color={menuTheme.textColor}
+                onItemClick={() => setHoveredItem(null)}
+              />
+            )}
+          </AnimatePresence>
+        </>
       )}
     </div>
   )
@@ -261,6 +298,7 @@ export default function NavbarLayout({
   data,
   artists,
   collections,
+  blogCategories,
   menuTheme,
   menuImages,
 }: NavbarLayoutProps) {
@@ -294,6 +332,7 @@ export default function NavbarLayout({
             setHoveredItem={setHoveredItem}
             artists={artists}
             collections={collections}
+            blogCategories={blogCategories}
             isTop
             pathname={pathname}
             settingsTheme={menuTheme ?? data.theme}
@@ -314,6 +353,7 @@ export default function NavbarLayout({
               setHoveredItem={setHoveredItem}
               artists={artists}
               collections={collections}
+              blogCategories={blogCategories}
               pathname={pathname}
               settingsTheme={menuTheme ?? data.theme}
             />

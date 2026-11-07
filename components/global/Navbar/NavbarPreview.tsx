@@ -2,12 +2,14 @@
 
 import { mergeMenuTheme } from '@/lib/theme'
 import { useMenu, useSettings } from '@/sanity/loader/useQuery'
+import type { BlogCategoryPayload } from '@/types'
 
 import NavbarLayout from './NavbarLayout'
 
 type Props = {
   initial: Parameters<typeof useSettings>[0]
   initialMenu: Parameters<typeof useMenu>[0]
+  blogCategories: BlogCategoryPayload[]
 }
 
 export default function NavbarPreview(props: Props) {
@@ -29,6 +31,7 @@ export default function NavbarPreview(props: Props) {
       data={data!}
       artists={[]}
       collections={[]}
+      blogCategories={props.blogCategories}
       menuTheme={mergeMenuTheme(data?.theme, menu)}
       menuImages={{
         artists: menuImageFor('artists'),

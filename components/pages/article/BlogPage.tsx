@@ -16,6 +16,7 @@ import Calendar from './Calendar'
 
 export interface BlogPageProps {
   articles: ArticlePayload[]
+  category?: string
   menuImage?: {
     image: string
     title?: string
@@ -40,6 +41,7 @@ function getInitialMonth(articles: ArticlePayload[]) {
 
 const BlogPage = ({
   articles,
+  category = 'all',
   menuImage,
   pageTheme: pageThemeOverride,
   settingsTheme,
@@ -132,6 +134,8 @@ const BlogPage = ({
             data-testid="blog-articles-column"
           >
             <BlogArticleList
+              key={category}
+              initialCategory={category}
               accentColor={categoryButtonColor}
               articles={sortedArticles}
               contrastColor={categoryButtonContrastColor}

@@ -2,15 +2,18 @@
 
 import { format } from 'date-fns'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { toPlainText } from 'next-sanity'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { getBlogCategories, getBlogCategoryKey } from '@/lib/blogCategories'
 import { deterministicRange } from '@/lib/deterministicRandom'
 import { colorToHex } from '@/lib/theme'
 import { resolveHref } from '@/sanity/lib/utils'
-import type { ArticlePayload, BlogCategoryPayload } from '@/types'
+import type { ArticlePayload } from '@/types'
 
 interface BlogArticleListProps {
+  initialCategory?: string
   accentColor: string
   articles: ArticlePayload[]
   contrastColor: string
@@ -25,34 +28,26 @@ const getArticlePreview = (article: ArticlePayload) => {
   return undefined
 }
 
-const getCategoryKey = (category: BlogCategoryPayload) =>
-  category.slug || category._id
-
 export default function BlogArticleList({
+  initialCategory = 'all',
   accentColor,
   articles,
   contrastColor,
   pageBackgroundColor,
   textColor,
 }: BlogArticleListProps) {
-  const [activeCategory, setActiveCategory] = useState('all')
+  const router = useRouter()
+  const categories = useMemo(() => getBlogCategories(articles), [articles])
+  const [activeCategory, setActiveCategory] = useState(() =>
+    categories.some(
+      (category) => getBlogCategoryKey(category) === initialCategory,
+    )
+      ? initialCategory
+      : 'all',
+  )
   const [showTopFade, setShowTopFade] = useState(false)
   const [showBottomFade, setShowBottomFade] = useState(false)
   const scrollPanelRef = useRef<HTMLDivElement>(null)
-
-  const categories = useMemo(() => {
-    const categoryMap = new Map<string, BlogCategoryPayload>()
-
-    articles.forEach((article) => {
-      article.categories?.forEach((category) => {
-        categoryMap.set(getCategoryKey(category), category)
-      })
-    })
-
-    return Array.from(categoryMap.values()).sort((a, b) =>
-      a.title.localeCompare(b.title),
-    )
-  }, [articles])
 
   const filteredArticles = useMemo(
     () =>
@@ -60,7 +55,7 @@ export default function BlogArticleList({
         ? articles
         : articles.filter((article) =>
             article.categories?.some(
-              (category) => getCategoryKey(category) === activeCategory,
+              (category) => getBlogCategoryKey(category) === activeCategory,
             ),
           ),
     [activeCategory, articles],
@@ -133,7 +128,7 @@ export default function BlogArticleList({
     { color: accentColor, key: 'all', title: 'All' },
     ...categories.map((category) => ({
       color: category.color?.hex || accentColor,
-      key: getCategoryKey(category),
+      key: getBlogCategoryKey(category),
       title: category.title,
     })),
   ]
@@ -169,7 +164,15 @@ export default function BlogArticleList({
               className="relative px-2 py-0 text-sm font-medium uppercase tracking-tight hover:animate-wiggle md:text-xl"
               id={`blog-category-${category.key}`}
               key={category.key}
-              onClick={() => setActiveCategory(category.key)}
+              onClick={() => {
+                setActiveCategory(category.key)
+                router.push(
+                  category.key === 'all'
+                    ? '/blog'
+                    : `/blog?category=${encodeURIComponent(category.key)}`,
+                  { scroll: false },
+                )
+              }}
               role="tab"
               style={{
                 top,
