@@ -189,13 +189,6 @@ function MenuItemLink({
   const textColor =
     hoveredItem === menuItem.title || active ? menuTheme.textColor : grayColor
 
-  // Check if on homepage or if this section is active
-  const isHomepage = pathname === '/'
-  const isActive =
-    isHomepage ||
-    pathname === '/info' ||
-    pathname.includes(menuItem.title.toLowerCase())
-
   const hasSubmenu = ITEMS_WITH_SUBMENU.includes(menuItem.title as any)
 
   return (
@@ -208,15 +201,7 @@ function MenuItemLink({
         <>
           <MenuStroke color={borderColor} />
           <div
-            className={`distort uppercase text-lg font-extrabold md:text-2xl transition-opacity duration-300 ${
-              // Only show text when:
-              // 1. This is the item being hovered, OR
-              // 2. This is active AND no other item is being hovered
-              hoveredItem === menuItem.title ||
-              (isActive && hoveredItem === null)
-                ? 'opacity-100'
-                : 'opacity-0'
-            }`}
+            className="distort uppercase text-lg font-extrabold md:text-2xl"
             style={{ color: textColor }}
           >
             {menuItem.title}
@@ -253,34 +238,15 @@ function MenuItemLink({
           </AnimatePresence>
         </>
       ) : (
-        // <Link
-        //   href={href}
-        //   className={`uppercase text-lg font-extrabold tracking-tighter md:text-2xl transition-colors duration-300 ${
-        //     !hasSubmenu ? 'hover:text-white' : ''
-        //   }`}
-        //   style={{
-        //     borderBottom: `8px solid ${hoveredItem === menuItem.title ? 'transparent' : borderColor}`,
-        //     color: textColor,
-        //   }}
-        // >
-        //   {menuItem.title}
         <Link
           href={href}
           className={`block uppercase text-lg font-extrabold tracking-tighter md:text-2xl transition-colors duration-300 ${
             !hasSubmenu ? 'hover:text-white' : ''
           }`}
         >
-          {/* Wrap the text in a span with controlled opacity */}
           <span
             className="distort inline-block"
-            style={{
-              color: textColor,
-              opacity:
-                isActive || isHomepage || hoveredItem === menuItem.title
-                  ? 1
-                  : 0,
-              transition: 'opacity 0.3s ease',
-            }}
+            style={{ color: textColor }}
           >
             {menuItem.title}
           </span>

@@ -17,7 +17,10 @@ export function ClickCursor() {
       'a, button, summary, label, [role="button"], [role="link"], input[type="button"], input[type="submit"], input[type="reset"], .cursor-pointer'
 
     const render = () => {
-      const visible = Boolean(animation || overLink) && cursor.complete && cursor.naturalWidth > 0
+      const visible =
+        Boolean(animation || overLink) &&
+        cursor.complete &&
+        cursor.naturalWidth > 0
       cursor.hidden = !visible
       root.toggleAttribute('data-cursor-spinning', visible)
       cursor.style.filter = overLink ? 'invert(1)' : 'none'
@@ -35,18 +38,33 @@ export function ClickCursor() {
       if (event.pointerType !== 'mouse') return
       cursor.style.left = `${event.clientX - 3}px`
       cursor.style.top = `${event.clientY - 3}px`
-      overLink = event.target instanceof Element && Boolean(event.target.closest(interactive))
+      if (
+        event.target instanceof Element &&
+        event.target.closest('[data-section-scrollbar]')
+      ) {
+        animation?.cancel()
+        animation = null
+        overLink = false
+        render()
+        return
+      }
+      overLink =
+        event.target instanceof Element &&
+        Boolean(event.target.closest(interactive))
       render()
     }
 
     const spin = (event: PointerEvent) => {
       if (
+        (event.target instanceof Element &&
+          event.target.closest('[data-section-scrollbar]')) ||
         event.pointerType !== 'mouse' ||
         event.button !== 0 ||
         reducedMotion.matches ||
         !cursor.complete ||
         !cursor.naturalWidth
-      ) return
+      )
+        return
 
       animation?.cancel()
       move(event)

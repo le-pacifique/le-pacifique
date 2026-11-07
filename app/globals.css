@@ -745,25 +745,38 @@ select,
 }
 
 .artist-section-scrollbar {
-  scrollbar-color: rgb(0 0 0 / 10%) transparent;
-  scrollbar-width: thin;
+  scrollbar-width: none;
 }
 
 .artist-section-scrollbar::-webkit-scrollbar {
-  width: 3px;
+  display: none;
 }
 
-.artist-section-scrollbar::-webkit-scrollbar-track {
-  background-color: transparent;
+.artist-section-scrollbar-control {
+  position: absolute;
+  inset: 0 -3px 0 auto;
+  width: 12px;
+  touch-action: none;
+  cursor: var(--site-cursor);
+  outline: none;
 }
 
-.artist-section-scrollbar::-webkit-scrollbar-thumb {
+.artist-section-scrollbar-control:focus-visible {
+  outline: 1px dashed var(--artist-scrollbar-hover);
+}
+
+.artist-section-scrollbar-handle {
+  position: absolute;
+  left: 3px;
+  width: 6px;
   background-color: rgb(0 0 0 / 10%);
   border-radius: 9999px;
+  cursor: var(--site-cursor);
 }
 
-.artist-section-scrollbar:hover::-webkit-scrollbar-thumb {
-  background-color: rgb(0 0 0 / 22%);
+.artist-section-scrollbar-control:is(:hover, :focus-visible, [data-dragging])
+  .artist-section-scrollbar-handle {
+  background-color: var(--artist-scrollbar-hover);
 }
 
 @keyframes collection-release-orbit {

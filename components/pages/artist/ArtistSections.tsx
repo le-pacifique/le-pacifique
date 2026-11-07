@@ -164,6 +164,7 @@ export default function ArtistSections({
     <SectionTabs
       seed={_id}
       label="Artist sections"
+      tabLayout="wide"
       accentColor={accentColor}
       contrastColor={contrastColor}
       sections={sections.map((section) => ({

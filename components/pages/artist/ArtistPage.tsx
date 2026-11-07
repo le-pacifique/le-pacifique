@@ -67,11 +67,11 @@ const ArtistPage = ({ data, settingsTheme }: ArtistPageProps) => {
       )}
 
       <div className="relative z-10 mx-auto h-full px-4 tracking-tight lg:px-12 xl:px-24 2xl:px-48">
-        <div className="mx-auto grid h-full max-w-2xl grid-cols-1 grid-rows-[42svh_minmax(0,1fr)] gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:grid-rows-1">
+        <div className="mx-auto grid h-full max-w-2xl grid-cols-1 grid-rows-[38svh_minmax(0,1fr)] gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:grid-rows-1">
           <div
             className={`${
               isLeft ? 'order-2 lg:order-2' : 'order-2 lg:order-1'
-            } min-h-0 pb-12 lg:h-full lg:pb-[6vh] lg:pt-[var(--title-panel-offset,44vh)]`}
+            } min-h-0 pb-12 lg:h-full lg:pb-[6vh] lg:pt-[calc(var(--title-panel-offset,44vh)-1.5rem)]`}
             data-testid="artist-biography-column"
           >
             <ArtistSections
