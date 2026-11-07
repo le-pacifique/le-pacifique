@@ -132,7 +132,7 @@ function BackgroundOverlay({
 
   return (
     <motion.div
-      className="fixed inset-0 z-30 overflow-hidden pointer-events-none"
+      className="menu-background-overlay fixed inset-0 z-30 overflow-hidden pointer-events-none"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, transition: { duration: 0.3 } }}

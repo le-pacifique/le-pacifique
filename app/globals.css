@@ -935,3 +935,203 @@ html[data-cursor-spinning],
 html[data-cursor-spinning] * {
   cursor: none !important;
 }
+
+.theme-toggle {
+  position: fixed;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid currentColor;
+  border-radius: 4px 8px 5px 7px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #171717;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(10px);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+html[data-theme='dark'] {
+  --site-theme-on-solid: #111;
+  filter: grayscale(1);
+  color-scheme: dark;
+  --site-theme-surface: transparent;
+  --site-theme-text: #ededed;
+  --site-theme-accent: #a5a5a5;
+  --site-page-background: #111 !important;
+  --site-scrollbar-track: #181818 !important;
+  --site-scrollbar-thumb: #b8b8b8;
+  background: #111;
+}
+
+html[data-theme='dark'] body {
+  background: linear-gradient(135deg, #484848 0%, #272727 35%, #151515 65%, #050505 100%);
+  background-attachment: fixed;
+  color: #ededed;
+}
+
+html[data-theme='dark'] .menu-background-overlay,
+html[data-theme='dark'] .loading-screen {
+  background: linear-gradient(135deg, #484848 0%, #272727 35%, #151515 65%, #050505 100%) !important;
+}
+
+html[data-theme='dark'] .text-black,
+html[data-theme='dark'] [class*='text-black/'],
+html[data-theme='dark'] .distort,
+html[data-theme='dark'] .distort-text,
+html[data-theme='dark'] h1,
+html[data-theme='dark'] h2,
+html[data-theme='dark'] h3 {
+  color: #ededed !important;
+}
+
+html[data-theme='dark'] [data-testid='site-logo'] {
+  filter: invert(1);
+}
+
+html[data-theme='dark'] [class*='pointer-events-none'][style*='background-image'],
+html[data-theme='dark'] .menu-background-overlay img,
+html[data-theme='dark'] img[alt='PCFQ Logo'] {
+  filter: grayscale(1) invert(1);
+}
+
+html[data-theme='dark'] .theme-toggle {
+  background: rgba(18, 18, 18, 0.85);
+  border-color: #929292;
+  color: #ededed;
+}
+
+html[data-theme='dark'] [role='tab'] {
+  background-color: #303030 !important;
+  color: #ededed !important;
+}
+
+html[data-theme='dark'] [role='tab'][aria-selected='true'] {
+  background-color: #dedede !important;
+  color: #111 !important;
+}
+
+@media (max-width: 640px) {
+  .theme-toggle {
+    right: 0.75rem;
+    padding: 0.5rem;
+  }
+
+  .theme-toggle span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}
+
+
+html[data-theme='negative'] {
+  --site-theme-on-solid: #fff;
+  /* Filter the whole rendered page, including embedded image backgrounds. */
+  filter: grayscale(1);
+  color-scheme: light;
+  --site-theme-surface: transparent;
+  --site-theme-text: #000;
+  --site-theme-accent: #000;
+  --site-page-background: #fff !important;
+  --site-scrollbar-track: #fff !important;
+  --site-scrollbar-thumb: #000;
+  background: #fff;
+}
+
+html[data-theme='negative'] body,
+html[data-theme='negative'] .loading-screen {
+  background: #fff !important;
+  color: #000;
+}
+
+html[data-theme='negative'] .text-black,
+html[data-theme='negative'] [class*='text-black/'],
+html[data-theme='negative'] .distort,
+html[data-theme='negative'] .distort-text,
+html[data-theme='negative'] h1,
+html[data-theme='negative'] h2,
+html[data-theme='negative'] h3 {
+  color: var(--site-theme-text) !important;
+}
+
+html[data-theme='negative'] .menu-background-overlay {
+  background: #000 !important;
+}
+
+html[data-theme='negative']:has(.menu-background-overlay) {
+  --site-theme-text: #fff;
+  --site-theme-accent: #fff;
+}
+
+html[data-theme='negative'] .menu-background-overlay img,
+html[data-theme='negative']:has(.menu-background-overlay) [data-testid='site-logo'] {
+  filter: grayscale(1) invert(1);
+}
+
+html[data-theme='negative'] .theme-toggle {
+  background: #fff;
+  color: #000;
+  border-color: #000;
+}
+
+html[data-theme='negative'] [role='tab'] {
+  background-color: #fff !important;
+  color: #000 !important;
+  outline: 1px solid #000;
+}
+
+html[data-theme='negative'] [role='tab'][aria-selected='true'] {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+
+html[data-theme='negative'] [class*='pointer-events-none'][style*='background-image'],
+html[data-theme='negative'] img[alt='PCFQ Logo'] {
+  filter: grayscale(1) contrast(3);
+}
+
+html[data-theme='negative'] .menu-background-overlay img {
+  filter: grayscale(1) contrast(3) invert(1);
+}
+
+
+/* Nested section layouts must reveal the shared viewport background. */
+html[data-theme='dark'] .site-section-shell,
+html[data-theme='negative'] .site-section-shell {
+  background: transparent !important;
+  min-height: 100svh;
+}
+
+html[data-theme='dark'] [class*='pointer-events-none'][style*='background-image'] {
+  filter: grayscale(1) contrast(3) invert(1);
+  mix-blend-mode: screen;
+}
+
+html[data-theme='dark'] .menu-background-overlay img {
+  filter: grayscale(1) contrast(3) invert(1);
+  mix-blend-mode: screen;
+}
+
+
+html[data-theme='dark'] .calendar-event-link .distort {
+  color: #111 !important;
+}
+
+html[data-theme='dark'] .distort[class*='bg-white'] {
+  color: #111 !important;
+}

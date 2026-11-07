@@ -193,10 +193,10 @@ export function getSectionTheme(
   const textColor = colorToHex(configured?.textColor) ?? fallback.text
 
   return {
-    backgroundColor,
-    borderColor: backgroundColor,
-    hoverColor: backgroundColor,
-    textColor,
+    backgroundColor: `var(--site-theme-accent, ${backgroundColor})`,
+    borderColor: `var(--site-theme-accent, ${backgroundColor})`,
+    hoverColor: `var(--site-theme-accent, ${backgroundColor})`,
+    textColor: `var(--site-theme-text, ${textColor})`,
     noteDrawing: configured?.noteDrawing,
   }
 }
@@ -244,10 +244,9 @@ export function getResolvedPageTheme({
   const sectionTheme = getSectionTheme(settingsTheme, section)
 
   return {
-    backgroundColor:
-      colorToHex(backgroundColor) ?? sectionTheme.backgroundColor,
+    backgroundColor: `var(--site-theme-surface, ${colorToHex(backgroundColor) ?? sectionTheme.backgroundColor})`,
     noteDrawing: noteDrawing ?? sectionTheme.noteDrawing,
-    textColor: colorToHex(textColor) ?? sectionTheme.textColor,
+    textColor: `var(--site-theme-text, ${colorToHex(textColor) ?? sectionTheme.textColor})`,
   }
 }
 

@@ -128,7 +128,7 @@ export default function Calendar({
                     className="calendar-event-link block px-1.5 py-1 text-[0.6rem] font-medium uppercase leading-none md:text-xs"
                     style={{
                       backgroundColor: calendarTextColor,
-                      color: backgroundColor,
+                      color: `var(--site-theme-on-solid, ${backgroundColor})`,
                     }}
                   >
                     <span className="distort">{event.title}</span>

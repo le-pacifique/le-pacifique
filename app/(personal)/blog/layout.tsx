@@ -3,5 +3,5 @@ export default function BlogLayout({
 }: {
   children: React.ReactNode
 }) {
-  return <div className="min-h-svh w-full bg-[#9D9998]">{children}</div>
+  return <div className="site-section-shell min-h-svh w-full bg-[#9D9998]">{children}</div>
 }

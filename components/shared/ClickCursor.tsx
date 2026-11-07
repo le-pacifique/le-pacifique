@@ -11,19 +11,22 @@ export function ClickCursor() {
 
     let animation: Animation | null = null
     let overLink = false
+    let overScrollbar = false
     const root = document.documentElement
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const interactive =
       'a, button, summary, label, [role="button"], [role="link"], input[type="button"], input[type="submit"], input[type="reset"], .cursor-pointer'
 
     const render = () => {
-      const visible =
-        Boolean(animation || overLink) &&
-        cursor.complete &&
-        cursor.naturalWidth > 0
+      const inverseBackground = root.dataset.theme === 'dark' || (
+        root.dataset.theme === 'negative' && Boolean(document.querySelector('.menu-background-overlay'))
+      )
+      const visible = !overScrollbar &&
+        Boolean(animation || overLink || inverseBackground) &&
+        cursor.complete && cursor.naturalWidth > 0
       cursor.hidden = !visible
       root.toggleAttribute('data-cursor-spinning', visible)
-      cursor.style.filter = overLink ? 'invert(1)' : 'none'
+      cursor.style.filter = overLink || inverseBackground ? 'invert(1)' : 'none'
       cursor.style.mixBlendMode = overLink ? 'difference' : 'normal'
     }
 
@@ -31,17 +34,17 @@ export function ClickCursor() {
       animation?.cancel()
       animation = null
       overLink = false
-      render()
+      cursor.hidden = true
+      root.removeAttribute('data-cursor-spinning')
     }
 
     const move = (event: PointerEvent) => {
       if (event.pointerType !== 'mouse') return
       cursor.style.left = `${event.clientX - 3}px`
       cursor.style.top = `${event.clientY - 3}px`
-      if (
-        event.target instanceof Element &&
-        event.target.closest('[data-section-scrollbar]')
-      ) {
+      overScrollbar = event.target instanceof Element &&
+        Boolean(event.target.closest('[data-section-scrollbar]'))
+      if (overScrollbar) {
         animation?.cancel()
         animation = null
         overLink = false

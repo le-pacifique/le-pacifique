@@ -5,6 +5,7 @@ import localFont from 'next/font/local'
 
 import { ClickCursor } from '@/components/shared/ClickCursor'
 import { DistortFilter } from '@/components/shared/DistortFilter'
+import { ThemeToggle } from '@/components/shared/ThemeToggle'
 
 const mono = localFont({
   variable: '--font-supply-mono',
@@ -51,12 +52,17 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${mono.variable} ${sans.variable} ${serif.variable}`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: "try{const t=localStorage.getItem('le-pacifique-color-mode');if(['dark','negative'].includes(t)){document.documentElement.dataset.theme=t}}catch{}" }} />
+      </head>
       <body className="font-mono min-h-svh">
         {children}
         <DistortFilter />
         <ClickCursor />
+        <ThemeToggle />
       </body>
     </html>
   )

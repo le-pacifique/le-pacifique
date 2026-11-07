@@ -250,11 +250,11 @@ export default function BlogArticleList({
                               </p>
                             ) : null}
                             <Link
-                              className="inline-block px-3 py-1 text-sm uppercase transition-opacity hover:opacity-75"
+                              className="article-read-more inline-block px-3 py-1 text-sm uppercase transition-opacity hover:opacity-75"
                               href={href || '#'}
                               style={{
                                 backgroundColor: textColor,
-                                color: pageBackgroundColor,
+                                color: `var(--site-theme-on-solid, ${pageBackgroundColor})`,
                               }}
                             >
                               Read more
