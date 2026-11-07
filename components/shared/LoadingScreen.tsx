@@ -72,7 +72,7 @@ export function LoadingScreen({ className = '' }: LoadingScreenProps) {
     >
       <svg
         ref={spiralRef}
-        className="loading-screen__spiral"
+        className="loading-screen__spiral distort"
         viewBox="-170 -170 340 340"
         aria-hidden="true"
         focusable="false"
