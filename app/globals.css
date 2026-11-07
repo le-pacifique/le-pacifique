@@ -67,6 +67,7 @@ select,
 .loading-screen {
   align-items: center;
   background: var(--loading-screen-background, #9e9e9e);
+  color: var(--site-theme-text, #000);
   display: flex;
   inset: 0;
   justify-content: center;
@@ -115,7 +116,12 @@ select,
 .loading-screen__spiral {
   animation: loading-spiral 1.15s linear infinite;
   height: auto;
-  width: clamp(72px, 12vw, 134px);
+  width: calc(
+    clamp(72px, 12vw, 134px) +
+      (110vmin - clamp(72px, 12vw, 134px)) * var(--loading-spiral-growth, 0)
+  );
+  max-width: none;
+  flex-shrink: 0;
   will-change: transform;
 }
 
@@ -976,14 +982,13 @@ html[data-theme='dark'] {
 }
 
 html[data-theme='dark'] body {
-  background: linear-gradient(135deg, #484848 0%, #272727 35%, #151515 65%, #050505 100%);
-  background-attachment: fixed;
+  background: var(--site-page-background);
   color: #ededed;
 }
 
 html[data-theme='dark'] .menu-background-overlay,
 html[data-theme='dark'] .loading-screen {
-  background: linear-gradient(135deg, #484848 0%, #272727 35%, #151515 65%, #050505 100%) !important;
+  background: var(--site-page-background) !important;
 }
 
 html[data-theme='dark'] .text-black,
