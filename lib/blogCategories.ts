@@ -3,6 +3,9 @@ import type { ArticlePayload, BlogCategoryPayload } from '@/types'
 export const getBlogCategoryKey = (category: BlogCategoryPayload) =>
   category.slug || category._id
 
+export const getArticleCategoryColor = (article: ArticlePayload) =>
+  article.categories?.find((category) => category.color?.hex)?.color?.hex
+
 export function getBlogCategories(articles: ArticlePayload[]) {
   const categories = new Map<string, BlogCategoryPayload>()
   for (const article of articles) {

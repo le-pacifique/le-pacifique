@@ -6,9 +6,12 @@ import { useRouter } from 'next/navigation'
 import { toPlainText } from 'next-sanity'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { getBlogCategories, getBlogCategoryKey } from '@/lib/blogCategories'
+import {
+  getArticleCategoryColor,
+  getBlogCategories,
+  getBlogCategoryKey,
+} from '@/lib/blogCategories'
 import { deterministicRange } from '@/lib/deterministicRandom'
-import { colorToHex } from '@/lib/theme'
 import { resolveHref } from '@/sanity/lib/utils'
 import type { ArticlePayload } from '@/types'
 
@@ -143,13 +146,8 @@ export default function BlogArticleList({
         {filterOptions.map((category, index) => {
           const active = activeCategory === category.key
           const rotate =
-            deterministicRange(
-              4,
-              8,
-              'blog-category',
-              category.key,
-              'rotate',
-            ) * (index % 2 === 0 ? 1 : -1)
+            deterministicRange(4, 8, 'blog-category', category.key, 'rotate') *
+            (index % 2 === 0 ? 1 : -1)
           const top = deterministicRange(
             -4,
             4,
@@ -229,9 +227,7 @@ export default function BlogArticleList({
                             style={{
                               backgroundColor: `var(--site-theme-on-solid, ${pageBackgroundColor})`,
                               borderColor:
-                                article.color ||
-                                colorToHex(article.backgroundColor) ||
-                                accentColor,
+                                getArticleCategoryColor(article) || accentColor,
                             }}
                           >
                             <Link

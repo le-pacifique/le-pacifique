@@ -10,7 +10,6 @@ import {
 } from '@/lib/theme'
 import type { ArticlePayload, BlogPayload } from '@/types'
 
-import AnimatedArtistTitle from '../artist/AnimatedArtistTitle'
 import BlogArticleList from './BlogArticleList'
 import Calendar from './Calendar'
 
@@ -65,8 +64,6 @@ const BlogPage = ({
     getArticleDate(article),
   )
   const sectionTheme = getSectionTheme(settingsTheme, 'blog')
-  const pageTitle = pageThemeOverride?.title?.trim()
-  const titleColor = pageThemeOverride?.titleColor?.hex || pageTheme.textColor
   const categoryButtonColor =
     pageThemeOverride?.categoryButtonColor?.hex || sectionTheme.backgroundColor
   const categoryButtonContrastColor =
@@ -91,25 +88,6 @@ const BlogPage = ({
         />
       ) : null}
 
-      {pageTitle && (
-        <div className="pointer-events-none absolute inset-0 z-20 mx-auto px-4 lg:px-12 xl:px-24 2xl:px-48">
-          <div className="mx-auto grid h-full max-w-2xl grid-cols-1 gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-            <div
-              className={`min-w-0 ${areArticlesLeft ? 'lg:col-start-1' : 'lg:col-start-2'}`}
-              data-testid="blog-title-column"
-            >
-              <AnimatedArtistTitle
-                blendMode={false}
-                color={titleColor}
-                distort
-                fitToColumn
-                name={pageTitle}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="relative z-10 mx-auto h-full px-4 tracking-tight lg:px-12 xl:px-24 2xl:px-48">
         <div className="mx-auto grid h-full max-w-2xl grid-cols-1 grid-rows-[46svh_minmax(0,1fr)] gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:grid-rows-1">
           <section
@@ -128,7 +106,7 @@ const BlogPage = ({
           </section>
 
           <section
-            className={`min-h-0 pb-8 lg:h-full lg:pb-[6vh] lg:pt-[34vh] ${
+            className={`min-h-0 pb-8 lg:h-full lg:pb-[6vh] lg:pt-[15vh] ${
               areArticlesLeft ? 'order-2 lg:order-1' : 'order-2 lg:order-2'
             }`}
             data-testid="blog-articles-column"
