@@ -3,6 +3,7 @@ import './globals.css'
 import { IBM_Plex_Mono, Inter, PT_Serif } from 'next/font/google'
 import localFont from 'next/font/local'
 
+import { ClickCursor } from '@/components/shared/ClickCursor'
 import { DistortFilter } from '@/components/shared/DistortFilter'
 
 const mono = localFont({
@@ -55,6 +56,7 @@ export default async function RootLayout({
       <body className="font-mono min-h-svh">
         {children}
         <DistortFilter />
+        <ClickCursor />
       </body>
     </html>
   )

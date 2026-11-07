@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --site-cursor: url('/images/cursors/donate-cursor.png') 30 1, auto;
-  --site-pointer-cursor: url('/images/cursors/donate-cursor.png') 30 1, pointer;
+  --site-cursor: url('/images/cursors/arrow-grain.png') 3 3, auto;
+  --site-pointer-cursor: url('/images/cursors/arrow-grain.png') 3 3, pointer;
   --site-page-background: #9e9e9e;
   --site-scrollbar-thumb: #050505;
   --site-scrollbar-track: var(--site-page-background);
@@ -916,4 +916,9 @@ select,
   .image-reveal__skeleton > span {
     animation: none;
   }
+}
+
+html[data-cursor-spinning],
+html[data-cursor-spinning] * {
+  cursor: none !important;
 }

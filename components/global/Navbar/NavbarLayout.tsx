@@ -15,6 +15,8 @@ import type {
   SettingsPayload,
 } from '@/types'
 
+import { MenuStroke } from './MenuStroke'
+
 const ITEMS_WITH_SUBMENU = ['Artists', 'Collections'] as const
 const ITEMS_WITH_BACKGROUND_OVERLAY = [
   'Artists',
@@ -204,10 +206,7 @@ function MenuItemLink({
     >
       {isTop ? (
         <>
-          <div
-            className="h-2 w-full relative"
-            style={{ backgroundColor: borderColor }}
-          />
+          <MenuStroke color={borderColor} />
           <div
             className={`distort uppercase text-lg font-extrabold md:text-2xl transition-opacity duration-300 ${
               // Only show text when:
@@ -270,9 +269,6 @@ function MenuItemLink({
           className={`block uppercase text-lg font-extrabold tracking-tighter md:text-2xl transition-colors duration-300 ${
             !hasSubmenu ? 'hover:text-white' : ''
           }`}
-          style={{
-            borderBottom: `8px solid ${borderColor}`,
-          }}
         >
           {/* Wrap the text in a span with controlled opacity */}
           <span
@@ -288,6 +284,7 @@ function MenuItemLink({
           >
             {menuItem.title}
           </span>
+          <MenuStroke color={borderColor} edge="bottom" />
         </Link>
       )}
     </div>
