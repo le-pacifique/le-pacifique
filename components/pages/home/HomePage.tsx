@@ -86,6 +86,12 @@ export function HomePage({
           style={{ backgroundImage: `url(${pageTheme.noteDrawing.image})` }}
         />
       )}
+      <h1
+        className="absolute inset-x-0 top-24 z-20 px-4 text-center text-[clamp(4rem,12vw,12rem)] font-bold leading-none"
+        style={{ color: pageTheme.textColor }}
+      >
+        Chabad
+      </h1>
       {rotatingLogo?.image && (
         <Image
           className="z-[19] min-w-96 max-w-[100rem] hidden md:flex px-10"
