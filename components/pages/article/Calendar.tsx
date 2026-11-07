@@ -54,83 +54,89 @@ export default function Calendar({
     <div className="relative mb-5 flex items-center justify-between">
       <div className="min-w-0 flex-1 [container-type:inline-size]">
         <h2
-          className="relative whitespace-nowrap py-3 text-[clamp(3rem,21.5cqw,8rem)] font-normal uppercase leading-none tracking-[-0.09em]"
+          className="relative h-[calc(2em+2.25rem)] whitespace-nowrap py-3 text-[clamp(3rem,21.5cqw,8rem)] font-normal uppercase leading-none tracking-[-0.09em] lg:text-[clamp(3rem,min(21.5cqw,7.4vw,12svh),8rem)]"
           style={{ color: calendarTextColor }}
           aria-live="polite"
         >
           <span className="sr-only">{monthLabel}</span>
-          <span aria-hidden="true">
-            {monthLabel.split('').map((letter, index) => {
-              if (letter === ' ')
-                return (
-                  <span key={`${monthLabel}-${index}`} className="block h-3" />
-                )
-              const isYear = index > monthLabel.indexOf(' ')
-              const rotate = deterministicRange(
-                -6,
-                6,
-                monthLabel,
-                index,
-                'rotate',
-              )
-              const y =
-                deterministicRange(-0.12, 0.12, monthLabel, index, 'top') +
-                index * 0.012 -
-                (isYear ? 0.38 : 0.18)
-              return (
-                <motion.span
-                  key={`${monthLabel}-${index}`}
-                  className="distort relative inline-block"
-                  style={
-                    isYear
-                      ? {
-                          marginLeft:
-                            index === monthLabel.indexOf(' ') + 1
-                              ? '2.4em'
-                              : undefined,
-                          letterSpacing: '0.025em',
-                        }
-                      : { left: '-0.25em' }
-                  }
-                  initial={false}
-                  animate={
-                    reducedMotion
-                      ? { rotate, y: `${y}em` }
-                      : {
-                          rotate: [
-                            rotate,
-                            rotate +
-                              deterministicRange(
-                                -2,
-                                2,
-                                monthLabel,
-                                index,
-                                'drift',
-                              ),
-                          ],
-                          y: [
-                            `${y}em`,
-                            `${y + deterministicRange(-0.08, 0.08, monthLabel, index, 'float')}em`,
-                          ],
-                        }
-                  }
-                  transition={{
-                    duration: deterministicRange(
-                      3,
-                      5,
-                      monthLabel,
-                      index,
-                      'duration',
-                    ),
-                    repeat: Infinity,
-                    repeatType: 'reverse',
-                    ease: 'easeInOut',
-                  }}
-                >
-                  {letter === ' ' ? '\u00A0' : letter}
-                </motion.span>
-              )
-            })}
+          <span aria-hidden="true" className="relative inline-block">
+            {monthLabel.split(' ').map((word, wordIndex) => (
+              <span
+                key={`${monthLabel}-${wordIndex}`}
+                className={
+                  wordIndex === 0
+                    ? 'inline-block'
+                    : 'absolute left-[clamp(0.5em,calc(100%-1em),2.4em)] top-[calc(1em+0.75rem)]'
+                }
+              >
+                {word.split('').map((letter, letterIndex) => {
+                  const isYear = wordIndex === 1
+                  const index = isYear
+                    ? monthLabel.indexOf(' ') + 1 + letterIndex
+                    : letterIndex
+                  const rotate = deterministicRange(
+                    -6,
+                    6,
+                    monthLabel,
+                    index,
+                    'rotate',
+                  )
+                  const y =
+                    deterministicRange(-0.12, 0.12, monthLabel, index, 'top') +
+                    index * 0.012 -
+                    (isYear ? 0.38 : 0.18)
+                  return (
+                    <motion.span
+                      key={`${monthLabel}-${index}`}
+                      className="distort relative inline-block"
+                      style={
+                        isYear
+                          ? {
+                              letterSpacing: '0.025em',
+                            }
+                          : { left: '-0.25em' }
+                      }
+                      initial={false}
+                      animate={
+                        reducedMotion
+                          ? { rotate, y: `${y}em` }
+                          : {
+                              rotate: [
+                                rotate,
+                                rotate +
+                                  deterministicRange(
+                                    -2,
+                                    2,
+                                    monthLabel,
+                                    index,
+                                    'drift',
+                                  ),
+                              ],
+                              y: [
+                                `${y}em`,
+                                `${y + deterministicRange(-0.08, 0.08, monthLabel, index, 'float')}em`,
+                              ],
+                            }
+                      }
+                      transition={{
+                        duration: deterministicRange(
+                          3,
+                          5,
+                          monthLabel,
+                          index,
+                          'duration',
+                        ),
+                        repeat: Infinity,
+                        repeatType: 'reverse',
+                        ease: 'easeInOut',
+                      }}
+                    >
+                      {letter === ' ' ? '\u00A0' : letter}
+                    </motion.span>
+                  )
+                })}
+              </span>
+            ))}
           </span>
         </h2>
       </div>
@@ -158,9 +164,8 @@ export default function Calendar({
   // Calendar grid cells
   const renderCells = () => {
     const monthStart = startOfMonth(currentMonth)
-    const monthEnd = endOfMonth(monthStart)
     const startDate = startOfWeek(monthStart, { weekStartsOn: 1 })
-    const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 })
+    const endDate = endOfWeek(endOfMonth(monthStart), { weekStartsOn: 1 })
 
     let day = startDate
     const rows: React.ReactNode[] = []
@@ -172,7 +177,7 @@ export default function Calendar({
         const cell = (
           <div
             key={day.toString()}
-            className="calendar-grid-cell-distorted relative flex min-h-10 flex-col overflow-visible p-1 sm:min-h-12 md:min-h-20 md:p-1.5"
+            className="calendar-grid-cell-distorted relative flex h-10 min-h-0 flex-col overflow-visible p-1 sm:h-12 md:h-20 md:p-1.5 lg:h-[min(5rem,8svh)]"
           >
             <span
               className="distort mb-1 text-xs md:text-sm"

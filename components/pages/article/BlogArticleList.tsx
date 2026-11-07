@@ -20,8 +20,6 @@ interface BlogArticleListProps {
   accentColor: string
   articles: ArticlePayload[]
   contrastColor: string
-  pageBackgroundColor: string
-  textColor: string
 }
 
 const getArticlePreview = (article: ArticlePayload) => {
@@ -36,8 +34,6 @@ export default function BlogArticleList({
   accentColor,
   articles,
   contrastColor,
-  pageBackgroundColor,
-  textColor,
 }: BlogArticleListProps) {
   const router = useRouter()
   const categories = useMemo(() => getBlogCategories(articles), [articles])
@@ -204,10 +200,7 @@ export default function BlogArticleList({
                 .sort((a, b) => b.localeCompare(a))
                 .map((date) => (
                   <div key={date}>
-                    <h2
-                      className="mb-3 border-b pb-2 text-sm font-semibold md:text-xl"
-                      style={{ borderColor: textColor }}
-                    >
+                    <h2 className="mb-3 pb-2 text-sm font-semibold md:text-xl">
                       {date === 'undated'
                         ? 'Undated'
                         : format(new Date(`${date}T12:00:00`), 'EEEE, MMM d')}
@@ -222,18 +215,16 @@ export default function BlogArticleList({
 
                         return (
                           <li
-                            className="group border-l-4 p-4"
+                            className="blog-article-card group p-4"
                             key={article._id}
                             style={{
-                              backgroundColor: `var(--site-theme-on-solid, ${pageBackgroundColor})`,
-                              borderColor:
+                              backgroundColor: '#ffffcb',
+                              color: '#000000',
+                              ['--blog-card-accent' as string]:
                                 getArticleCategoryColor(article) || accentColor,
                             }}
                           >
-                            <Link
-                              className="block transition-opacity hover:opacity-65"
-                              href={href || '#'}
-                            >
+                            <Link className="block" href={href || '#'}>
                               <h3 className="mb-1 text-lg font-bold group-hover:underline md:text-2xl">
                                 {article.title}
                               </h3>
@@ -254,8 +245,8 @@ export default function BlogArticleList({
                               className="article-read-more inline-block px-3 py-1 text-sm uppercase transition-opacity hover:opacity-75"
                               href={href || '#'}
                               style={{
-                                backgroundColor: textColor,
-                                color: `var(--site-theme-on-solid, ${pageBackgroundColor})`,
+                                backgroundColor: '#000000',
+                                color: '#ffffcb',
                               }}
                             >
                               Read more

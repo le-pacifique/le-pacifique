@@ -91,7 +91,7 @@ const BlogPage = ({
       <div className="relative z-10 mx-auto h-full px-4 tracking-tight lg:px-12 xl:px-24 2xl:px-48">
         <div className="mx-auto grid h-full max-w-2xl grid-cols-1 grid-rows-[46svh_minmax(0,1fr)] gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:grid-rows-1">
           <section
-            className={`flex min-h-0 items-center justify-center pt-[15svh] lg:h-full lg:pt-0 ${
+            className={`flex min-h-0 items-center justify-center pt-[15svh] lg:h-full lg:items-start lg:pt-[13svh] ${
               areArticlesLeft ? 'order-1 lg:order-2' : 'order-1 lg:order-1'
             }`}
           >
@@ -117,8 +117,6 @@ const BlogPage = ({
               accentColor={categoryButtonColor}
               articles={sortedArticles}
               contrastColor={categoryButtonContrastColor}
-              pageBackgroundColor={pageTheme.backgroundColor}
-              textColor={pageTheme.textColor}
             />
           </section>
         </div>
