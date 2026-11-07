@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { toPlainText } from 'next-sanity'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { MenuStroke } from '@/components/global/Navbar/MenuStroke'
 import {
   getArticleCategoryColor,
   getBlogCategories,
@@ -215,15 +216,21 @@ export default function BlogArticleList({
 
                         return (
                           <li
-                            className="blog-article-card group p-4"
+                            className="blog-article-card group relative border-l-4 p-4"
                             key={article._id}
                             style={{
                               backgroundColor: '#ffffcb',
                               color: '#000000',
-                              ['--blog-card-accent' as string]:
-                                getArticleCategoryColor(article) || accentColor,
+                              borderColor: 'transparent',
+                              backgroundClip: 'padding-box',
                             }}
                           >
+                            <MenuStroke
+                              edge="left"
+                              color={
+                                getArticleCategoryColor(article) || accentColor
+                              }
+                            />
                             <Link className="block" href={href || '#'}>
                               <h3 className="mb-1 text-lg font-bold group-hover:underline md:text-2xl">
                                 {article.title}

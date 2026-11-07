@@ -5,23 +5,42 @@ export function MenuStroke({
   edge = 'top',
 }: {
   color: string
-  edge?: 'top' | 'bottom'
+  edge?: 'top' | 'bottom' | 'left'
 }) {
   const filterId = `menu-stroke-${useId().replace(/:/g, '')}`
+  const vertical = edge === 'left'
 
   return (
-    <span aria-hidden="true" className="pointer-events-none relative block h-4 w-full">
+    <span
+      aria-hidden="true"
+      className={
+        vertical
+          ? 'pointer-events-none absolute inset-y-0 -left-1 block w-1'
+          : 'pointer-events-none relative block h-4 w-full'
+      }
+    >
       <svg
-        className={`absolute inset-x-0 h-6 w-full overflow-visible ${edge === 'top' ? 'top-0' : 'bottom-0'}`}
-        viewBox="0 0 200 24"
+        className={
+          vertical
+            ? 'absolute inset-0 h-full w-full overflow-visible'
+            : `absolute inset-x-0 h-6 w-full overflow-visible ${edge === 'top' ? 'top-0' : 'bottom-0'}`
+        }
+        viewBox={vertical ? '0 0 6 200' : '0 0 200 24'}
         preserveAspectRatio="none"
         focusable="false"
       >
         <defs>
-          <filter id={filterId} filterUnits="userSpaceOnUse" x="-20" y="-50" width="240" height="124">
+          <filter
+            id={filterId}
+            filterUnits="userSpaceOnUse"
+            x={vertical ? '-50' : '-20'}
+            y={vertical ? '-20' : '-50'}
+            width={vertical ? '106' : '240'}
+            height={vertical ? '240' : '124'}
+          >
             <feTurbulence
               type="fractalNoise"
-              baseFrequency="0.08 0.6"
+              baseFrequency={vertical ? '0.6 0.08' : '0.08 0.6'}
               numOctaves="2"
               seed="11"
               result="edgeNoise"
@@ -48,11 +67,21 @@ export function MenuStroke({
           </filter>
         </defs>
         <path
-          d="M -5,6 C 15,4 23,7 37,5 S 61,7 77,5 S 103,4 119,6 S 145,4 161,5 S 185,7 205,5"
-          transform={edge === 'top' ? 'translate(0 -6)' : 'translate(0 18)'}
+          d={
+            vertical
+              ? 'M 3,-5 C 1,15 4,23 2,37 S 4,61 2,77 S 1,103 3,119 S 1,145 2,161 S 4,185 2,205'
+              : 'M -5,6 C 15,4 23,7 37,5 S 61,7 77,5 S 103,4 119,6 S 145,4 161,5 S 185,7 205,5'
+          }
+          transform={
+            vertical
+              ? undefined
+              : edge === 'top'
+                ? 'translate(0 -6)'
+                : 'translate(0 18)'
+          }
           fill="none"
           stroke={color}
-          strokeWidth="29"
+          strokeWidth={vertical ? '4' : '29'}
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"

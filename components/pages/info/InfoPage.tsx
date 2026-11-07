@@ -36,7 +36,7 @@ const InfoPage = ({ info, menuImage, settingsTheme }: InfoPageProps) => {
   const drawing = pageTheme.noteDrawing ?? menuImage
   const socialButtonColor = getSectionTheme(
     settingsTheme,
-    'artists',
+    'info',
   ).backgroundColor
 
   return (
@@ -88,6 +88,7 @@ const InfoPage = ({ info, menuImage, settingsTheme }: InfoPageProps) => {
             <SectionTabs
               seed={info._id}
               label="Info sections"
+              tabLayout="wide"
               accentColor={socialButtonColor}
               contrastColor="#000000"
               sections={[
