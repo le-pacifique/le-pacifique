@@ -37,14 +37,15 @@ export function TimelineItem({
         {/* Title */}
         <div className="font-bold text-black">{title}</div>
         {/* Tags */}
-        <div className="text-sm text-gray-600 ">
+        <div className="text-sm">
           {tags?.map((tag, key) => (
-            <span key={key}>
+            <span className="site-tag mb-1 mr-1" key={key}>
               {tag}
-              <span className="mx-1">●</span>
             </span>
           ))}
-          {startYear} - {endYear}
+          <span className="text-gray-600">
+            {startYear} - {endYear}
+          </span>
         </div>
         {/* Description */}
         <div className="pb-5 pt-3 font-serif text-gray-600">{description}</div>

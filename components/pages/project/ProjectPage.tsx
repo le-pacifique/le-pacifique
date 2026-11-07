@@ -5,10 +5,7 @@ import { CustomPortableText } from '@/components/shared/CustomPortableText'
 import { Header } from '@/components/shared/Header'
 import ImageBox from '@/components/shared/ImageBox'
 import { PageScrollbarTheme } from '@/components/shared/PageScrollbarTheme'
-import {
-  getResolvedPageTheme,
-  type SettingsTheme,
-} from '@/lib/theme'
+import { getResolvedPageTheme, type SettingsTheme } from '@/lib/theme'
 import type { ProjectPayload } from '@/types'
 
 export interface ProjectPageProps {
@@ -117,9 +114,9 @@ export function ProjectPage({
             {/* Tags */}
             <div className="p-3 lg:p-4">
               <div className="text-xs md:text-sm">Tags</div>
-              <div className="text-md flex flex-row flex-wrap md:text-lg">
+              <div className="text-md flex flex-row flex-wrap gap-1 md:text-lg">
                 {tags?.map((tag, key) => (
-                  <div key={key} className="mr-1 break-words ">
+                  <div key={key} className="site-tag break-words">
                     #{tag}
                   </div>
                 ))}
